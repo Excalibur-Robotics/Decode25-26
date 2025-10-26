@@ -5,10 +5,9 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.DECODE.In_take;
-import org.firstinspires.ftc.teamcode.DECODE.MovingFWBW;
-import org.firstinspires.ftc.teamcode.DECODE.Out_take;
-import org.firstinspires.ftc.teamcode.DECODE.turning;
+import org.firstinspires.ftc.teamcode.DECODE.*;
+
+
 
 @TeleOp (name= "DECODE1")
 public class TeleOP1 extends CommandOpMode {

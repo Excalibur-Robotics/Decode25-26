@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.DECODE;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.EvanTeleOp.Drivetrain;
 
+@Autonomous
 public class BasicAuto extends LinearOpMode {
     public Drivetrain drivetrain = new Drivetrain();
     public In_take intake;

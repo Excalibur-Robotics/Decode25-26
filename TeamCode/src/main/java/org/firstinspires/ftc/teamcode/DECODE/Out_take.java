@@ -13,11 +13,11 @@ public class Out_take extends SubsystemBase {
         out_take2 = hardware.get(DcMotor.class,"outtakeL");
 
         out_take.setDirection(DcMotor.Direction.REVERSE);
-        out_take2.setDirection(DcMotor.Direction.REVERSE);
+        out_take2.setDirection(DcMotor.Direction.FORWARD);
     }
     public void basicMovement (double power){
 
-        out_take.setPower(-power);
+        out_take.setPower(power);
         out_take2.setPower(power);
     }
 }

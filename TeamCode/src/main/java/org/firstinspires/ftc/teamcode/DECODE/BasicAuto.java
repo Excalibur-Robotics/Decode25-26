@@ -32,7 +32,7 @@ public class BasicAuto extends LinearOpMode {
         }
         timer.reset();
         while(timer.seconds() < 3) {
-            intake.movement(0.25);
+            intake.movement(-0.25);
         }
         intake.movement(0);
         outtake.basicMovement(0);

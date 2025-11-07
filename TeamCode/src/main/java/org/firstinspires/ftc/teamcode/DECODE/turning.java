@@ -11,10 +11,10 @@ public class turning extends SubsystemBase {
     DcMotor bottomLeft;
 
     public turning (HardwareMap hardware){
-        topRight = hardware.get(DcMotor.class,"topRight");
-        topLeft = hardware.get(DcMotor.class,"topLeft");
-        bottomRight = hardware.get(DcMotor.class,"bottomRight");
-        bottomLeft = hardware.get(DcMotor.class,"bottomLeft");
+        topRight = hardware.get(DcMotor.class,"frontRight");
+        topLeft = hardware.get(DcMotor.class,"frontLeft");
+        bottomRight = hardware.get(DcMotor.class,"backRight");
+        bottomLeft = hardware.get(DcMotor.class,"backLeft");
 
         topLeft.setDirection(DcMotor.Direction.REVERSE);
         topRight.setDirection(DcMotor.Direction.REVERSE);

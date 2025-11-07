@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.EvanTeleOp.Drivetrain;
-
 @Autonomous
 public class BasicAuto extends LinearOpMode {
     public DrivetrainSubsystem drivetrain;

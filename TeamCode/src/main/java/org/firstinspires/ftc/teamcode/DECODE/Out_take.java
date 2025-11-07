@@ -17,7 +17,7 @@ public class Out_take extends SubsystemBase {
     }
     public void basicMovement (double power){
 
-        out_take.setPower(power);
-        out_take2.setPower(-power);
+        out_take.setPower(-power);
+        out_take2.setPower(power);
     }
 }

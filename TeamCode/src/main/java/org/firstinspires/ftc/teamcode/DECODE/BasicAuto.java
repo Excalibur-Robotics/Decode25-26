@@ -8,14 +8,14 @@ import org.firstinspires.ftc.teamcode.EvanTeleOp.Drivetrain;
 
 @Autonomous
 public class BasicAuto extends LinearOpMode {
-    public Drivetrain drivetrain = new Drivetrain();
+    public DrivetrainSubsystem drivetrain;
     public In_take intake;
     public Out_take outtake;
     ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drivetrain.init(hardwareMap);
+        drivetrain = new DrivetrainSubsystem(hardwareMap);
         intake = new In_take(hardwareMap);
         outtake = new Out_take(hardwareMap);
 
@@ -33,10 +33,8 @@ public class BasicAuto extends LinearOpMode {
         timer.reset();
         while(timer.seconds() < 3) {
             intake.movement(0.25);
-            outtake.setMidtake(0.25);
         }
         intake.movement(0);
-        outtake.setMidtake(0);
         outtake.basicMovement(0);
         timer.reset();
         while(timer.seconds() < 1.5) {

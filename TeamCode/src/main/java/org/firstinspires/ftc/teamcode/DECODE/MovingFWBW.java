@@ -11,10 +11,10 @@ public class MovingFWBW extends SubsystemBase {
     DcMotor bottomLeft;
 
     public MovingFWBW(HardwareMap hardware){
-        topRight = hardware.get(DcMotor.class, "topRight");
-        topLeft = hardware.get(DcMotor.class,"topLeft");
-        bottomLeft = hardware.get(DcMotor.class,"bottomLeft");
-        bottomRight = hardware.get(DcMotor.class,"bottomRight");
+        topRight = hardware.get(DcMotor.class, "frontRight");
+        topLeft = hardware.get(DcMotor.class,"frontLeft");
+        bottomLeft = hardware.get(DcMotor.class,"backLeft");
+        bottomRight = hardware.get(DcMotor.class,"backRight");
 
         topRight.setDirection(DcMotor.Direction.FORWARD);
         topLeft.setDirection(DcMotor.Direction.FORWARD);

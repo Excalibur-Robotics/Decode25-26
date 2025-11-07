@@ -47,10 +47,10 @@ public class TeleOP1 extends CommandOpMode {
             intake.movement(0);
         }
 
-        driving.movement(gamepad1.left_stick_y);
+        driving.movement(-gamepad1.left_stick_y);
 
-        turn.rturn(gamepad1.right_stick_y);
-        turn.lturn(-gamepad1.right_stick_y);
+        turn.rturn(-gamepad1.right_stick_y);
+        turn.lturn(gamepad1.right_stick_y);
 
     }
 }

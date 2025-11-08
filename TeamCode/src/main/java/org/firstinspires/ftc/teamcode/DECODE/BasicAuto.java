@@ -26,7 +26,11 @@ public class BasicAuto extends LinearOpMode {
         timer.reset();
         while(timer.seconds() < 3) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             intake.movement(-0.5);
+=======
+            intake.movement(-0.25);
+>>>>>>> Stashed changes
 =======
             intake.movement(-0.25);
 >>>>>>> Stashed changes

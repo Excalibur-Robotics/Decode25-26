@@ -13,7 +13,7 @@ public class BasicAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drivetrain = new DrivetrainSubsystem(hardwareMap);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
         intake = new In_take(hardwareMap);
         outtake = new Out_take(hardwareMap);
 
@@ -25,7 +25,7 @@ public class BasicAuto extends LinearOpMode {
         }
         timer.reset();
         while(timer.seconds() < 3) {
-            intake.movement(-0.1);
+            intake.movement(-0.5);
         }
         intake.movement(0);
         outtake.basicMovement(0);
@@ -35,7 +35,7 @@ public class BasicAuto extends LinearOpMode {
             drivetrain.moveRobot(0, -0.5, 0);
         }
         drivetrain.moveRobot(0,0,0);
-        
+
         timer.reset();
         while(timer.seconds() < 1.5) {
             drivetrain.moveRobot(0.5, 0, 0);

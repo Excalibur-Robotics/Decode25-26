@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.DECODE;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -9,8 +10,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+    private Gamepad gamepad;
 
-    public DrivetrainSubsystem(HardwareMap hwMap) {
+    public DrivetrainSubsystem(HardwareMap hwMap, Gamepad gamepad1) {
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         backLeft = hwMap.get(DcMotor.class, "backLeft");
@@ -18,6 +20,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        gamepad = gamepad1;
     }
 
     public void powerMotors(double fl, double fr, double bl, double br) {
@@ -45,5 +49,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         // set power of each motor
         powerMotors(topLeftPower, topRightPower, bottomLeftPower, bottomRightPower);
+    }
+
+    @Override
+    public void periodic() {
+        double x = gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        double yaw = gamepad.right_stick_x;
+
+        moveRobot(x, y, yaw);
     }
 }

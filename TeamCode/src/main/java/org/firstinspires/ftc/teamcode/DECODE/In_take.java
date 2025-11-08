@@ -17,7 +17,7 @@ public class In_take extends SubsystemBase {
     }
 
     public void movement (double power){
-        intake1.setPower(-power);
-        intake2.setPower(-power);
+        intake1.setPower(power);
+        intake2.setPower(power);
     }
 }

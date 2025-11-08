@@ -20,6 +20,8 @@ public class TeleOP1 extends CommandOpMode {
     @Override
     public void initialize(){
         CommandScheduler.getInstance().reset();
+
+        // initialize hardware
         gp1 = new GamepadEx(gamepad1);
         outTake = new Out_take(hardwareMap);
         intake = new In_take(hardwareMap);
@@ -27,7 +29,10 @@ public class TeleOP1 extends CommandOpMode {
     }
 
     public void run(){
+        // scheduler runs periodic drivetrain method for driving
         CommandScheduler.getInstance().run();
+
+        // turn on outtake when right trigger is pressed
         if (gamepad1.right_trigger > 0.5){
             outTake.basicMovement(1);
         }
@@ -35,14 +40,17 @@ public class TeleOP1 extends CommandOpMode {
             outTake.basicMovement(0);
         }
 
+        // turn on intake when left trigger is pressed
         if (gamepad1.left_trigger > 0.5){
-            intake.movement(-1);
+            intake.movement(1);
         }
         else {
             intake.movement(0);
         }
+
+        // reverse intake when left bumper is pressed
         if(gamepad1.left_bumper) {
-            intake.movement(1);
+            intake.movement(-1);
         }
         else {
             intake.movement(0);

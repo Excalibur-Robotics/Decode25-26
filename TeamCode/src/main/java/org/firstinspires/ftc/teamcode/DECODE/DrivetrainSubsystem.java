@@ -13,17 +13,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private Gamepad gamepad;
 
     public DrivetrainSubsystem(HardwareMap hwMap, Gamepad gamepad1) {
+        // initialize motors
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         backLeft = hwMap.get(DcMotor.class, "backLeft");
         backRight = hwMap.get(DcMotor.class, "backRight");
 
+        // reverse left motors
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
+        // initialize gamepad
         gamepad = gamepad1;
     }
 
+    // power motors
     public void powerMotors(double fl, double fr, double bl, double br) {
         frontLeft.setPower(fl);
         frontRight.setPower(fr);
@@ -31,6 +35,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         backRight.setPower(br);
     }
 
+    // calculate powers of motors for mecanum drive
     public void moveRobot(double x, double y, double yaw) {
         // deadzone
         if(Math.abs(x) < 0.05)
@@ -51,6 +56,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         powerMotors(topLeftPower, topRightPower, bottomLeftPower, bottomRightPower);
     }
 
+    // periodic method runs each time scheduler is run in the opmode
+    // takes gamepad joysticks to feed to moveRobot()
     @Override
     public void periodic() {
         double x = gamepad.left_stick_x;

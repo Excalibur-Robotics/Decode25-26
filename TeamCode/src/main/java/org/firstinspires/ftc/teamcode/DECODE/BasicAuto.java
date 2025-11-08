@@ -28,7 +28,11 @@ public class BasicAuto extends LinearOpMode {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             intake.movement(-0.5);
+=======
+            intake.movement(-0.25);
+>>>>>>> Stashed changes
 =======
             intake.movement(-0.25);
 >>>>>>> Stashed changes

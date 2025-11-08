@@ -16,23 +16,23 @@ public class turning extends SubsystemBase {
         bottomRight = hardware.get(DcMotor.class,"backRight");
         bottomLeft = hardware.get(DcMotor.class,"backLeft");
 
-        topLeft.setDirection(DcMotor.Direction.REVERSE);
-        topRight.setDirection(DcMotor.Direction.REVERSE);
+        topLeft.setDirection(DcMotor.Direction.FORWARD);
+        topRight.setDirection(DcMotor.Direction.FORWARD);
         bottomRight.setDirection(DcMotor.Direction.FORWARD);
         bottomLeft.setDirection(DcMotor.Direction.FORWARD);
     }
 
     public void rturn (double power){
-        topRight.setPower(-power);
-        bottomRight.setPower(power);
+        topRight.setPower(power);
+        topLeft.setPower(power);
         bottomLeft.setPower(power);
-        bottomRight.setPower(-power);
+        bottomRight.setPower(power);
     }
 
     public void lturn (double power){
-        topLeft.setPower(power);
+        topLeft.setPower(-power);
         bottomLeft.setPower(-power);
-        bottomLeft.setPower(-power);
-        bottomRight.setPower(power);
+        topRight.setPower(-power);
+        bottomRight.setPower(-power);
     }
 }

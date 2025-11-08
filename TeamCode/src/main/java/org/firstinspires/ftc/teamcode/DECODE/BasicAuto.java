@@ -20,20 +20,22 @@ public class BasicAuto extends LinearOpMode {
         waitForStart();
 
         timer.reset();
-        while(timer.seconds() < 1.5) {
-            drivetrain.moveRobot(0, -0.5, 0);
-        }
-        drivetrain.moveRobot(0,0,0);
-        timer.reset();
         while(timer.seconds() < 0.5) {
             outtake.basicMovement(1);
         }
         timer.reset();
         while(timer.seconds() < 3) {
-            intake.movement(-0.25);
+            intake.movement(-0.1);
         }
         intake.movement(0);
         outtake.basicMovement(0);
+
+        timer.reset();
+        while(timer.seconds() < 1) {
+            drivetrain.moveRobot(0, -0.5, 0);
+        }
+        drivetrain.moveRobot(0,0,0);
+        
         timer.reset();
         while(timer.seconds() < 1.5) {
             drivetrain.moveRobot(0.5, 0, 0);

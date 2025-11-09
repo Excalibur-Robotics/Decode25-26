@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.DECODE;
 
+import com.arcrobotics.ftclib.controller.PDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.RobotAutoDriveToAprilTagOmni;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
@@ -13,11 +15,18 @@ import java.util.List;
 @TeleOp(name="LimelightTest")
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
+    DrivetrainSubsystem drivetrain;
+    PDController apriltagX;
+    double kP = 0.01; // need to tune
+    double kD = 0.01; // need to tune
 
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        apriltagX = new PDController(kP, kD);
+        apriltagX.setSetPoint(0);
     }
 
     @Override
@@ -27,6 +36,7 @@ public class LimelightTest extends OpMode {
 
     @Override
     public void loop() {
+        // get result from limelight
         LLResult result = limelight.getLatestResult();
         int id = 0;
         double tx = 0;
@@ -48,24 +58,31 @@ public class LimelightTest extends OpMode {
             poseString = botPose.toString();
         }
 
+        // drive robot, automatically faces apriltag
+        double x = gamepad1.left_stick_x;
+        double y = -gamepad1.left_stick_y;
+        double yaw = -apriltagX.calculate(tx);
+        drivetrain.moveRobot(x, y, yaw);
+
+        // Telemetry
         // check if an AprilTag is in view
         if(id == 0) {
             telemetry.addData("AprilTag ID", "No AprilTag in view");
-            telemetry.addData("Motif", "");
+            telemetry.addData("Motif/Goal", "");
         }
         // display motif/goal of the AprilTag
         else {
             telemetry.addData("AprilTag ID", id);
             if (id == 21)
-                telemetry.addData("Motif", "green, purple, purple");
+                telemetry.addData("Motif/Goal", "green, purple, purple");
             else if (id == 22)
-                telemetry.addData("Motif", "purple, green, purple");
+                telemetry.addData("Motif/Goal", "purple, green, purple");
             else if (id == 23)
-                telemetry.addData("Motif", "purple, purple, green");
+                telemetry.addData("Motif/Goal", "purple, purple, green");
             else if (id == 20)
-                telemetry.addData("Motif", "Blue Goal");
+                telemetry.addData("Motif/Goal", "Blue Goal");
             else if (id == 24)
-                telemetry.addData("Motif", "Red Goal");
+                telemetry.addData("Motif/Goal", "Red Goal");
         }
         // display target position and bot pose
         telemetry.addLine();

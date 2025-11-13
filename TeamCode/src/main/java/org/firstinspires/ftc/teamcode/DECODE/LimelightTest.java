@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.DECODE;
 
 import com.arcrobotics.ftclib.controller.PDController;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -12,13 +13,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
+@Configurable
 @TeleOp(name="LimelightTest")
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
     DrivetrainSubsystem drivetrain;
     PDController apriltagX;
-    double kP = 0.01; // need to tune
-    double kD = 0.01; // need to tune
+    public static double kP = 0.05; // need to tune
+    public static double kD = 0.0; // need to tune
 
     @Override
     public void init() {
@@ -61,7 +63,14 @@ public class LimelightTest extends OpMode {
         // drive robot, automatically faces apriltag
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y;
-        double yaw = -apriltagX.calculate(tx);
+        double yaw = 0;
+        if(gamepad1.right_stick_x > 0.05) {
+            yaw = gamepad1.right_stick_x;
+        }
+        else {
+            yaw = -apriltagX.calculate(tx);
+        }
+
         drivetrain.moveRobot(x, y, yaw);
 
         // Telemetry
@@ -87,8 +96,8 @@ public class LimelightTest extends OpMode {
         // display target position and bot pose
         telemetry.addLine();
         telemetry.addData("tx", tx);
-        telemetry.addData("tx", ty);
-        telemetry.addData("tx", ta);
+        telemetry.addData("ty", ty);
+        telemetry.addData("ta", ta);
         telemetry.addData("Pose", poseString);
     }
 }

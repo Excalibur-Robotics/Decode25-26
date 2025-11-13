@@ -34,8 +34,8 @@ public class Constants {
             .yVelocity(5); // use LateralVelocityTuner to tune
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5) // y offset - need to measure
-            .strafePodX(-5) // x offset - need to measure
+            .forwardPodY(-135/25.4) // y offset in inches - need to measure
+            .strafePodX(-150/25.4) // x offset in inches - need to measure
             .distanceUnit(DistanceUnit.INCH) // units
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

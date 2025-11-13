@@ -92,6 +92,11 @@ public class LimelightTest extends OpMode {
                 telemetry.addData("Motif/Goal", "Blue Goal");
             else if (id == 24)
                 telemetry.addData("Motif/Goal", "Red Goal");
+            /*
+            Each Id has its own ID. It is critical for limelight to understand what
+            its seeing so that is able to interpret what the color code is for the
+            current robot.
+             */
         }
         // display target position and bot pose
         telemetry.addLine();
@@ -100,4 +105,8 @@ public class LimelightTest extends OpMode {
         telemetry.addData("ta", ta);
         telemetry.addData("Pose", poseString);
     }
+    /*
+    This adds all the data to the driver hub so
+    that the driver knows what they are seeing
+     */
 }

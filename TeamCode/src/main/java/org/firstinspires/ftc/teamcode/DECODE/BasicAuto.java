@@ -20,6 +20,12 @@ public class BasicAuto extends LinearOpMode {
 
         waitForStart();
 
+        timer.reset();
+        while(timer.seconds() < 0.5) {
+            drivetrain.moveRobot(0, -0.5, 0);
+        }
+        drivetrain.moveRobot(0,0,0);
+
         // turn on outtake and spin up for 0.5 seconds
         timer.reset();
         while(timer.seconds() < 0.5) {

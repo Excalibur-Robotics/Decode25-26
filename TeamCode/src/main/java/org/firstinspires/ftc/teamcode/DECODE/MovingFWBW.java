@@ -30,3 +30,14 @@ public class MovingFWBW extends SubsystemBase {
         bottomLeft.setPower(-power);
     }
 }
+
+/*
+The code in this subsystem
+sets the motor direction and power
+to allow it to move
+forward and backward
+
+Line 8-12 - Defines the motors
+Lines 14-23 - Motors names are set and direction of motors are set
+Lines 26-30 - Sets motor powers
+ */

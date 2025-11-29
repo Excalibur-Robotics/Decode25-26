@@ -5,15 +5,14 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
-public class CloseAuto {
+public class FarAuto {
     // declare poses
     public Pose startPose;
-    public Pose shootPose;
     public Pose beforePickup;
     public Pose afterPickup;
+    public Pose shootPose;
 
     // declare paths
-    public PathChain goToFirstShoot;
     public PathChain goToPickup;
     public PathChain intakeBalls;
     public PathChain goToSecondShoot;
@@ -22,29 +21,25 @@ public class CloseAuto {
     private int pathState;
 
     // constructor initializes poses and paths
-    public CloseAuto(Follower follower, boolean redTeam) {
+    public FarAuto(Follower follower, boolean redTeam) {
         // sets poses based on if we are red or blue
         if(redTeam) {
-            startPose = new Pose(122.0, 125.0, Math.toRadians(36));
-            shootPose = new Pose(100.0, 107.0, Math.toRadians(44));
-            beforePickup = new Pose(100.0, 84.0, 0);
-            afterPickup = new Pose(126.0, 84.0, 0);
+            startPose = new Pose(87, 9, Math.PI/2);
+            beforePickup = new Pose(100, 36, 0);
+            afterPickup = new Pose(126, 36, 0);
+            shootPose = new Pose(87, 12, 0);
         }
         else {
-            startPose = new Pose(22.0, 125.0, Math.toRadians(144));
-            shootPose = new Pose(44.0, 107.0, Math.toRadians(136));
-            beforePickup = new Pose(44.0, 84.0, Math.PI);
-            afterPickup = new Pose(18.0, 84.0, Math.PI);
+            startPose = new Pose(57, 9, Math.PI/2);
+            beforePickup = new Pose(44, 36, Math.PI);
+            afterPickup = new Pose(18, 36, Math.PI);
+            shootPose = new Pose(57, 12, Math.PI);
         }
 
         // set paths between the poses, same for both colors
-        goToFirstShoot = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shootPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
-                .build();
         goToPickup = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, beforePickup))
-                .setLinearHeadingInterpolation(shootPose.getHeading(), beforePickup.getHeading())
+                .addPath(new BezierLine(startPose, beforePickup))
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforePickup.getHeading())
                 .build();
         intakeBalls = follower.pathBuilder()
                 .addPath(new BezierLine(beforePickup, afterPickup))
@@ -77,22 +72,18 @@ public class CloseAuto {
     public void autoPathUpdate(Follower follower) {
         switch (pathState) {
             case 0:
-                follower.followPath(goToFirstShoot);
-                setPathState(1);
+                if(!follower.isBusy()) {
+                    follower.followPath(goToPickup);
+                    setPathState(1);
+                }
                 break;
             case 1:
                 if(!follower.isBusy()) {
-                    follower.followPath(goToPickup);
+                    follower.followPath(intakeBalls);
                     setPathState(2);
                 }
                 break;
             case 2:
-                if(!follower.isBusy()) {
-                    follower.followPath(intakeBalls);
-                    setPathState(3);
-                }
-                break;
-            case 3:
                 if(!follower.isBusy()) {
                     follower.followPath(goToSecondShoot);
                     setPathState(-1);

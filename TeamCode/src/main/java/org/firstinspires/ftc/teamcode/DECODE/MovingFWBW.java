@@ -32,7 +32,7 @@ public class MovingFWBW extends SubsystemBase {
 }
 
 /*
-Code is self explanatory. The code in this subsystem
+The code in this subsystem
 sets the motor direction and power
 to allow it to move
 forward and backward

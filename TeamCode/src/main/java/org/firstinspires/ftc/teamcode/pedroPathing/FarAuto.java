@@ -5,6 +5,17 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+/*
+This contains the poses and paths for the far auto routine and the state
+machine that determines the current path to follow.
+So far this only contains the raw pathing of the robot, not shooting,
+limelight, or indexing.
+
+Routine:
+The robot shoots the preloads from the start position, goes to pick up
+the closest three artifacts, returns to the launch zone, and shoots those three.
+*/
+
 public class FarAuto {
     // declare poses
     public Pose startPose;
@@ -36,7 +47,7 @@ public class FarAuto {
             shootPose = new Pose(57, 12, Math.PI);
         }
 
-        // set paths between the poses, same for both colors
+        // set paths, same for both colors
         goToPickup = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, beforePickup))
                 .setLinearHeadingInterpolation(startPose.getHeading(), beforePickup.getHeading())

@@ -5,6 +5,18 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+/*
+This contains the poses and paths for the close auto routine and the state
+machine that determines the current path to follow.
+So far this only contains the raw pathing of the robot, not shooting,
+limelight, or indexing.
+
+Routine:
+The robot moves back to the shooting position, shoots the preloads, goes to
+pick up the closest three artifacts, returns to the shooting position, and
+shoots those three.
+*/
+
 public class CloseAuto {
     // declare poses
     public Pose startPose;
@@ -37,7 +49,7 @@ public class CloseAuto {
             afterPickup = new Pose(18.0, 84.0, Math.PI);
         }
 
-        // set paths between the poses, same for both colors
+        // set paths, same for both colors
         goToFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())

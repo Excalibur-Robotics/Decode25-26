@@ -4,13 +4,20 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+/*
+This is the main OpMode for our autonomous programs.
+It creates and autonomous routine object (CloseAuto or FarAuto) which contains
+information about the specific routine. You can also set the team color for
+each routine. It also creates the follower, which is what makes the robot
+actually follow the path.
+*/
+
 @Autonomous
 public class AutoOpMode extends OpMode {
-    // declare the follower, which is what makes the robot follow the path
+    // declare the follower
     private Follower follower;
 
-    // declare an autonomous routine, change for close or far: CloseAuto or FarAuto
-    // this contains the paths and the state machine to determine which path to follow
+    // declare an autonomous routine - CloseAuto or FarAuto
     CloseAuto routine;
 
     @Override
@@ -38,6 +45,5 @@ public class AutoOpMode extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
-
     }
 }

@@ -6,7 +6,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.DECODE.*;
-import org.firstinspires.ftc.teamcode.V1.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
 
 @TeleOp (name= "DECODE1")
 public class TeleOP1 extends CommandOpMode {

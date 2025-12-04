@@ -7,9 +7,10 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.RobotAutoDriveToAprilTagOmni;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
 
 import java.util.List;
 
@@ -18,7 +19,8 @@ import java.util.List;
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
     DrivetrainSubsystem drivetrain;
-    PDController apriltagX;
+    public DcMotor turret;
+    PDController turretController;
     public static double kP = 0.05; // need to tune
     public static double kD = 0.0; // need to tune
 
@@ -27,8 +29,9 @@ public class LimelightTest extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
-        apriltagX = new PDController(kP, kD);
-        apriltagX.setSetPoint(0);
+        turret = hardwareMap.get(DcMotor.class, "turret");
+        turretController = new PDController(kP, kD);
+        turretController.setSetPoint(0);
     }
 
     @Override
@@ -60,7 +63,8 @@ public class LimelightTest extends OpMode {
             poseString = botPose.toString();
         }
 
-        // drive robot, automatically faces apriltag
+        /* This was for making the whole robot turn toward the apriltag
+           instead of a turret
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y;
         double yaw = 0;
@@ -68,10 +72,14 @@ public class LimelightTest extends OpMode {
             yaw = gamepad1.right_stick_x;
         }
         else {
-            yaw = -apriltagX.calculate(tx);
+            yaw = -turretController.calculate(tx);
         }
-
         drivetrain.moveRobot(x, y, yaw);
+        */
+
+        // turn turret toward apriltag
+        double turretPower = turretController.calculate(tx);
+        turret.setPower(turretPower);
 
         // Telemetry
         // check if an AprilTag is in view

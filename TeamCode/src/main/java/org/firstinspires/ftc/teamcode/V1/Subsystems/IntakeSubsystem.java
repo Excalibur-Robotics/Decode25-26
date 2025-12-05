@@ -5,6 +5,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+/*
+This is the subsystem for the intake of V1. It is just one motor, which can be
+activated and stopped
+ */
+
 public class IntakeSubsystem extends SubsystemBase {
     public DcMotor intakeMotor;
 
@@ -13,10 +18,12 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
+    // set intake motor to full power
     public void activateIntake() {
         intakeMotor.setPower(1);
     }
 
+    // stop intake motor
     public void stopIntake() {
         intakeMotor.setPower(0);
     }

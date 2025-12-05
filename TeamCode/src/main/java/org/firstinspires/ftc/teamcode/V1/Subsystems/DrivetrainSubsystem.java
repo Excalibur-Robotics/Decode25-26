@@ -6,6 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+/*
+This the subsystem for a mecanum drivetrain. It includes the 4 drive motors,
+and in the future it will include Pinpoint for odometry. It has a method to
+move the robot based on given x, y, and yaw values. Its periodic method takes
+input from the gamepad to move the robot, and this is automatically called each
+loop in teleop.
+ */
+
 public class DrivetrainSubsystem extends SubsystemBase {
     private DcMotor frontLeft;
     private DcMotor frontRight;

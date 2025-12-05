@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
@@ -49,7 +48,7 @@ public class ShootColor extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        outtake.kickerDown();
+        outtake.resetKicker();
     }
 
     @Override

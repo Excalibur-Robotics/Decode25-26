@@ -8,6 +8,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/*
+This is the subsystem for the outtake of V1. It includes:
+flywheel motor: can be set to a given speed in rpm
+turret motor: can set power - determined by PID in AimTurret command
+hood servo: can be set to a given position
+kicker servo: can be kicked up and brought down
+limelight: method to get data from limelight as LLResult
+
+It also stores a variable targetSpeed, which is the current speed the flywheel
+should be spinning at, and this can be compared to the actual flywheel speed
+ */
+
 public class OuttakeSubsystem extends SubsystemBase {
     public DcMotorEx flywheel;
     public DcMotor turret;
@@ -31,45 +43,54 @@ public class OuttakeSubsystem extends SubsystemBase {
         targetSpeed = 0;
     }
 
-    // speed in rpm
+    // set flywheel to a speed in rpm
     public void setFlywheelSpeed(double speed) {
         double ticksPerSec = speed / 60 * ticksPerRev;
         flywheel.setVelocity(ticksPerSec);
         targetSpeed = speed;
     }
 
+    // get flywheel speed in rpm
     public double getFlywheelSpeed() {
         return flywheel.getVelocity() * 60 / ticksPerRev;
     }
 
+    // get the speed the flywheel should be spinning at
     public double getTargetSpeed() {
         return targetSpeed;
     }
 
+    // set the power of the turret motor
     public void powerTurret(double power) {
         turret.setPower(power);
     }
 
+    // set the position of the hood - to be used in the future
     public void setHood(double angle) {
         hood.setPosition(angle);
     }
 
+    // rotate the kicker to kick an artifact to the outtake
     public void kickUp() {
         kicker.setPosition(0.5);
     }
 
-    public void kickerDown() {
+    // move kicker back down to original position
+    public void resetKicker() {
         kicker.setPosition(0);
     }
 
+    // get the position of the kicker
     public double getKickerPos() {
         return kicker.getPosition();
     }
 
+    // get limelight data as LLResult
     public LLResult readLimelight() {
         return limelight.getLatestResult();
     }
 
+    // start the limelight - not done in constructor b/c limelight uses up energy
     public void startLimelight() {
         limelight.start();
     }

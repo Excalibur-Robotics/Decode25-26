@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V1.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,9 +11,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private Gamepad gamepad;
+    private GamepadEx gamepad;
 
-    public DrivetrainSubsystem(HardwareMap hwMap, Gamepad gamepad1) {
+    public DrivetrainSubsystem(HardwareMap hwMap, GamepadEx gamepadEx) {
         // initialize motors
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
         frontRight = hwMap.get(DcMotor.class, "frontRight");
@@ -24,7 +25,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // initialize gamepad
-        gamepad = gamepad1;
+        gamepad = gamepadEx;
     }
 
     // power motors
@@ -60,9 +61,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // takes gamepad joysticks to feed to moveRobot()
     @Override
     public void periodic() {
-        double x = gamepad.left_stick_x;
-        double y = -gamepad.left_stick_y;
-        double yaw = gamepad.right_stick_x;
+        double x = gamepad.getLeftX();
+        double y = gamepad.getLeftY();
+        double yaw = gamepad.getRightX();
 
         moveRobot(x, y, yaw);
     }

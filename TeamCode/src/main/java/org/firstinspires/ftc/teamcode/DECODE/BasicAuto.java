@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.DECODE;
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,11 +13,12 @@ public class BasicAuto extends LinearOpMode {
     public In_take intake;
     public Out_take outtake;
     ElapsedTime timer = new ElapsedTime();
+    GamepadEx gamepad = new GamepadEx(gamepad1);
 
     @Override
     public void runOpMode() throws InterruptedException {
         // initialize hardware
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad);
         intake = new In_take(hardwareMap);
         outtake = new Out_take(hardwareMap);
 

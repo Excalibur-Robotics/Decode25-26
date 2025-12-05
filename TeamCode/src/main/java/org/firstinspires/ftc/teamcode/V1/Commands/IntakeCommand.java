@@ -18,16 +18,17 @@ public class IntakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        if(spindexer.getNumArtifacts() == 3)
+            cancel();
         intake.activateIntake();
     }
 
     @Override
     public void execute() {
-        /*
+        /* Need to implement color sensor
         if(spindexer.detectsArtifact()) {
-
-            spindexer.nextPosition();
-
+            spindexer.addArtifact(spindexer.getColor());
+            spindexer.rotateCCW();
         }
          */
     }

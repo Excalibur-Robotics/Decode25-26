@@ -26,7 +26,7 @@ public class TeleOP1 extends CommandOpMode {
         gp1 = new GamepadEx(gamepad1);
         outTake = new Out_take(hardwareMap);
         intake = new In_take(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gp1);
     }
 
     public void run(){

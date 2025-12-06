@@ -34,8 +34,9 @@ public class ActivateFlywheel extends CommandBase {
     @Override
     public void initialize() {
         outtake.setFlywheelSpeed(flywheelSpeed);
-        if(!spindexer.inOuttakeMode())
-            spindexer.setToOuttakeMode();
+        // no longer needed with new kicker position
+        //if(!spindexer.inOuttakeMode())
+        //    spindexer.setToOuttakeMode();
         hasRumbled = false;
     }
 
@@ -45,8 +46,6 @@ public class ActivateFlywheel extends CommandBase {
             gamepad.runRumbleEffect(rumble);
             hasRumbled = true;
         }
-
-
     }
 
     @Override

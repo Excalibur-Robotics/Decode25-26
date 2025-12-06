@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.V1;
 
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -65,7 +64,7 @@ public class V1TeleOp extends CommandOpMode {
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new IntakeCommand(intake, spindexer));
-        rightTrigger.whileActiveOnce(new ActivateFlywheel(outtake, spindexer));
+        rightTrigger.whileActiveOnce(new ActivateFlywheel(outtake, spindexer, gamepad1));
         rightBumper.whenPressed(new ShootArtifact(outtake, spindexer));
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));

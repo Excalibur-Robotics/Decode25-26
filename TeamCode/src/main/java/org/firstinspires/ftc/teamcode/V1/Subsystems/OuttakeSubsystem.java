@@ -2,11 +2,14 @@ package org.firstinspires.ftc.teamcode.V1.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import java.util.List;
 
 /*
 This is the subsystem for the outtake of V1. It includes:
@@ -65,6 +68,12 @@ public class OuttakeSubsystem extends SubsystemBase {
         turret.setPower(power);
     }
 
+    public void rotateTurret(double angle) {
+        turret.setTargetPosition((int) (angle / 360 * ticksPerRev));
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(0.5);
+    }
+
     // set the position of the hood - to be used in the future
     public void setHood(double angle) {
         hood.setPosition(angle);
@@ -88,6 +97,18 @@ public class OuttakeSubsystem extends SubsystemBase {
     // get limelight data as LLResult
     public LLResult readLimelight() {
         return limelight.getLatestResult();
+    }
+
+    public int getApriltagID() {
+        LLResult llResult = readLimelight();
+        int id = 0;
+        if(llResult != null && llResult.isValid()) {
+            List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+            if (!fiducials.isEmpty()) {
+                id = fiducials.get(0).getFiducialId();
+            }
+        }
+        return id;
     }
 
     // start the limelight - not done in constructor b/c limelight uses up energy

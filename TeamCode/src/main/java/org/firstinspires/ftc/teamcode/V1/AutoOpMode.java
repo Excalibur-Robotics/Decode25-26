@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.V1.Autos.CloseAuto;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 /*

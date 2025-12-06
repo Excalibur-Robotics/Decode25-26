@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V1.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
@@ -15,12 +16,17 @@ outtake mode. At the end of the command, the flywheel speed is set to 0.
 public class ActivateFlywheel extends CommandBase {
     private OuttakeSubsystem outtake;
     private SpindexerSubsystem spindexer;
+    Gamepad gamepad;
+    Gamepad.RumbleEffect rumble;
+    boolean hasRumbled;
 
     private static final double flywheelSpeed = 1000;
 
-    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub) {
+    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, Gamepad gamepad) {
         outtake = outtakeSub;
         spindexer = spindexSub;
+        this.gamepad = gamepad;
+        rumble = new Gamepad.RumbleEffect.Builder().addStep(1, 1, 500).build();
 
         addRequirements(spindexer);
     }
@@ -30,6 +36,16 @@ public class ActivateFlywheel extends CommandBase {
         outtake.setFlywheelSpeed(flywheelSpeed);
         if(!spindexer.inOuttakeMode())
             spindexer.setToOuttakeMode();
+        hasRumbled = false;
+    }
+
+    @Override
+    public void execute() {
+        if(outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 5 && !hasRumbled) {
+            gamepad.runRumbleEffect(rumble);
+            hasRumbled = true;
+        }
+
 
     }
 

@@ -7,8 +7,10 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.V1.Commands.ActivateFlywheel;
+import org.firstinspires.ftc.teamcode.V1.Commands.AimRobot;
 import org.firstinspires.ftc.teamcode.V1.Commands.AimTurret;
 import org.firstinspires.ftc.teamcode.V1.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V1.Commands.ShootArtifact;
@@ -24,6 +26,7 @@ FTCLib. The robot can intake artifacts, which are detected by a color sensor
 and stored in the spindexer, and launch artifacts of a specified color.
  */
 
+@TeleOp
 public class V1TeleOp extends CommandOpMode {
     // subsystems
     IntakeSubsystem intake;
@@ -41,6 +44,7 @@ public class V1TeleOp extends CommandOpMode {
     Button rightBumper;
     Button X;
     Button B;
+    Button A;
 
     @Override
     public void initialize() {
@@ -61,6 +65,7 @@ public class V1TeleOp extends CommandOpMode {
         rightBumper = new GamepadButton(gp2, GamepadKeys.Button.RIGHT_BUMPER);
         X = new GamepadButton(gp2, GamepadKeys.Button.X);
         B = new GamepadButton(gp2, GamepadKeys.Button.B);
+        A = new GamepadButton(gp2, GamepadKeys.Button.A);
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new IntakeCommand(intake, spindexer));
@@ -68,6 +73,7 @@ public class V1TeleOp extends CommandOpMode {
         rightBumper.whenPressed(new ShootArtifact(outtake, spindexer));
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));
+        A.toggleWhenPressed(new AimRobot(outtake, drivetrain));
         CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
     }
 }

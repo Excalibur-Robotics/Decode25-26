@@ -56,10 +56,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         // calculate power of each motor
         double den = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(yaw), 1);
-        double topLeftPower = (y + x + yaw) / den;
-        double bottomLeftPower = (y - x + yaw) / den;
-        double topRightPower = (y - x - yaw) / den;
-        double bottomRightPower = (y + x - yaw) / den;
+        double topLeftPower = (y - x + yaw) / den;
+        double bottomLeftPower = (y + x + yaw) / den;
+        double topRightPower = (y + x - yaw) / den;
+        double bottomRightPower = (y - x - yaw) / den;
 
         // set power of each motor
         powerMotors(topLeftPower, topRightPower, bottomLeftPower, bottomRightPower);

@@ -40,7 +40,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         kicker = hwMap.get(Servo.class, "kicker");
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
-        flywheel.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         limelight.pipelineSwitch(0);
 
         targetSpeed = 0;
@@ -51,6 +51,10 @@ public class OuttakeSubsystem extends SubsystemBase {
         double ticksPerSec = speed / 60 * ticksPerRev;
         flywheel.setVelocity(ticksPerSec);
         targetSpeed = speed;
+    }
+
+    public void setFlywheelPower(double power) {
+        flywheel.setPower(power);
     }
 
     // get flywheel speed in rpm

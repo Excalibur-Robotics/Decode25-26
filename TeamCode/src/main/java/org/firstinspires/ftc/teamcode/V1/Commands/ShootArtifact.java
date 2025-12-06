@@ -27,8 +27,8 @@ public class ShootArtifact extends CommandBase {
     public void initialize() {
         // don't allow command to run if the flywheel isn't up to speed
         // or if the spindexer is empty
-        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 5
-                || spindexer.getNumArtifacts() == 0) {
+        if(/*outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 5
+                || */spindexer.getNumArtifacts() == 0) {
             cancel();
         }
         // logic to rotate to correct slot

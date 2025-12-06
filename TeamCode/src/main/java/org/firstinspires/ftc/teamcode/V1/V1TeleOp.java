@@ -37,7 +37,7 @@ public class V1TeleOp extends CommandOpMode {
     // gamepads
     GamepadEx gp1;
     GamepadEx gp2;
-
+//
     // buttons/triggers
     Trigger leftTrigger;
     Trigger rightTrigger;

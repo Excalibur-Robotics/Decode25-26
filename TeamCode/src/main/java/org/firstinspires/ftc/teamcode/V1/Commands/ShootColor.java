@@ -21,8 +21,8 @@ public class ShootColor extends CommandBase {
 
     @Override
     public void initialize() {
-        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 5
-                || spindexer.getNumArtifacts() == 0) {
+        if(/*outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 5
+                || */spindexer.getNumArtifacts() == 0) {
             cancel();
         }
         if(!spindexer.getIndexerState().get(2).equals(color)) {

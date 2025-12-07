@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1;
 
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -20,10 +21,13 @@ import org.firstinspires.ftc.teamcode.V1.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
 
+import java.util.ArrayList;
+
 /*
 This is the OpMode for our TeleOp for V1. It uses a command based system with
 FTCLib. The robot can intake artifacts, which are detected by a color sensor
-and stored in the spindexer, and launch artifacts of a specified color.
+and stored in the spindexer, and launch artifacts of a specified color by
+automatically rotating the spindexer to the correct position
  */
 
 @TeleOp
@@ -37,7 +41,7 @@ public class V1TeleOp extends CommandOpMode {
     // gamepads
     GamepadEx gp1;
     GamepadEx gp2;
-//
+
     // buttons/triggers
     Trigger leftTrigger;
     Trigger rightTrigger;
@@ -57,7 +61,7 @@ public class V1TeleOp extends CommandOpMode {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gp1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gp2);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -74,6 +78,23 @@ public class V1TeleOp extends CommandOpMode {
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));
         A.toggleWhenPressed(new AimRobot(outtake, drivetrain));
-        CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
+        //CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
+    }
+
+    @Override
+    public void run() {
+        CommandScheduler.getInstance().run();
+        if(gamepad2.y) {
+            outtake.kickUp();
+        }
+        else {
+            outtake.resetKicker();
+        }
+
+        telemetry.addData("kicker position", outtake.getKickerPos());
+        telemetry.addData ("spindexer position", spindexer.getSpindexerAngle());
+        ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("indexer state", indexer.get(0) + " " + indexer.get(1) + " " + indexer.get(2));
+        telemetry.update();
     }
 }

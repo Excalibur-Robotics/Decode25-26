@@ -33,7 +33,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public DcMotor spindexMotor;
     public NormalizedColorSensor colorSensor;
 
-    private final int ticksPerRev = (int) spindexMotor.getMotorType().getTicksPerRev();
+    private int ticksPerRev;
     private ArrayList<String> indexer;
     private int numArtifacts;
     private boolean shootMode;
@@ -42,7 +42,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor = hwMap.get(DcMotor.class, "spindexer");
         colorSensor = hwMap.get(NormalizedColorSensor.class, "colorSensor");
 
-        spindexMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         indexer = new ArrayList<String>();
@@ -51,6 +51,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("empty");
         numArtifacts = 0;
         shootMode = false;
+        ticksPerRev = (int) spindexMotor.getMotorType().getTicksPerRev();
     }
 
     // rotate the spindexer an specified angle in radians
@@ -58,7 +59,11 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spindexMotor.setTargetPosition(ticksPerRev * angle / 360);
         spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        spindexMotor.setPower(0.5);
+        spindexMotor.setPower(0.05);
+    }
+
+    public double getSpindexerAngle() {
+        return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
     }
 
     // rotate spindexer clockwise one slot (120 degrees)

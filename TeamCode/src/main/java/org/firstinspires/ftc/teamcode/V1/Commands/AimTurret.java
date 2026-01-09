@@ -44,7 +44,7 @@ public class AimTurret extends CommandBase {
         }
         // pass tx to the pid controller to calculate motor power
         double power = turretController.calculate(tx);
-        //outtake.powerTurret(power);
+        outtake.powerTurret(power);
     }
 
     @Override

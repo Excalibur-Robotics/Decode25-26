@@ -66,6 +66,10 @@ public class SpindexerSubsystem extends SubsystemBase {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
     }
 
+    public double getPower() {
+        return spindexMotor.getPower();
+    }
+
     // rotate spindexer clockwise one slot (120 degrees)
     public void rotateCW() {
         rotateAngle(-120);
@@ -78,15 +82,15 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add(0, indexer.remove(2));
     }
 
-    // rotate 30 degrees to outtake mode
+    // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        rotateAngle(30);
+        rotateAngle(60);
         shootMode = true;
     }
 
-    // rotate back 30 degrees to intake mode
+    // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
-        rotateAngle(-30);
+        rotateAngle(-60);
         shootMode = false;
     }
 

@@ -25,18 +25,18 @@ should be spinning at, and this can be compared to the actual flywheel speed
 
 public class OuttakeSubsystem extends SubsystemBase {
     public DcMotorEx flywheel;
-    //public DcMotor turret;
-    //public Servo hood;
+    public DcMotor turret;
+    public Servo hood;
     public Servo kicker;
     public Limelight3A limelight;
 
-    //private final int ticksPerRev = (int) flywheel.getMotorType().getTicksPerRev();
+    private final int ticksPerRev = (int) flywheel.getMotorType().getTicksPerRev();
     private double targetSpeed;
 
     public OuttakeSubsystem(HardwareMap hwMap) {
         flywheel = hwMap.get(DcMotorEx.class, "flywheel");
-        //turret = hwMap.get(DcMotor.class, "turret");
-        //hood = hwMap.get(Servo.class, "hood");
+        turret = hwMap.get(DcMotor.class, "turret");
+        hood = hwMap.get(Servo.class, "hood");
         kicker = hwMap.get(Servo.class, "kicker");
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
@@ -47,20 +47,20 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     // set flywheel to a speed in rpm
-    /*public void setFlywheelSpeed(double speed) {
+    public void setFlywheelSpeed(double speed) {
         double ticksPerSec = speed / 60 * ticksPerRev;
         flywheel.setVelocity(ticksPerSec);
         targetSpeed = speed;
-    }*/
+    }
 
     public void setFlywheelPower(double power) {
         flywheel.setPower(power);
     }
 
     // get flywheel speed in rpm
-    /*public double getFlywheelSpeed() {
+    public double getFlywheelSpeed() {
         return flywheel.getVelocity() * 60 / ticksPerRev;
-    }*/
+    }
 
     // get the speed the flywheel should be spinning at
     public double getTargetSpeed() {
@@ -68,20 +68,20 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     // set the power of the turret motor
-    /*public void powerTurret(double power) {
+    public void powerTurret(double power) {
         turret.setPower(power);
-    }*/
+    }
 
-    /*public void rotateTurret(double angle) {
+    public void rotateTurret(double angle) {
         turret.setTargetPosition((int) (angle / 360 * ticksPerRev));
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(0.5);
-    }*/
+    }
 
     // set the position of the hood - to be used in the future
-    /*public void setHood(double angle) {
+    public void setHood(double angle) {
         hood.setPosition(angle);
-    }*/
+    }
 
     // rotate the kicker to kick an artifact to the outtake
     public void kickUp() {

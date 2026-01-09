@@ -32,10 +32,9 @@ public class IntakeCommand extends CommandBase {
         // Don't allow command to run if spindexer is full
         if(spindexer.getNumArtifacts() == 3)
             cancel();
-        // no longer needed with new kicker position
-        //if(spindexer.inOuttakeMode()) {
-        //    spindexer.setToIntakeMode();
-        //}
+        if(spindexer.inOuttakeMode()) {
+            spindexer.setToIntakeMode();
+        }
         // activate intake at start of command
         intake.activateIntake();
 

@@ -42,6 +42,7 @@ public class LHV2TeleOp extends OpMode {
     ElapsedTime timer = new ElapsedTime();
 
 
+
     public void init() {
         //Color sensors and Bore encoder
         color_sensor1 = hardwareMap.get(NormalizedColorSensor.class, "CS1");
@@ -90,7 +91,7 @@ public class LHV2TeleOp extends OpMode {
                 x=true;
             }
         }
-
+/*
         double rotate= gamepad1.right_stick_x;
         double x1= gamepad1.left_stick_x;
         double y1=gamepad1.left_stick_y;
@@ -104,7 +105,7 @@ public class LHV2TeleOp extends OpMode {
         flwheel.setPower(flpower);
         brwheel.setPower(brpower);
         blwheel.setPower(blpower);
-
+*/
 
 
 
@@ -153,18 +154,18 @@ public class LHV2TeleOp extends OpMode {
         //Spindexer controls  (STILL NEEDS TUNING)
         if (timer.milliseconds()>200) {
             if (gamepad1.right_bumper) { //rotates spindexer counterclockwise 1 slot
-                V2PID PID = new V2PID(.00042, 0, 0); //Still needs tuning
+                V2PID PID = new V2PID(.00012, 0.0000000025, -0.0002); //Still needs tuning
                 double CP = bore.getCurrentPosition();
                 bore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                while (abs((theta + 2550) - CP) > 30) {
+                while ((abs(theta + 2470) - CP) > 1) {
                     if(timer.milliseconds()>15) {
-                        double MotorPower = PID.Calculate(theta + 2550, CP);
+                        double MotorPower = PID.Calculate(theta+2470, CP);
                         bore.setPower(MotorPower);
                         CP = bore.getCurrentPosition();
                         timer.reset();
+
                     }
                 }
-                bore.setPower(0);
                 timer.reset();
                 temp = slot1;
                 slot1 = slot3;
@@ -173,16 +174,28 @@ public class LHV2TeleOp extends OpMode {
 
             }
         }
-        if (gamepad1.left_bumper){ //rotates spindexer clockwise 1 slot
-            bore.setTargetPosition(0);
-            bore.setTargetPositionTolerance(200);
-            bore.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            bore.setVelocity(20);
-            temp=slot1;
-            slot1=slot2;
-            slot2=slot3;
-            slot3=temp;
-        }
+        if (timer.milliseconds()>200) {
+            if (gamepad1.left_bumper) { //rotates spindexer counterclockwise 1 slot
+                V2PID PID = new V2PID(.00012, 0.0000000025, -0.0002); //Still needs tuning
+                double CP = bore.getCurrentPosition();
+                bore.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                while ((abs(theta - 2470) - CP) > 20) {
+                    if(timer.milliseconds()>15) {
+                        double MotorPower = PID.Calculate(theta - 2470, CP);
+                        bore.setPower(MotorPower);
+                        CP = bore.getCurrentPosition();
+                        timer.reset();
+
+                    }
+                }
+                timer.reset();
+                temp=slot1;
+                slot1=slot2;
+                slot2=slot3;
+                slot3=temp;
+            }
+            }
+
 
 
         //Displays slot data

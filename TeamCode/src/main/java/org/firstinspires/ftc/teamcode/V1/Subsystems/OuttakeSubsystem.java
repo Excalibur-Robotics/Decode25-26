@@ -26,7 +26,8 @@ should be spinning at, and this can be compared to the actual flywheel speed
 public class OuttakeSubsystem extends SubsystemBase {
     public DcMotorEx flywheel;
     public DcMotor turret;
-    public Servo hood;
+    public Servo hoodR;
+    public Servo hoodL;
     public Servo kicker;
     public Limelight3A limelight;
 
@@ -36,7 +37,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     public OuttakeSubsystem(HardwareMap hwMap) {
         flywheel = hwMap.get(DcMotorEx.class, "flywheel");
         turret = hwMap.get(DcMotor.class, "turret");
-        hood = hwMap.get(Servo.class, "hood");
+        hoodR = hwMap.get(Servo.class, "hoodR");
+        hoodL = hwMap.get(Servo.class, "hoodL");
         kicker = hwMap.get(Servo.class, "kicker");
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
@@ -80,7 +82,8 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // set the position of the hood - to be used in the future
     public void setHood(double angle) {
-        hood.setPosition(angle);
+        hoodR.setPosition(angle);
+        hoodL.setPosition(angle);
     }
 
     // rotate the kicker to kick an artifact to the outtake

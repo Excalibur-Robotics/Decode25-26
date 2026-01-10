@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.V1;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -43,8 +42,9 @@ public class LHV2TeleOp extends OpMode {
     boolean y=true;
     boolean x=true;
 
-    public static double kP = 0.00042;
-    public static double kD = 0;
+    public static double kP = 0.00012;
+    public static double kI = 0.0000000025;
+    public static double kD = -0.0002;
 
     ElapsedTime timer = new ElapsedTime();
 

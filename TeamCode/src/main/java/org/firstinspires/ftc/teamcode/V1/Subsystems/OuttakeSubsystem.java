@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V1.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -23,6 +24,7 @@ It also stores a variable targetSpeed, which is the current speed the flywheel
 should be spinning at, and this can be compared to the actual flywheel speed
  */
 
+@Configurable
 public class OuttakeSubsystem extends SubsystemBase {
     public DcMotorEx flywheel;
     public DcMotor turret;
@@ -33,6 +35,9 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int ticksPerRev = (int) flywheel.getMotorType().getTicksPerRev();
     private double targetSpeed;
+
+    public static double kickerUp = 0.8;
+    public static double kickerDown = 0.5;
 
     public OuttakeSubsystem(HardwareMap hwMap) {
         flywheel = hwMap.get(DcMotorEx.class, "flywheel");

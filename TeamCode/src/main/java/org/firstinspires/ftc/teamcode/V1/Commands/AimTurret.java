@@ -49,6 +49,6 @@ public class AimTurret extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        //outtake.powerTurret(0);
+        outtake.powerTurret(0);
     }
 }

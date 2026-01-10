@@ -78,20 +78,13 @@ public class V1TeleOp extends CommandOpMode {
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));
         A.toggleWhenPressed(new AimRobot(outtake, drivetrain));
-        //CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
+        CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
     }
 
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
-        if(gamepad2.y) {
-            outtake.kickUp();
-        }
-        else {
-            outtake.resetKicker();
-        }
 
-        telemetry.addData("kicker position", outtake.getKickerPos());
         telemetry.addData ("spindexer position", spindexer.getSpindexerAngle());
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("indexer state", indexer.get(0) + " " + indexer.get(1) + " " + indexer.get(2));

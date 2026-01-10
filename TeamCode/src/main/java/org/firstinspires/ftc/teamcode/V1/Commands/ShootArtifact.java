@@ -63,6 +63,6 @@ public class ShootArtifact extends CommandBase {
     public boolean isFinished() {
         // after kicking the artifact, the command will continue until the
         // kicker reaches the target position
-        return outtake.getKickerPos() > 0.48;
+        return outtake.getKickerPos() > 0.78;
     }
 }

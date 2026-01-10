@@ -43,8 +43,9 @@ public class SpindexerSubsystem extends SubsystemBase {
     private int numArtifacts;
     private boolean shootMode;
 
-    public static double kP = 0.00042;
-    public static double kD = 0;
+    public static double kP = 0.00012;
+    public static double kI = 0.0000000025;
+    public static double kD = -0.0002;
 
     ElapsedTime timer = new ElapsedTime();
 
@@ -75,10 +76,10 @@ public class SpindexerSubsystem extends SubsystemBase {
 
         double angleTicks = angle / 360.0 * 7650;
         double theta = spindexMotor.getCurrentPosition();
-        LHV2PID PID = new LHV2PID(kP, 0, kD); //Still needs tuning
+        LHV2PID PID = new LHV2PID(kP, kI, kD); //Still needs tuning
         double CP = spindexMotor.getCurrentPosition();
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        while (abs((theta + angleTicks) - CP) > 50 || spindexMotor.getVelocity() > 100) {
+        while (abs((theta + angleTicks) - CP) > 1) {
             if(timer.milliseconds()>15) {
                 double MotorPower = PID.Calculate(theta + angleTicks, CP);
                 spindexMotor.setPower(MotorPower);

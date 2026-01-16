@@ -30,7 +30,7 @@ public class LimelightTest extends OpMode {
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
         turret = hardwareMap.get(DcMotor.class, "turret");
         turretController = new PDController(kP, kD);
         turretController.setSetPoint(0);

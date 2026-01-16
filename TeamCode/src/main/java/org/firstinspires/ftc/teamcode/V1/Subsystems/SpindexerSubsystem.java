@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.V1.Subsystems;
 
 import static java.lang.Math.abs;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -34,6 +35,7 @@ spindexer can be rotate 30 degrees to switch between intake and outtake mode.
 When this happens, the state of the indexer arraylist doesn't change.
  */
 
+@Config
 public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
     public NormalizedColorSensor colorSensor;
@@ -43,15 +45,20 @@ public class SpindexerSubsystem extends SubsystemBase {
     private int numArtifacts;
     private boolean shootMode;
 
-    public static double kP = 0.00012;
-    public static double kI = 0.0000000025;
-    public static double kD = -0.0002;
+    public static double kP = 0.00025; //0.00012;
+    public static double kI = 0; //0.0000000025;
+    public static double kD = 0.008; //-0.0002;
+    public static int tolerance = 50;
+    public static int velocityTolerance = 15;
+
+    public static int ticks = 8300;
 
     ElapsedTime timer = new ElapsedTime();
+    ElapsedTime timer2 = new ElapsedTime();
 
     public SpindexerSubsystem(HardwareMap hwMap) {
-        spindexMotor = hwMap.get(DcMotorEx.class, "spindexer");
-        colorSensor = hwMap.get(NormalizedColorSensor.class, "colorSensor");
+        spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
+        colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -62,7 +69,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("empty");
         numArtifacts = 0;
         shootMode = false;
-        ticksPerRev = (int) spindexMotor.getMotorType().getTicksPerRev();
+        ticksPerRev = 8192; //(int) spindexMotor.getMotorType().getTicksPerRev();
     }
 
     // rotate the spindexer an specified angle in radians
@@ -74,12 +81,14 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor.setPower(0.05);
          */
 
-        double angleTicks = angle / 360.0 * 7650;
+        double angleTicks = angle / 360.0 * ticks;
         double theta = spindexMotor.getCurrentPosition();
         LHV2PID PID = new LHV2PID(kP, kI, kD); //Still needs tuning
         double CP = spindexMotor.getCurrentPosition();
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        while (abs((theta + angleTicks) - CP) > 1) {
+        timer2.reset();
+        while ((abs((theta + angleTicks) - CP) > tolerance || spindexMotor.getVelocity() > velocityTolerance)
+                && timer2.milliseconds() < 2000) {
             if(timer.milliseconds()>15) {
                 double MotorPower = PID.Calculate(theta + angleTicks, CP);
                 spindexMotor.setPower(MotorPower);
@@ -89,6 +98,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         }
         spindexMotor.setPower(0);
         timer.reset();
+        timer2.reset();
     }
 
     public double getSpindexerAngle() {

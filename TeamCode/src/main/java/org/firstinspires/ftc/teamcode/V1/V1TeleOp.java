@@ -61,7 +61,7 @@ public class V1TeleOp extends CommandOpMode {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gp2);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad2);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);

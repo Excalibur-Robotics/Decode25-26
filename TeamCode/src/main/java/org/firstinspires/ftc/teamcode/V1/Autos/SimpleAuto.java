@@ -31,7 +31,7 @@ public class SimpleAuto extends OpMode {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gp1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
         autoState = 0;
         CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
         CommandScheduler.getInstance().schedule(new ActivateFlywheel(outtake, spindexer, gamepad2));

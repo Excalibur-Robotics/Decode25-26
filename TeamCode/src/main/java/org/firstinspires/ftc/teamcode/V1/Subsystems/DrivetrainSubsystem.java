@@ -19,21 +19,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private GamepadEx gamepad;
+    private Gamepad gamepad;
 
-    public DrivetrainSubsystem(HardwareMap hwMap, GamepadEx gamepadEx) {
+    public DrivetrainSubsystem(HardwareMap hwMap, Gamepad gamepad1) {
         // initialize motors
-        frontLeft = hwMap.get(DcMotor.class, "frontLeft");
-        frontRight = hwMap.get(DcMotor.class, "frontRight");
-        backLeft = hwMap.get(DcMotor.class, "backLeft");
-        backRight = hwMap.get(DcMotor.class, "backRight");
+        frontLeft = hwMap.get(DcMotor.class, "flwheel");
+        frontRight = hwMap.get(DcMotor.class, "frwheel");
+        backLeft = hwMap.get(DcMotor.class, "blwheel");
+        backRight = hwMap.get(DcMotor.class, "brwheel");
 
         // reverse left motors
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         // initialize gamepad
-        gamepad = gamepadEx;
+        gamepad = gamepad1;
     }
 
     // power motors
@@ -69,9 +69,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // takes gamepad joysticks to feed to moveRobot()
     @Override
     public void periodic() {
-        double x = gamepad.getLeftX();
-        double y = gamepad.getLeftY();
-        double yaw = gamepad.getRightX();
+        double x = gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        double yaw = gamepad.right_stick_x;
 
         moveRobot(x, y, yaw);
     }

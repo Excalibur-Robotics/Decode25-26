@@ -51,7 +51,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public static int tolerance = 50;
     public static int velocityTolerance = 15;
 
-    public static int ticks = 8300;
+    public static int ticks = 8300; //(int) spindexMotor.getMotorType().getTicksPerRev();
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -69,10 +69,9 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("empty");
         numArtifacts = 0;
         shootMode = false;
-        ticksPerRev = 8192; //(int) spindexMotor.getMotorType().getTicksPerRev();
     }
 
-    // rotate the spindexer an specified angle in radians
+    // rotate the spindexer a specified angle in degrees
     private void rotateAngle(int angle) {
         /*
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

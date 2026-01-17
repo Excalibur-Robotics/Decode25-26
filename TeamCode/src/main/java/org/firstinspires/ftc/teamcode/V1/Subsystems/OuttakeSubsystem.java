@@ -93,12 +93,12 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // rotate the kicker to kick an artifact to the outtake
     public void kickUp() {
-        kicker.setPosition(0.8);
+        kicker.setPosition(kickerUp);
     }
 
     // move kicker back down to original position
     public void resetKicker() {
-        kicker.setPosition(0.5);
+        kicker.setPosition(kickerDown);
     }
 
     // get the position of the kicker

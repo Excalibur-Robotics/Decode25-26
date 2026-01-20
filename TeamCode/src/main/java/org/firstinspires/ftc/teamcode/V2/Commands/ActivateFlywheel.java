@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.V1.Commands;
+package org.firstinspires.ftc.teamcode.V2.Commands;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 /*
 This is the command to spin up the flywheel. The flywheel speed is constant,

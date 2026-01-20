@@ -1,16 +1,13 @@
-package org.firstinspires.ftc.teamcode.V1;
+package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 /*
 Simple TeleOp for V2 with the goal of just being able to launch artifacts.

@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.V1.Commands;
+package org.firstinspires.ftc.teamcode.V2.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 /*
 This is the command to intake artifacts for V1. When the command starts, the

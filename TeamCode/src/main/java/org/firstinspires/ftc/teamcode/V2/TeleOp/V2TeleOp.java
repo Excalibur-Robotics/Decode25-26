@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.V1;
+package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -10,16 +9,16 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.V1.Commands.ActivateFlywheel;
-import org.firstinspires.ftc.teamcode.V1.Commands.AimRobot;
-import org.firstinspires.ftc.teamcode.V1.Commands.AimTurret;
-import org.firstinspires.ftc.teamcode.V1.Commands.IntakeCommand;
-import org.firstinspires.ftc.teamcode.V1.Commands.ShootArtifact;
-import org.firstinspires.ftc.teamcode.V1.Commands.ShootColor;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
+import org.firstinspires.ftc.teamcode.V2.Commands.AimRobot;
+import org.firstinspires.ftc.teamcode.V2.Commands.AimTurret;
+import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootColor;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 import java.util.ArrayList;
 
@@ -31,7 +30,7 @@ automatically rotating the spindexer to the correct position
  */
 
 @TeleOp
-public class V1TeleOp extends CommandOpMode {
+public class V2TeleOp extends CommandOpMode {
     // subsystems
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;

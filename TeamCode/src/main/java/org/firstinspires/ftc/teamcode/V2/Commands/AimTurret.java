@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.V1.Commands;
+package org.firstinspires.ftc.teamcode.V2.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 
 /*
 This is the command to aim the turret towards the apriltag on the goal.

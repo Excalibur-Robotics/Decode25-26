@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.V1.Subsystems;
+package org.firstinspires.ftc.teamcode.V2.Subsystems;
 
 import static java.lang.Math.abs;
 
@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.teamcode.V1.LHV2PID;
+import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 
 import java.util.ArrayList;
 
@@ -86,7 +86,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         double CP = spindexMotor.getCurrentPosition();
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         timer2.reset();
-        while ((abs((theta + angleTicks) - CP) > tolerance || spindexMotor.getVelocity() > velocityTolerance)
+        while ((abs((theta + angleTicks) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance)
                 && timer2.milliseconds() < 2000) {
             if(timer.milliseconds()>15) {
                 double MotorPower = PID.Calculate(theta + angleTicks, CP);

@@ -1,12 +1,11 @@
-package org.firstinspires.ftc.teamcode.V1.Commands;
+package org.firstinspires.ftc.teamcode.V2.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.LLResult;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 
 public class AimRobot extends CommandBase {
     private OuttakeSubsystem outtake;

@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.V1.Commands;
+package org.firstinspires.ftc.teamcode.V2.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 public class ShootColor extends CommandBase {
     private OuttakeSubsystem outtake;

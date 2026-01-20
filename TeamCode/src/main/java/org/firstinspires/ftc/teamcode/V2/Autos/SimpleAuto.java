@@ -1,17 +1,17 @@
-package org.firstinspires.ftc.teamcode.V1.Autos;
+package org.firstinspires.ftc.teamcode.V2.Autos;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.V1.Commands.ActivateFlywheel;
-import org.firstinspires.ftc.teamcode.V1.Commands.AimTurret;
-import org.firstinspires.ftc.teamcode.V1.Commands.ShootArtifact;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.DrivetrainSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.V1.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
+import org.firstinspires.ftc.teamcode.V2.Commands.AimTurret;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 /*
 Basic Auto without pedro pathing to score three preloads

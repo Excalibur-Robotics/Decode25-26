@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.V2.Autos;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -16,40 +16,43 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 /*
 Basic Auto without pedro pathing to score three preloads
  */
-public class SimpleAuto extends OpMode {
+public class SimpleAuto extends LinearOpMode {
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
-    GamepadEx gp1 = new GamepadEx(gamepad1);
     ElapsedTime timer = new ElapsedTime();
-    int autoState;
 
     @Override
-    public void init() {
-        CommandScheduler.getInstance().reset();
+    public void runOpMode() throws InterruptedException {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
-        autoState = 0;
-        CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
-        CommandScheduler.getInstance().schedule(new ActivateFlywheel(outtake, spindexer, gamepad2));
-    }
+        //CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
+        //CommandScheduler.getInstance().schedule(new ActivateFlywheel(outtake, spindexer, gamepad2));
 
-    @Override
-    public void start() {
-        drivetrain.moveRobot(0, -0.5, 0);
+        waitForStart();
+
+        outtake.setFlywheelPower(1);
         timer.reset();
-    }
-
-    @Override
-    public void loop() {
-        CommandScheduler.getInstance().run();
-        if(timer.milliseconds() > 2000) {
-            drivetrain.moveRobot(0,0,0);
-            CommandScheduler.getInstance().schedule(new ShootArtifact(outtake, spindexer));
+        while(timer.milliseconds() < 2000) {
+            drivetrain.moveRobot(0, -0.5, 0);
         }
-
+        drivetrain.moveRobot(0,0,0);
+        for(int i = 0; i < 3; i++) {
+            timer.reset();
+            while (timer.milliseconds() < 0.5)
+                outtake.kickUp();
+            timer.reset();
+            while (timer.milliseconds() < 0.5)
+                outtake.resetKicker();
+            spindexer.rotateCCW();
+        }
+        timer.reset();
+        while(timer.milliseconds() < 1)
+            drivetrain.moveRobot(-0.5, 0, 0);
     }
+
+
 }

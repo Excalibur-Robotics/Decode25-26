@@ -14,7 +14,7 @@ Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
  */
 
-@TeleOp
+@TeleOp (name = "SpindexerTest")
 public class V2SimpleTeleOp extends CommandOpMode {
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;

@@ -38,9 +38,8 @@ When this happens, the state of the indexer arraylist doesn't change.
 @Config
 public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
-    public NormalizedColorSensor colorSensor;
+    //public NormalizedColorSensor colorSensor;
 
-    private int ticksPerRev;
     private ArrayList<String> indexer;
     private int numArtifacts;
     private boolean shootMode;
@@ -51,14 +50,14 @@ public class SpindexerSubsystem extends SubsystemBase {
     public static int tolerance = 50;
     public static int velocityTolerance = 15;
 
-    public static int ticks = 8300; //(int) spindexMotor.getMotorType().getTicksPerRev();
+    public static int ticksPerRev = 8300;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
 
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
-        colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
+        //colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -73,14 +72,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     // rotate the spindexer a specified angle in degrees
     private void rotateAngle(int angle) {
-        /*
-        spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        spindexMotor.setTargetPosition(ticksPerRev * angle / 360);
-        spindexMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        spindexMotor.setPower(0.05);
-         */
-
-        double angleTicks = angle / 360.0 * ticks;
+        double angleTicks = angle / 360.0 * ticksPerRev;
         double theta = spindexMotor.getCurrentPosition();
         LHV2PID PID = new LHV2PID(kP, kI, kD); //Still needs tuning
         double CP = spindexMotor.getCurrentPosition();
@@ -164,7 +156,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     // get the color the color sensor currently sees.
     public String getColor() {
-        NormalizedRGBA rgba = colorSensor.getNormalizedColors();
+        /*NormalizedRGBA rgba = colorSensor.getNormalizedColors();
         double hue = JavaUtil.colorToHue(rgba.toColor());
         String color = "empty";
         if(hue >= 210 && hue <= 245) {
@@ -173,11 +165,15 @@ public class SpindexerSubsystem extends SubsystemBase {
         else if(hue >= 150 && hue <= 180) {
             color = "green";
         }
-        return color;
+
+         */
+        return "";//color;
     }
 
     public boolean detectsArtifact() {
         String color = getColor();
         return color.equals("purple") || color.equals("green");
     }
+
+
 }

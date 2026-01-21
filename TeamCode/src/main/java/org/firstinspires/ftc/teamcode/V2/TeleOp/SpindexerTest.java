@@ -17,61 +17,17 @@ Driver manually controls each individual movement, no automatic actions.
  */
 
 @TeleOp
-public class V2SimpleTeleOp extends CommandOpMode {
-    IntakeSubsystem intake;
+public class SpindexerTest extends CommandOpMode {
     SpindexerSubsystem spindexer;
-    OuttakeSubsystem outtake;
-    DrivetrainSubsystem drivetrain;
-
-    //GamepadEx gamepadEx = new GamepadEx(gamepad1);
-
-    private PIDController turretController;
-    public static double kP = 0.025;
-    public static double kD = 0.00005;
 
     @Override
     public void initialize() {
-        intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
-        outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
-
-        turretController = new PIDController(kP, 0, kD);
-        turretController.setSetPoint(0);
     }
 
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
-        /*
-        // kicker - X
-        if(gamepad1.x) {
-            outtake.kickUp();
-        }
-        else {
-            outtake.resetKicker();
-        }
-
-         */
-
-        // intake - left trigger
-        if(gamepad1.left_trigger > 0.5) {
-            intake.activateIntake();
-        }
-        else {
-            intake.stopIntake();
-        }
-
-
-        // flywheel - right trigger
-        if(gamepad1.right_trigger > 0.5) {
-            outtake.setFlywheelPower(1);
-        }
-        else {
-            outtake.setFlywheelPower(0);
-        }
-
-
 
         // rotate spindexer CCW - right bumper
         if(gamepad1.rightBumperWasPressed()) {
@@ -86,28 +42,6 @@ public class V2SimpleTeleOp extends CommandOpMode {
         // rotate spindexer half a turn to switch between intake/outtake - Y
         if(gamepad1.yWasPressed()) {
             spindexer.setToOuttakeMode();
-        }
-
-
-        // move hood up - dpad up
-        if(gamepad1.dpad_up) {
-            outtake.setHood(0.5);
-        }
-
-        // move hood down - dpad down
-        if(gamepad1.dpad_down) {
-            outtake.setHood(0);
-        }
-
-        // aim turret with limelight - hold A
-        if(gamepad1.a) {
-            LLResult llData = outtake.readLimelight();
-            double tx = 0;
-            if (llData != null && llData.isValid()) {
-                tx = llData.getTx();
-            }
-            double power = turretController.calculate(tx);
-            outtake.powerTurret(power);
         }
 
 

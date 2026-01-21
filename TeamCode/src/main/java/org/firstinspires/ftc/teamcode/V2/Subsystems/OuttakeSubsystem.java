@@ -106,6 +106,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         return kicker.getPosition();
     }
 
+
     // get limelight data as LLResult
     public LLResult readLimelight() {
         return limelight.getLatestResult();

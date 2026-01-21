@@ -19,9 +19,9 @@ import java.util.List;
 @TeleOp(name="LimelightTest")
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
-    DrivetrainSubsystem drivetrain;
+    //DrivetrainSubsystem drivetrain;
     public DcMotor turret;
-    GamepadEx gamepad = new GamepadEx(gamepad1);
+    //GamepadEx gamepad = new GamepadEx(gamepad1);
     PDController turretController;
     public static double kP = 0.05; // need to tune
     public static double kD = 0.0; // need to tune
@@ -30,7 +30,7 @@ public class LimelightTest extends OpMode {
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        //drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
         turret = hardwareMap.get(DcMotor.class, "turret");
         turretController = new PDController(kP, kD);
         turretController.setSetPoint(0);

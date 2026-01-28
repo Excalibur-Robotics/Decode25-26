@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.Subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -24,16 +25,16 @@ It also stores a variable targetSpeed, which is the current speed the flywheel
 should be spinning at, and this can be compared to the actual flywheel speed
  */
 
-@Configurable
+@Config
 public class OuttakeSubsystem extends SubsystemBase {
     public DcMotorEx flywheel;
     public DcMotor turret;
     public Servo hoodR;
     public Servo hoodL;
-    public Servo kicker;
+    //public Servo kicker;
     public Limelight3A limelight;
 
-    private final int ticksPerRev = (int) flywheel.getMotorType().getTicksPerRev();
+    private final int ticksPerRev = 112;//(int) flywheel.getMotorType().getTicksPerRev();
     private double targetSpeed;
 
     public static double kickerUp = 0.8;
@@ -44,11 +45,14 @@ public class OuttakeSubsystem extends SubsystemBase {
         turret = hwMap.get(DcMotor.class, "turret");
         hoodR = hwMap.get(Servo.class, "hoodR");
         hoodL = hwMap.get(Servo.class, "hoodL");
-        kicker = hwMap.get(Servo.class, "kicker");
+        //kicker = hwMap.get(Servo.class, "kicker");
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         limelight.pipelineSwitch(0);
+        limelight.start();
+        hoodL.setDirection(Servo.Direction.FORWARD);
+        hoodR.setDirection(Servo.Direction.REVERSE);
 
         targetSpeed = 0;
     }
@@ -85,25 +89,30 @@ public class OuttakeSubsystem extends SubsystemBase {
         turret.setPower(0.5);
     }
 
-    // set the position of the hood - to be used in the future
+    // set the position of the hood
     public void setHood(double angle) {
         hoodR.setPosition(angle);
         hoodL.setPosition(angle);
     }
 
+    public double getHoodAngle() {
+        return hoodR.getPosition();
+    }
+
     // rotate the kicker to kick an artifact to the outtake
     public void kickUp() {
-        kicker.setPosition(kickerUp);
+        //kicker.setPosition(kickerUp);
     }
 
     // move kicker back down to original position
     public void resetKicker() {
-        kicker.setPosition(kickerDown);
+        //kicker.setPosition(kickerDown);
     }
 
     // get the position of the kicker
     public double getKickerPos() {
-        return kicker.getPosition();
+        //return kicker.getPosition();
+        return 0;
     }
 
 

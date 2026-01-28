@@ -8,18 +8,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 
 import java.util.ArrayList;
 
 /*
-Note: color sensor code still needs to be added
-
 This is the subsystem for the spindexer of V1. It includes a motor to turn the
 spindexer and a color sensor.
 spindexer motor: can rotate spindexer one slot and switch modes*
@@ -44,13 +39,15 @@ public class SpindexerSubsystem extends SubsystemBase {
     private int numArtifacts;
     private boolean shootMode;
 
-    public static double kP = 0.00025; //0.00012;
+    // spindexer pid constants
+    public static double kP = 0.0006; //0.00012;
     public static double kI = 0; //0.0000000025;
     public static double kD = 0.008; //-0.0002;
-    public static int tolerance = 50;
+    public static int tolerance = 35;
     public static int velocityTolerance = 15;
+    public static int ticksPerRev = 8192; // cpm of bore encoder
 
-    public static int ticksPerRev = 8300;
+    public LHV2PID PID;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -61,6 +58,9 @@ public class SpindexerSubsystem extends SubsystemBase {
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        PID = new LHV2PID(kP, kI, kD);
 
         indexer = new ArrayList<String>();
         indexer.add("empty");
@@ -73,15 +73,13 @@ public class SpindexerSubsystem extends SubsystemBase {
     // rotate the spindexer a specified angle in degrees
     private void rotateAngle(int angle) {
         double angleTicks = angle / 360.0 * ticksPerRev;
-        double theta = spindexMotor.getCurrentPosition();
-        LHV2PID PID = new LHV2PID(kP, kI, kD); //Still needs tuning
+        double TP = spindexMotor.getCurrentPosition() + angleTicks;
         double CP = spindexMotor.getCurrentPosition();
-        spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         timer2.reset();
-        while ((abs((theta + angleTicks) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance)
-                && timer2.milliseconds() < 2000) {
+        while ((abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance)
+                && timer2.milliseconds() < 1500) {
             if(timer.milliseconds()>15) {
-                double MotorPower = PID.Calculate(theta + angleTicks, CP);
+                double MotorPower = -PID.Calculate(TP, CP);
                 spindexMotor.setPower(MotorPower);
                 CP = spindexMotor.getCurrentPosition();
                 timer.reset();
@@ -92,35 +90,41 @@ public class SpindexerSubsystem extends SubsystemBase {
         timer2.reset();
     }
 
+    // returns angle spindexer has rotated in degrees
     public double getSpindexerAngle() {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
     }
 
-    public double getPower() {
-        return spindexMotor.getPower();
+    // modify the angle if spindexer is off
+    // instead of always rotating the same amount
+    private int modifyAngle(int angle) {
+        int CP = spindexMotor.getCurrentPosition();
+        int ticksToRotate = ticksPerRev * angle / 360;
+        int target = (CP + abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
+        return target - CP;
     }
 
     // rotate spindexer clockwise one slot (120 degrees)
     public void rotateCW() {
-        rotateAngle(-120);
+        rotateAngle(modifyAngle(-120));
         indexer.add(indexer.remove(0));
     }
 
     // rotate spindexer counter clockwise one slot
     public void rotateCCW() {
-        rotateAngle(120);
+        rotateAngle(modifyAngle(120));
         indexer.add(0, indexer.remove(2));
     }
 
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        rotateAngle(60);
+        rotateAngle(modifyAngle(60));
         shootMode = true;
     }
 
     // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
-        rotateAngle(-60);
+        rotateAngle(modifyAngle(-60));
         shootMode = false;
     }
 

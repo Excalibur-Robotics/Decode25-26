@@ -12,8 +12,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 /*
-Simple TeleOp for V2 with the goal of just being able to launch artifacts.
-Driver manually controls each individual movement, no automatic actions.
+test just the spindexer rotation
  */
 
 @TeleOp

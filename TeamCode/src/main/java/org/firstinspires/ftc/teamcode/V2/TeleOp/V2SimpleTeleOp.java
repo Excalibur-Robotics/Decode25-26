@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
  */
-
+@Config
 @TeleOp
 public class V2SimpleTeleOp extends CommandOpMode {
     IntakeSubsystem intake;
@@ -23,11 +24,14 @@ public class V2SimpleTeleOp extends CommandOpMode {
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
 
-    //GamepadEx gamepadEx = new GamepadEx(gamepad1);
-
     private PIDController turretController;
-    public static double kP = 0.025;
-    public static double kD = 0.00005;
+    public static double kP = 0.03;
+    public static double kD = 0.0001;
+
+    public static double hoodUp = 0.75;
+    public static double hoodDown = 0.1;
+
+    public static double flywheelPower = 0.85;
 
     @Override
     public void initialize() {
@@ -62,16 +66,13 @@ public class V2SimpleTeleOp extends CommandOpMode {
             intake.stopIntake();
         }
 
-
         // flywheel - right trigger
         if(gamepad1.right_trigger > 0.5) {
-            outtake.setFlywheelPower(1);
+            outtake.setFlywheelPower(flywheelPower);
         }
         else {
             outtake.setFlywheelPower(0);
         }
-
-
 
         // rotate spindexer CCW - right bumper
         if(gamepad1.rightBumperWasPressed()) {
@@ -91,28 +92,28 @@ public class V2SimpleTeleOp extends CommandOpMode {
 
         // move hood up - dpad up
         if(gamepad1.dpad_up) {
-            outtake.setHood(0.5);
+            outtake.setHood(hoodUp);
         }
 
         // move hood down - dpad down
         if(gamepad1.dpad_down) {
-            outtake.setHood(0);
+            outtake.setHood(hoodDown);
         }
 
-        // aim turret with limelight - hold A
-        if(gamepad1.a) {
-            LLResult llData = outtake.readLimelight();
-            double tx = 0;
-            if (llData != null && llData.isValid()) {
-                tx = llData.getTx();
-            }
-            double power = turretController.calculate(tx);
-            outtake.powerTurret(power);
+        // aim turret with limelight
+        LLResult llData = outtake.readLimelight();
+        double tx = 0;
+        if (llData != null && llData.isValid()) {
+            tx = llData.getTx();
         }
+        double power = turretController.calculate(tx);
+        outtake.powerTurret(power);
 
 
         //telemetry.addData("kicker position", outtake.getKickerPos());
         //telemetry.addData("flywheel speed", outtake.getFlywheelSpeed());
+        telemetry.addData("tx", tx);
+        telemetry.addData("hood angle", outtake.getHoodAngle());
         telemetry.addData ("spindexer position", spindexer.getSpindexerAngle());
         /*ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("indexer state", indexer.get(0) + " " +

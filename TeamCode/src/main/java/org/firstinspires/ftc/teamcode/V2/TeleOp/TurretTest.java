@@ -21,7 +21,7 @@ Driver manually controls each individual movement, no automatic actions.
  */
 
 @Config
-@TeleOp
+//@TeleOp
 public class TurretTest extends CommandOpMode {
     DcMotor turret;
     Servo hoodR;

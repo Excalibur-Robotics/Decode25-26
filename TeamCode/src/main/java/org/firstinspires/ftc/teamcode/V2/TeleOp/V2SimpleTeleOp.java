@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
@@ -17,21 +18,21 @@ Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
  */
 @Config
-@TeleOp
+@TeleOp (name = "BasicTeleOpV2")
 public class V2SimpleTeleOp extends CommandOpMode {
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
 
-    private PIDController turretController;
-    public static double kP = 0.03;
+    private LHV2PID turretController;
+    public static double kP = 0.02;
     public static double kD = 0.0001;
 
     public static double hoodUp = 0.75;
     public static double hoodDown = 0.1;
 
-    public static double flywheelPower = 0.85;
+    public static double flywheelPower = 0.8;
 
     @Override
     public void initialize() {
@@ -40,8 +41,7 @@ public class V2SimpleTeleOp extends CommandOpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
 
-        turretController = new PIDController(kP, 0, kD);
-        turretController.setSetPoint(0);
+        turretController = new LHV2PID(kP, 0, kD);
     }
 
     @Override
@@ -52,10 +52,9 @@ public class V2SimpleTeleOp extends CommandOpMode {
         if(gamepad1.x) {
             outtake.kickUp();
         }
-        else {
+        else if(outtake.getKickerPos() == outtake.kickerUp) {
             outtake.resetKicker();
         }
-
          */
 
         // intake - left trigger
@@ -89,6 +88,7 @@ public class V2SimpleTeleOp extends CommandOpMode {
             spindexer.setToOuttakeMode();
         }
 
+        spindexer.powerSpindexer();
 
         // move hood up - dpad up
         if(gamepad1.dpad_up) {
@@ -106,7 +106,7 @@ public class V2SimpleTeleOp extends CommandOpMode {
         if (llData != null && llData.isValid()) {
             tx = llData.getTx();
         }
-        double power = turretController.calculate(tx);
+        double power = turretController.Calculate(0, tx);
         outtake.powerTurret(power);
 
 

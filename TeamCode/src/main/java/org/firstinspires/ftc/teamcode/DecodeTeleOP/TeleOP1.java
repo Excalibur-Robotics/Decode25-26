@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.DECODE.*;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 
-@TeleOp (name= "DECODE1")
+//@TeleOp (name= "DECODE1")
 public class TeleOP1 extends CommandOpMode {
     GamepadEx gp1;
 

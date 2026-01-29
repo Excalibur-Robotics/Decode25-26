@@ -48,6 +48,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public static int ticksPerRev = 8192; // cpm of bore encoder
 
     public LHV2PID PID;
+    private int TP;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -61,6 +62,8 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         PID = new LHV2PID(kP, kI, kD);
+        TP = 0;
+        timer.reset();
 
         indexer = new ArrayList<String>();
         indexer.add("empty");
@@ -71,6 +74,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     // rotate the spindexer a specified angle in degrees
+    /* restructured so to not get stuck in a while loop
     private void rotateAngle(int angle) {
         double angleTicks = angle / 360.0 * ticksPerRev;
         double TP = spindexMotor.getCurrentPosition() + angleTicks;
@@ -79,15 +83,34 @@ public class SpindexerSubsystem extends SubsystemBase {
         while ((abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance)
                 && timer2.milliseconds() < 1500) {
             if(timer.milliseconds()>15) {
+                CP = spindexMotor.getCurrentPosition();
                 double MotorPower = -PID.Calculate(TP, CP);
                 spindexMotor.setPower(MotorPower);
-                CP = spindexMotor.getCurrentPosition();
                 timer.reset();
             }
         }
         spindexMotor.setPower(0);
         timer.reset();
         timer2.reset();
+    }
+     */
+
+    // set target position of spindexer in ticks
+    public void setTP(int tp) {
+        TP = tp;
+    }
+
+    // power spindexer based on PID
+    public void powerSpindexer() {
+        double CP = spindexMotor.getCurrentPosition();
+        if(abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance) {
+            if(timer.milliseconds()>15) {
+                CP = spindexMotor.getCurrentPosition();
+                double MotorPower = -PID.Calculate(TP, CP);
+                spindexMotor.setPower(MotorPower);
+                timer.reset();
+            }
+        }
     }
 
     // returns angle spindexer has rotated in degrees
@@ -100,31 +123,39 @@ public class SpindexerSubsystem extends SubsystemBase {
     private int modifyAngle(int angle) {
         int CP = spindexMotor.getCurrentPosition();
         int ticksToRotate = ticksPerRev * angle / 360;
-        int target = (CP + abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
-        return target - CP;
+        int target = 0;
+        if(CP >= 0)
+            target = (CP + abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
+        else
+            target = (CP - abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
+        return target;
     }
 
     // rotate spindexer clockwise one slot (120 degrees)
     public void rotateCW() {
-        rotateAngle(modifyAngle(-120));
+        //rotateAngle(modifyAngle(-120));
+        setTP(modifyAngle(-120));
         indexer.add(indexer.remove(0));
     }
 
-    // rotate spindexer counter clockwise one slot
+    // rotate spindexer counter-clockwise one slot
     public void rotateCCW() {
-        rotateAngle(modifyAngle(120));
+        //rotateAngle(modifyAngle(120));
+        setTP(modifyAngle(120));
         indexer.add(0, indexer.remove(2));
     }
 
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        rotateAngle(modifyAngle(60));
+        //rotateAngle(modifyAngle(60));
+        setTP(modifyAngle(60));
         shootMode = true;
     }
 
     // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
-        rotateAngle(modifyAngle(-60));
+        //rotateAngle(modifyAngle(-60));
+        setTP(modifyAngle(-60));
         shootMode = false;
     }
 

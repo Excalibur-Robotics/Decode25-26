@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 test just the spindexer rotation
  */
 
-@TeleOp
+//@TeleOp
 public class SpindexerTest extends CommandOpMode {
     SpindexerSubsystem spindexer;
 

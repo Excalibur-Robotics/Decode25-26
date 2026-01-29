@@ -49,6 +49,7 @@ public class IntakeCommand extends CommandBase {
                 spindexer.addArtifact(spindexer.getColor());
             spindexer.rotateCCW();
         }
+        spindexer.powerSpindexer();
         artifactPreviouslyDetected = artifactDetected;
     }
 

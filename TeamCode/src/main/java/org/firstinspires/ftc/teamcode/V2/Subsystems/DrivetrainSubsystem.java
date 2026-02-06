@@ -34,6 +34,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // initialize gamepad
         gamepad = gamepad1;
     }
+    public DrivetrainSubsystem(HardwareMap hwMap) {
+        // initialize motors
+        frontLeft = hwMap.get(DcMotor.class, "flwheel");
+        frontRight = hwMap.get(DcMotor.class, "frwheel");
+        backLeft = hwMap.get(DcMotor.class, "blwheel");
+        backRight = hwMap.get(DcMotor.class, "brwheel");
+
+        // reverse left motors
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+    }
 
     // power motors
     public void powerMotors(double fl, double fr, double bl, double br) {

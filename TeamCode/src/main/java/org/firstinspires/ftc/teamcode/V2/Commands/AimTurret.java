@@ -37,11 +37,7 @@ public class AimTurret extends CommandBase {
     public void execute() {
         // read limelight data and get tx, which is the
         // horizontal angle of the apriltag from the center
-        LLResult llData = outtake.readLimelight();
-        double tx = 0;
-        if(llData != null && llData.isValid()) {
-            tx = llData.getTx();
-        }
+        double tx = outtake.getTX();
         // pass tx to the pid controller to calculate motor power
         double power = turretController.calculate(tx);
         outtake.powerTurret(power);

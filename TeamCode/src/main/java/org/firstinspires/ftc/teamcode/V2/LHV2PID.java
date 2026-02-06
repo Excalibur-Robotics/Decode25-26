@@ -10,6 +10,7 @@ public class LHV2PID {
     public double kP; //Error Proportion Constant for tuning
     public double kD; //Derivative Proportion Constant for tuning
     public double kI; //Integral Proportion Constant for tuning
+    public double kV;
     public static double power;
     public static double error;
     public static double integral=0;
@@ -21,6 +22,13 @@ public class LHV2PID {
         this.kP=kP;
         this.kI=kI;
         this.kD=kD;
+        kV = 0;
+    }
+    public LHV2PID(double kP, double kI, double kD, double kV) {
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.kV = kV;
     }
     public double Calculate(double TP, double CP){ //TP = Target Position
         FtcDashboard dashboard= FtcDashboard.getInstance();
@@ -34,7 +42,7 @@ public class LHV2PID {
             integral=0;
         }
         double derivative= ((error-OldError)/dT);
-        power= (error*kP)+(derivative*kD)+(integral*kI);
+        power= (error*kP)+(derivative*kD)+(integral*kI) + (TP*kV);
         packet.put("Error", error);
         packet.put("Integral", integral);
         packet.put("Derivative", derivative);

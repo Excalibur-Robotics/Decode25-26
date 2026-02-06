@@ -72,7 +72,7 @@ public class V2TeleOp extends CommandOpMode {
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new IntakeCommand(intake, spindexer));
-        rightTrigger.whileActiveOnce(new ActivateFlywheel(outtake, spindexer, gamepad1));
+        rightTrigger.whileActiveOnce(new ActivateFlywheel(outtake, spindexer, 600, gamepad1));
         rightBumper.whenPressed(new ShootArtifact(outtake, spindexer));
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));

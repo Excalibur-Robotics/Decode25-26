@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
@@ -23,20 +24,30 @@ public class ActivateFlywheel extends CommandBase {
     Gamepad.RumbleEffect rumble;
     boolean hasRumbled;
 
-    PIDController flywheelPID;
+    LHV2PID flywheelPID;
     // constants need tuning
-    public static double kP = 0.05;
+    public static double kP = 0.015;
     public static double kI = 0;
     public static double kD = 0;
-    public static double flywheelSpeed = 1000; // in rpm
+    public static double kV = 0.000795; // feedforward constant
 
-    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, Gamepad gamepad) {
+    public double flywheelSpeed; // in rpm
+
+    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, int speed, Gamepad gamepad) {
         outtake = outtakeSub;
         spindexer = spindexSub;
         this.gamepad = gamepad;
+        flywheelSpeed = speed;
         rumble = new Gamepad.RumbleEffect.Builder().addStep(1, 1, 500).build();
-        flywheelPID = new PIDController(kP, kI, kD);
-        flywheelPID.setSetPoint(flywheelSpeed);
+
+        addRequirements(spindexer);
+    }
+
+    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, int speed) {
+        outtake = outtakeSub;
+        spindexer = spindexSub;
+        gamepad = null;
+        flywheelSpeed = speed;
 
         addRequirements(spindexer);
     }
@@ -47,13 +58,14 @@ public class ActivateFlywheel extends CommandBase {
         if(!spindexer.inOuttakeMode())
             spindexer.setToOuttakeMode();
         hasRumbled = false;
+        flywheelPID = new LHV2PID(kP, kI, kD, kV);
     }
 
     @Override
     public void execute() {
-        double power = flywheelPID.calculate(outtake.getFlywheelSpeed());
+        double power = flywheelPID.Calculate(flywheelSpeed, outtake.getFlywheelSpeed());
         outtake.setFlywheelPower(power);
-        if(outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 5 && !hasRumbled) {
+        if(gamepad != null && outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 25 && !hasRumbled) {
             gamepad.runRumbleEffect(rumble);
             hasRumbled = true;
         }

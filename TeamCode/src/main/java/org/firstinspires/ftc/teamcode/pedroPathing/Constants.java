@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -14,18 +15,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5) // robot mass in kg - need to measure
-            .forwardZeroPowerAcceleration(5) // use ForwardZeroPowerAcceleration to tune
-            .lateralZeroPowerAcceleration(5); // use LateralZeroPowerAcceleration to tune
+            .mass(5); // robot mass in kg - need to measure
+            //.forwardZeroPowerAcceleration(5) // use ForwardZeroPowerAcceleration to tune
+            //.lateralZeroPowerAcceleration(5) // use LateralZeroPowerAcceleration to tune
+            //.translationalPIDFCoefficients(new PIDFCoefficients())
+            //.headingPIDFCoefficients(new PIDFCoefficients())
+            //.drivePIDFCoefficients(new FilteredPIDFCoefficients())
+            //.centripetalScaling();
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName("fr")
-            .rightRearMotorName("br")
-            .leftRearMotorName("bl")
-            .leftFrontMotorName("fl")
+            .rightFrontMotorName("frwheel")
+            .rightRearMotorName("brwheel")
+            .leftRearMotorName("blwheel")
+            .leftFrontMotorName("flwheel")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
@@ -34,8 +39,8 @@ public class Constants {
             .yVelocity(5); // use LateralVelocityTuner to tune
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-135/25.4) // y offset in inches - need to measure
-            .strafePodX(-150/25.4) // x offset in inches - need to measure
+            .forwardPodY(-1.093) // y offset in inches
+            .strafePodX(-5.69) // x offset in inches
             .distanceUnit(DistanceUnit.INCH) // units
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

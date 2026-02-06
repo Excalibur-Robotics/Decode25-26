@@ -5,6 +5,14 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
+import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootColor;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
+
 /*
 This contains the poses and paths for the far auto routine and the state
 machine that determines the current path to follow.
@@ -31,8 +39,19 @@ public class FarAuto {
     // declare path state, used for the state machine
     private int pathState;
 
+    public IntakeSubsystem intake;
+    public SpindexerSubsystem spindexer;
+    public OuttakeSubsystem outtake;
+
+    public ActivateFlywheel activateFlywheel;
+    public IntakeCommand activateIntake;
+    public ShootColor shootPurple;
+    public ShootColor shootGreen;
+    public ShootArtifact shootArtifact;
+
     // constructor initializes poses and paths
-    public FarAuto(Follower follower, boolean redTeam) {
+    public FarAuto(Follower follower, IntakeSubsystem intake,
+                   SpindexerSubsystem spindexer, OuttakeSubsystem outtake, boolean redTeam) {
         // sets poses based on if we are red or blue
         if(redTeam) {
             startPose = new Pose(87, 9, Math.PI/2);
@@ -63,6 +82,16 @@ public class FarAuto {
 
         // set path state to 0
         setPathState(0);
+
+        this.intake = intake;
+        this.spindexer = spindexer;
+        this.outtake = outtake;
+
+        activateFlywheel = new ActivateFlywheel(outtake, spindexer, 800);
+        activateIntake = new IntakeCommand(intake, spindexer);
+        shootPurple = new ShootColor(outtake, spindexer, "purple");
+        shootGreen = new ShootColor(outtake, spindexer, "green");
+        shootArtifact = new ShootArtifact(outtake, spindexer);
     }
 
     // method to change path state
@@ -83,21 +112,37 @@ public class FarAuto {
     public void autoPathUpdate(Follower follower) {
         switch (pathState) {
             case 0:
-                if(!follower.isBusy()) {
+                activateFlywheel.schedule();
+                if(spindexer.getNumArtifacts() > 0) {
+                    shootArtifact.schedule();
+                }
+                else {
                     follower.followPath(goToPickup);
                     setPathState(1);
                 }
                 break;
             case 1:
                 if(!follower.isBusy()) {
+                    activateIntake.schedule();
                     follower.followPath(intakeBalls);
                     setPathState(2);
                 }
                 break;
             case 2:
                 if(!follower.isBusy()) {
+                    activateFlywheel.schedule();
                     follower.followPath(goToSecondShoot);
-                    setPathState(-1);
+                    setPathState(3);
+                }
+                break;
+            case 3:
+                if(!follower.isBusy()) {
+                    if(spindexer.getNumArtifacts() > 0) {
+                        shootArtifact.schedule();
+                    }
+                    else {
+                        setPathState(-1);
+                    };
                 }
                 break;
         }

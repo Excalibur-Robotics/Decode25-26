@@ -20,7 +20,7 @@ Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
  */
 
-@Config
+//@Config
 //@TeleOp
 public class TurretTest extends CommandOpMode {
     DcMotor turret;

@@ -37,7 +37,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     private ArrayList<String> indexer;
     private int numArtifacts;
-    private boolean shootMode;
+    private boolean OuttakeMode;
 
     // spindexer pid constants
     public static double kP = 0.0006; //0.00012;
@@ -48,7 +48,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public static int ticksPerRev = 8192; // cpm of bore encoder
 
     public LHV2PID PID;
-    private int TP;
+    private double TP; // target position in ticks
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -69,35 +69,17 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("empty");
         indexer.add("empty");
         indexer.add("empty");
-        numArtifacts = 0;
-        shootMode = false;
+        numArtifacts = 3; // start with 3 preloads
+        OuttakeMode = true; // start spindexer in outtake mode
     }
-
-    // rotate the spindexer a specified angle in degrees
-    /* restructured so to not get stuck in a while loop
-    private void rotateAngle(int angle) {
-        double angleTicks = angle / 360.0 * ticksPerRev;
-        double TP = spindexMotor.getCurrentPosition() + angleTicks;
-        double CP = spindexMotor.getCurrentPosition();
-        timer2.reset();
-        while ((abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance)
-                && timer2.milliseconds() < 1500) {
-            if(timer.milliseconds()>15) {
-                CP = spindexMotor.getCurrentPosition();
-                double MotorPower = -PID.Calculate(TP, CP);
-                spindexMotor.setPower(MotorPower);
-                timer.reset();
-            }
-        }
-        spindexMotor.setPower(0);
-        timer.reset();
-        timer2.reset();
-    }
-     */
 
     // set target position of spindexer in ticks
-    public void setTP(int tp) {
+    public void setTP(double tp) {
         TP = tp;
+    }
+
+    public double getTP() {
+        return TP;
     }
 
     // power spindexer based on PID
@@ -118,49 +100,32 @@ public class SpindexerSubsystem extends SubsystemBase {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
     }
 
-    // modify the angle if spindexer is off
-    // instead of always rotating the same amount
-    private int modifyAngle(int angle) {
-        int CP = spindexMotor.getCurrentPosition();
-        int ticksToRotate = ticksPerRev * angle / 360;
-        int target = 0;
-        if(CP >= 0)
-            target = (CP + abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
-        else
-            target = (CP - abs(ticksToRotate) / 2) / ticksToRotate * ticksToRotate + ticksToRotate;
-        return target;
-    }
-
     // rotate spindexer clockwise one slot (120 degrees)
     public void rotateCW() {
-        //rotateAngle(modifyAngle(-120));
-        setTP(modifyAngle(-120));
+        setTP(TP - 120.0 / 360 * ticksPerRev);
         indexer.add(indexer.remove(0));
     }
 
     // rotate spindexer counter-clockwise one slot
     public void rotateCCW() {
-        //rotateAngle(modifyAngle(120));
-        setTP(modifyAngle(120));
+        setTP(TP + 120.0 / 360 * ticksPerRev);
         indexer.add(0, indexer.remove(2));
     }
 
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        //rotateAngle(modifyAngle(60));
-        setTP(modifyAngle(60));
-        shootMode = true;
+        setTP(TP - 60.0 / 360 * ticksPerRev);
+        OuttakeMode = true;
     }
 
     // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
-        //rotateAngle(modifyAngle(-60));
-        setTP(modifyAngle(-60));
-        shootMode = false;
+        setTP(TP + 60.0 / 360 * ticksPerRev);
+        OuttakeMode = false;
     }
 
     public boolean inOuttakeMode() {
-        return shootMode;
+        return OuttakeMode;
     }
 
     // get the arraylist of the artifacts

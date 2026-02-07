@@ -23,7 +23,6 @@ public class ShootArtifact extends CommandBase {
         outtake = outtakeSub;
         spindexer = spindexSub;
         timer = new ElapsedTime();
-
         artifactKickedUp = false;
     }
 
@@ -50,28 +49,22 @@ public class ShootArtifact extends CommandBase {
     @Override
     public void execute() {
         spindexer.powerSpindexer();
-        // uses a timer to make sure the spindexer has rotated fully before
-        // activating the kicker
-        if(timer.milliseconds() > 1000 && !artifactKickedUp) {
+        // make sure spindexer has fully rotated before activating the kicker
+        if(spindexer.getSpindexerPower() == 0 && !artifactKickedUp) {
             outtake.kickUp();
             artifactKickedUp = true;
+            timer.reset();
         }
         // once kicker is all the way up, it is reset
-        if(outtake.getKickerPos() > outtake.getKickerUp() - 0.02) {
+        if(timer.milliseconds() > outtake.getTransferTime() && artifactKickedUp) {
             outtake.resetKicker();
             spindexer.removeArtifact(); // remove artifact from indexer arraylist
         }
     }
 
     @Override
-    public void end(boolean interrupted) {
-        // the command ends by making sure the kicker is reset
-        outtake.resetKicker();
-    }
-
-    @Override
     public boolean isFinished() {
         // ends the command when the kicker is reset
-        return outtake.getKickerPos() < outtake.getKickerDown() + 0.02;
+        return outtake.getKickerPos() == outtake.getKickerDown() && artifactKickedUp;
     }
 }

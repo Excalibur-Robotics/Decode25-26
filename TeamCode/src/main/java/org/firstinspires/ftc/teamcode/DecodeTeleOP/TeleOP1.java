@@ -26,12 +26,14 @@ public class TeleOP1 extends CommandOpMode {
         gp1 = new GamepadEx(gamepad1);
         outTake = new Out_take(hardwareMap);
         intake = new In_take(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap);
     }
 
     public void run(){
         // scheduler runs periodic drivetrain method for driving
         CommandScheduler.getInstance().run();
+
+        drivetrain.teleOpDrive(gamepad1);
 
         // turn on outtake when right trigger is pressed
         if (gamepad1.right_trigger > 0.5){

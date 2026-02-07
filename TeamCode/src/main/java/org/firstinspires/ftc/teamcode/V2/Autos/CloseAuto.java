@@ -28,7 +28,7 @@ pick up the closest three artifacts, returns to the shooting position, and
 shoots those three.
 */
 
-public class CloseAuto {
+public class CloseAuto extends AutoRoutine{
     // declare poses
     public Pose startPose;
     public Pose shootPose;
@@ -57,6 +57,8 @@ public class CloseAuto {
     // constructor initializes poses and paths
     public CloseAuto(Follower follower, IntakeSubsystem intake,
                      SpindexerSubsystem spindexer, OuttakeSubsystem outtake, boolean redTeam) {
+        super(follower, intake, spindexer, outtake, redTeam, true);
+
         // sets poses based on if we are red or blue
         if(redTeam) {
             startPose = new Pose(122.0, 125.0, Math.toRadians(36));
@@ -88,29 +90,6 @@ public class CloseAuto {
                 .addPath(new BezierLine(afterPickup, shootPose))
                 .setConstantHeadingInterpolation(beforePickup.getHeading())
                 .build();
-
-        // set path state to 0
-        setPathState(0);
-
-        this.intake = intake;
-        this.spindexer = spindexer;
-        this.outtake = outtake;
-
-        activateFlywheel = new ActivateFlywheel(outtake, spindexer, 500);
-        activateIntake = new IntakeCommand(intake, spindexer);
-        shootPurple = new ShootColor(outtake, spindexer, "purple");
-        shootGreen = new ShootColor(outtake, spindexer, "green");
-        shootArtifact = new ShootArtifact(outtake, spindexer);
-    }
-
-    // method to change path state
-    public void setPathState(int state) {
-        pathState = state;
-    }
-
-    // method to get the path state - used for debugging
-    public int getPathState() {
-        return pathState;
     }
 
     /*

@@ -6,16 +6,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
-public class ShootColor extends CommandBase {
+public class ShootColor extends ShootArtifact {
     private OuttakeSubsystem outtake;
     private SpindexerSubsystem spindexer;
     private ElapsedTime timer;
-    String color;
+    private boolean artifactKickedUp;
+    private String color;
 
     public ShootColor(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, String color) {
-        outtake = outtakeSub;
-        spindexer = spindexSub;
-        timer = new ElapsedTime();
+        super(outtakeSub, spindexSub);
         this.color = color;
     }
 
@@ -37,22 +36,5 @@ public class ShootColor extends CommandBase {
             }
             timer.reset();
         }
-    }
-
-    @Override
-    public void execute() {
-        if(timer.milliseconds() > 1000) {
-            outtake.kickUp();
-        }
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        outtake.resetKicker();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return outtake.getKickerPos() > 0.78;
     }
 }

@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(5); // robot mass in kg - need to measure
+            .mass(13.6); // robot mass in kg - need to measure
             //.forwardZeroPowerAcceleration(5) // use ForwardZeroPowerAcceleration to tune
             //.lateralZeroPowerAcceleration(5) // use LateralZeroPowerAcceleration to tune
             //.translationalPIDFCoefficients(new PIDFCoefficients())
@@ -45,7 +45,7 @@ public class Constants {
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)

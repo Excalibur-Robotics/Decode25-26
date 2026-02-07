@@ -36,16 +36,20 @@ public class OuttakeSubsystem extends SubsystemBase {
     public Limelight3A limelight;
 
     private final int fwTicksPerRev = 112;
-    private double targetSpeed;
+    private int targetSpeed; // current speed the flywheel is trying to reach
+    public static int presetFlywheelSpeed = 600; // preset flywheel speed
 
-    public static double kickerUp = 0.7;
-    public static double kickerDown = 0;
+    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDown = 0.05; // kicker servo down position
+    public static double transferTime = 550; // in milliseconds
 
-    private final int turretTicksPerRev = 112; // need to look up
+    private final int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
-    public static double kP = 0.02;
+    public static double kP = 0.014;
     public static double kI = 0.0;
-    public static double kD = 0.0001;
+    public static double kD = 0.001;
+
+    private boolean onRedTeam;
 
     public OuttakeSubsystem(HardwareMap hwMap) {
         flywheel = hwMap.get(DcMotorEx.class, "flywheel");
@@ -56,24 +60,29 @@ public class OuttakeSubsystem extends SubsystemBase {
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        limelight.pipelineSwitch(0);
+        turret.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        limelight.pipelineSwitch(1);
         limelight.start();
         hoodL.setDirection(Servo.Direction.FORWARD);
         hoodR.setDirection(Servo.Direction.REVERSE);
+        kicker.setDirection(Servo.Direction.REVERSE);
 
         targetSpeed = 0;
         turretPID = new LHV2PID(kP, kI, kD);
     }
 
-    // set flywheel to a speed in rpm
-    public void setFlywheelSpeed(double speed) {
-        double ticksPerSec = speed / 60 * fwTicksPerRev;
-        flywheel.setVelocity(ticksPerSec);
+    public void setFlywheelPower(double power) {
+        flywheel.setPower(power);
+    }
+
+    public void setTargetSpeed(int speed) {
         targetSpeed = speed;
     }
 
-    public void setFlywheelPower(double power) {
-        flywheel.setPower(power);
+    // calculate flywheel speed based on april tag
+    // still have to figure this out
+    public void calculateFlywheelSpeed() {
+        setTargetSpeed(presetFlywheelSpeed);
     }
 
     // get flywheel speed in rpm
@@ -86,7 +95,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         return targetSpeed;
     }
 
-    public int getFwTicksPerRev() {
+    public int getFWTicksPerRev() {
         return fwTicksPerRev;
     }
 
@@ -96,7 +105,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // rotate the kicker to kick an artifact to the outtake
     public void kickUp() {
-        kicker.setPosition(kickerUp);
+        kicker.setPosition(kickerDown + kickerDist);
     }
 
     // move kicker back down to original position
@@ -109,17 +118,20 @@ public class OuttakeSubsystem extends SubsystemBase {
         return kicker.getPosition();
     }
 
-    public double getKickerUp() {
-        return kickerUp;
+    public double getKickerDist() {
+        return kickerDist;
     }
     public double getKickerDown() {
         return kickerDown;
     }
+    public double getTransferTime() {
+        return transferTime;
+    }
 
     // set the power of the turret motor
     public void powerTurret(double power) {
-        if(!(turret.getCurrentPosition() > 110 && power < 0) &&
-                !(turret.getCurrentPosition() < -110 && power > 0)) {
+        if(!(getTurretPos() > 110 && power > 0) &&
+                !(getTurretPos() < -90 && power < 0)) {
             turret.setPower(power);
         }
     }
@@ -142,29 +154,51 @@ public class OuttakeSubsystem extends SubsystemBase {
         hoodL.setPosition(angle);
     }
 
+    public double calculateHood() {
+        return 0.45;
+    }
+
     public double getHoodAngle() {
         return hoodR.getPosition();
     }
 
+    public void setTeam(boolean redTeam) {
+        onRedTeam = redTeam;
+        limelight.pipelineSwitch(onRedTeam ? 1 : 2);
+    }
+
     public double getTX() {
         double tx = 0;
-        LLResult llData = limelight.getLatestResult();
-        if (llData != null && llData.isValid()) {
-            tx = llData.getTx();
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            tx = llResult.getTx();
         }
         return tx;
+    }
+    public double getTA() {
+        double ta = 0;
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            ta = llResult.getTa();
+        }
+        return ta;
     }
 
     public int getApriltagID() {
         LLResult llResult = limelight.getLatestResult();
         int id = 0;
-        if(llResult != null && llResult.isValid()) {
+        if (llResult != null && llResult.isValid()) {
             List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
             if (!fiducials.isEmpty()) {
                 id = fiducials.get(0).getFiducialId();
             }
         }
         return id;
+    }
+
+    @Override
+    public void periodic() {
+        calculateFlywheelSpeed();
     }
 
     // start the limelight - not done in constructor b/c limelight uses up energy

@@ -18,22 +18,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-    private Gamepad gamepad;
 
-    public DrivetrainSubsystem(HardwareMap hwMap, Gamepad gamepad1) {
-        // initialize motors
-        frontLeft = hwMap.get(DcMotor.class, "flwheel");
-        frontRight = hwMap.get(DcMotor.class, "frwheel");
-        backLeft = hwMap.get(DcMotor.class, "blwheel");
-        backRight = hwMap.get(DcMotor.class, "brwheel");
-
-        // reverse left motors
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-
-        // initialize gamepad
-        gamepad = gamepad1;
-    }
     public DrivetrainSubsystem(HardwareMap hwMap) {
         // initialize motors
         frontLeft = hwMap.get(DcMotor.class, "flwheel");
@@ -77,8 +62,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     // periodic method runs each time scheduler is run in the opmode
     // takes gamepad joysticks to feed to moveRobot()
-    @Override
-    public void periodic() {
+    public void teleOpDrive(Gamepad gamepad) {
         double x = gamepad.left_stick_x;
         double y = -gamepad.left_stick_y;
         double yaw = gamepad.right_stick_x;

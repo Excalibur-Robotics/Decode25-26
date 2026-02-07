@@ -18,7 +18,7 @@ public class BasicAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // initialize hardware
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap);
         intake = new In_take(hardwareMap);
         outtake = new Out_take(hardwareMap);
 

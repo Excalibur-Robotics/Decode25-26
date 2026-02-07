@@ -1,13 +1,8 @@
 package org.firstinspires.ftc.teamcode.V2.Autos;
 
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
-import org.firstinspires.ftc.teamcode.V2.Commands.AimTurret;
-import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
@@ -28,7 +23,7 @@ public class SimpleAuto extends LinearOpMode {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad1);
+        drivetrain = new DrivetrainSubsystem(hardwareMap);
         //CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
         //CommandScheduler.getInstance().schedule(new ActivateFlywheel(outtake, spindexer, gamepad2));
 

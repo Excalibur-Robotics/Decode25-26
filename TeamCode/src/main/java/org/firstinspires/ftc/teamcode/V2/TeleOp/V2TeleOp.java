@@ -10,8 +10,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
-import org.firstinspires.ftc.teamcode.V2.Commands.AimRobot;
-import org.firstinspires.ftc.teamcode.V2.Commands.AimTurret;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootColor;
@@ -60,7 +58,7 @@ public class V2TeleOp extends CommandOpMode {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        drivetrain = new DrivetrainSubsystem(hardwareMap, gamepad2);
+        drivetrain = new DrivetrainSubsystem(hardwareMap);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -72,17 +70,17 @@ public class V2TeleOp extends CommandOpMode {
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new IntakeCommand(intake, spindexer));
-        rightTrigger.whileActiveOnce(new ActivateFlywheel(outtake, spindexer, 600, gamepad1));
+        rightTrigger.whenActive(new ActivateFlywheel(outtake, spindexer, gamepad1));
         rightBumper.whenPressed(new ShootArtifact(outtake, spindexer));
         X.whenPressed(new ShootColor(outtake, spindexer, "green"));
         B.whenPressed(new ShootColor(outtake, spindexer, "purple"));
-        A.toggleWhenPressed(new AimRobot(outtake, drivetrain));
-        CommandScheduler.getInstance().setDefaultCommand(outtake, new AimTurret(outtake));
     }
 
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
+        drivetrain.teleOpDrive(gamepad1);
+        outtake.calculateTurret(outtake.getTX());
 
         telemetry.addData ("spindexer position", spindexer.getSpindexerAngle());
         ArrayList<String> indexer = spindexer.getIndexerState();

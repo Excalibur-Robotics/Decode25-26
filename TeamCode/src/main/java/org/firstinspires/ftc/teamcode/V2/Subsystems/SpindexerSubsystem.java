@@ -66,20 +66,11 @@ public class SpindexerSubsystem extends SubsystemBase {
         timer.reset();
 
         indexer = new ArrayList<String>();
-        indexer.add("empty");
-        indexer.add("empty");
-        indexer.add("empty");
+        indexer.add("purple");
+        indexer.add("green");
+        indexer.add("purple");
         numArtifacts = 3; // start with 3 preloads
         OuttakeMode = true; // start spindexer in outtake mode
-    }
-
-    // set target position of spindexer in ticks
-    public void setTP(double tp) {
-        TP = tp;
-    }
-
-    public double getTP() {
-        return TP;
     }
 
     // power spindexer based on PID
@@ -95,33 +86,41 @@ public class SpindexerSubsystem extends SubsystemBase {
         }
     }
 
-    // returns angle spindexer has rotated in degrees
-    public double getSpindexerAngle() {
-        return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
-    }
-
     // rotate spindexer clockwise one slot (120 degrees)
     public void rotateCW() {
-        setTP(TP - 120.0 / 360 * ticksPerRev);
+        TP = TP - 120.0 / 360 * ticksPerRev;
         indexer.add(indexer.remove(0));
     }
 
     // rotate spindexer counter-clockwise one slot
     public void rotateCCW() {
-        setTP(TP + 120.0 / 360 * ticksPerRev);
+        TP = TP + 120.0 / 360 * ticksPerRev;
         indexer.add(0, indexer.remove(2));
     }
 
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        setTP(TP - 60.0 / 360 * ticksPerRev);
+        TP =TP - 60.0 / 360 * ticksPerRev;
         OuttakeMode = true;
     }
 
     // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
-        setTP(TP + 60.0 / 360 * ticksPerRev);
+        TP = TP + 60.0 / 360 * ticksPerRev;
         OuttakeMode = false;
+    }
+
+    // returns angle spindexer has rotated in degrees
+    public double getSpindexerAngle() {
+        return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
+    }
+
+    public double getSpindexerPower() {
+        return spindexMotor.getPower();
+    }
+
+    public double getTP() {
+        return TP;
     }
 
     public boolean inOuttakeMode() {

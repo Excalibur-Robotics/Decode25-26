@@ -18,6 +18,10 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
+    public void setIntakePower(double power) {
+        intakeMotor.setPower(power);
+    }
+
     // set intake motor to full power
     public void activateIntake() {
         intakeMotor.setPower(1);

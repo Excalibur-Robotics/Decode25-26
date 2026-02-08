@@ -61,6 +61,7 @@ public class ActivateFlywheel extends CommandBase {
 
     @Override
     public void execute() {
+        spindexer.powerSpindexer();
         double power = 0;
         if(gamepad.right_trigger > 0.5) {
             power = flywheelPID.Calculate(outtake.getTargetSpeed(), outtake.getFlywheelSpeed());
@@ -82,6 +83,6 @@ public class ActivateFlywheel extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(outtake.getFlywheelSpeed()) < 10;
+        return gamepad.right_trigger == 0 && Math.abs(outtake.getFlywheelSpeed()) < 10;
     }
 }

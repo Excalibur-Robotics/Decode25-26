@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -7,6 +8,7 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -35,6 +37,13 @@ public class V2TeleOp extends CommandOpMode {
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
 
+    // commands
+    IntakeCommand intakeCommand;
+    ActivateFlywheel activateFlywheel;
+    ShootArtifact shootArtifact;
+    ShootColor shootPurple;
+    ShootColor shootGreen;
+
     // gamepads
     GamepadEx gp1;
     GamepadEx gp2;
@@ -46,6 +55,8 @@ public class V2TeleOp extends CommandOpMode {
     Button X;
     Button B;
     Button A;
+
+    private boolean onRedTeam = true;
 
     @Override
     public void initialize() {
@@ -60,31 +71,102 @@ public class V2TeleOp extends CommandOpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
 
+        // initialize commands
+        intakeCommand = new IntakeCommand(intake, spindexer);
+        activateFlywheel = new ActivateFlywheel(outtake, spindexer, gamepad1);
+        shootArtifact = new ShootArtifact(outtake, spindexer);
+        shootGreen = new ShootColor(outtake, spindexer, "green");
+        shootPurple = new ShootColor(outtake, spindexer, "purple");
+
         // set buttons/triggers
-        leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
-        rightTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
-        rightBumper = new GamepadButton(gp2, GamepadKeys.Button.RIGHT_BUMPER);
-        X = new GamepadButton(gp2, GamepadKeys.Button.X);
-        B = new GamepadButton(gp2, GamepadKeys.Button.B);
-        A = new GamepadButton(gp2, GamepadKeys.Button.A);
+        leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
+        rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
+        rightBumper = new GamepadButton(gp1, GamepadKeys.Button.RIGHT_BUMPER);
+        X = new GamepadButton(gp1, GamepadKeys.Button.X);
+        B = new GamepadButton(gp1, GamepadKeys.Button.B);
+        A = new GamepadButton(gp1, GamepadKeys.Button.A);
 
         // Bind buttons/triggers with commands
-        leftTrigger.whileActiveOnce(new IntakeCommand(intake, spindexer));
-        rightTrigger.whenActive(new ActivateFlywheel(outtake, spindexer, gamepad1));
-        rightBumper.whenPressed(new ShootArtifact(outtake, spindexer));
-        X.whenPressed(new ShootColor(outtake, spindexer, "green"));
-        B.whenPressed(new ShootColor(outtake, spindexer, "purple"));
+        leftTrigger.whileActiveOnce(intakeCommand);
+        rightTrigger.whenActive(activateFlywheel);
+        X.whenPressed(shootArtifact);
+        B.whenPressed(shootPurple);
+        A.whenPressed(shootGreen);
+
+        outtake.startLL();
+/*
+        while(!isStarted() && !isStopRequested()) {
+            telemetry.addData("Choose Team Color", "press X if blue team, B if red team");
+            if (gamepad1.x) {
+                outtake.setTeam(false);
+                onRedTeam = false;
+            }
+            if (gamepad1.b) {
+                outtake.setTeam(true);
+                onRedTeam = true;
+            }
+            telemetry.addData("Team Color", onRedTeam ? "RED" : "BLUE");
+        }
+
+ */
     }
 
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
+
         drivetrain.teleOpDrive(gamepad1);
+        outtake.calculateFlywheelSpeed();
         outtake.calculateTurret(outtake.getTX());
 
-        telemetry.addData ("spindexer position", spindexer.getSpindexerAngle());
+        // move hood up - dpad up
+        if(gamepad1.dpad_up) {
+            outtake.setHood(outtake.getHoodMax());
+        }
+
+        // move hood down - dpad down
+        if(gamepad1.dpad_down) {
+            outtake.setHood(0);
+        }
+
+        if(gamepad1.rightBumperWasPressed()) {
+            spindexer.rotateCCW();
+        }
+
+        // rotate spindexer CW - left bumper
+        if(gamepad1.leftBumperWasPressed()) {
+            spindexer.rotateCW();
+        }
+        spindexer.powerSpindexer();
+
+
+
+        telemetry.addData("flywheel command scheduled", activateFlywheel.isScheduled());
+        telemetry.addData("shoot command scheduled", shootArtifact.isScheduled());
+        telemetry.addData("purple pixels", spindexer.getPurplePixels());
+        telemetry.addData("green pixels", spindexer.getGreenPixels());
+        FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
+        telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
+        telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
+        telemetry.addData("target speed", outtake.getTargetSpeed());
+        telemetry.addData("flywheel power", outtake.flywheel.getPower());
+        telemetry.addData("kicker position", outtake.getKickerPos());
+        telemetry.addData("hood angle", outtake.getHoodAngle());
+        telemetry.addData("turret position", outtake.getTurretPos());
+        telemetry.addData("tx", outtake.getTX());
+        telemetry.addData("apriltag ID", outtake.getApriltagID());
+        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        telemetry.addData("spindexer power", spindexer.getSpindexerPower());
+        telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
         ArrayList<String> indexer = spindexer.getIndexerState();
-        telemetry.addData("indexer state", indexer.get(0) + " " + indexer.get(1) + " " + indexer.get(2));
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
+        telemetry.addData("indexer state", indexer.get(0) + " " +
+                indexer.get(1) + " " + indexer.get(2));
+        telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
+                indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
+        telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
+                + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
         telemetry.update();
     }
 }

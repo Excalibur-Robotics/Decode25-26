@@ -31,7 +31,7 @@ public class IntakeCommand extends CommandBase {
     public void initialize() {
         // Don't allow command to run if spindexer is full
         if(spindexer.getNumArtifacts() == 3)
-            cancel();
+            this.cancel();
         if(spindexer.inOuttakeMode()) {
             spindexer.setToIntakeMode();
         }

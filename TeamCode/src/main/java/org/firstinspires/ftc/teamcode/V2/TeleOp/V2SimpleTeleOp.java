@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
-import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
@@ -66,16 +63,19 @@ public class V2SimpleTeleOp extends OpMode {
     }
 
     @Override
+    public void start() {
+        outtake.startLL();
+    }
+
+    @Override
     public void loop() {
         CommandScheduler.getInstance().run();
 
         drivetrain.teleOpDrive(gamepad1);
-        spindexer.powerSpindexer(); // spindexer pid
-        outtake.calculateFlywheelSpeed();
         outtake.calculateTurret(outtake.getTX()); // turret aim with apriltag
 
         // kicker - X
-        if(gamepad1.x) {
+        if(gamepad1.xWasPressed()) {
             outtake.kickUp();
             kickerTimer.reset();
         }
@@ -95,9 +95,14 @@ public class V2SimpleTeleOp extends OpMode {
             intake.stopIntake();
         }
 
+        outtake.calculateFlywheelSpeed();
         // flywheel - right trigger
         if(gamepad1.right_trigger > 0.5) {
-            activateFlywheel.schedule();
+            //activateFlywheel.schedule();
+            outtake.setFlywheelPower(0.6);
+        }
+        else {
+            outtake.setFlywheelPower(0);
         }
 
         // rotate spindexer CCW - right bumper
@@ -109,6 +114,7 @@ public class V2SimpleTeleOp extends OpMode {
         if(gamepad1.leftBumperWasPressed()) {
             spindexer.rotateCW();
         }
+        spindexer.powerSpindexer();
 
         // rotate spindexer half a turn to switch between intake/outtake - Y
         if(gamepad1.yWasPressed()) {
@@ -120,7 +126,7 @@ public class V2SimpleTeleOp extends OpMode {
 
         // move hood up - dpad up
         if(gamepad1.dpad_up) {
-            outtake.setHood(outtake.getHoodAngle()+0.05);
+            outtake.setHood(hoodUp);
         }
 
         // move hood down - dpad down
@@ -130,6 +136,9 @@ public class V2SimpleTeleOp extends OpMode {
 
 
 
+        telemetry.addData("purple pixels", spindexer.getPurplePixels());
+        telemetry.addData("green pixels", spindexer.getGreenPixels());
+        FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
         telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
         telemetry.addData("target speed", outtake.getTargetSpeed());
@@ -140,15 +149,16 @@ public class V2SimpleTeleOp extends OpMode {
         telemetry.addData("tx", outtake.getTX());
         telemetry.addData("apriltag ID", outtake.getApriltagID());
         telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("target position", spindexer.getTargetAngle());
         telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
-        telemetry.addData("target position", spindexer.getTP());
         ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.addData("indexer state", indexer.get(0) + " " +
                           indexer.get(1) + " " + indexer.get(2));
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
         telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
-                + " " + indexer.get(0).charAt(0) : "  " + indexer.get(0).charAt(0));
+                + " " + indexer.get(1).charAt(0) : "  " + indexer.get(0).charAt(0));
 
         telemetry.update();
     }

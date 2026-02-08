@@ -10,7 +10,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.V2.LHV2PID;
+import org.firstinspires.ftc.teamcode.V2.LTPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.ArrayList;
 
@@ -26,13 +30,15 @@ outtaked. It also has a variable containing the number of artifacts currently
 in the spindexer
 
 *Because the outtake and intake positions don't line up on the robot, the
-spindexer can be rotate 30 degrees to switch between intake and outtake mode.
+spindexer can be rotate 60 degrees to switch between intake and outtake mode.
 When this happens, the state of the indexer arraylist doesn't change.
  */
 
 @Config
 public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
+    public OpenCvCamera LT;
+    LTPipeline pipeline;
     //public NormalizedColorSensor colorSensor;
 
     private ArrayList<String> indexer;
@@ -53,6 +59,9 @@ public class SpindexerSubsystem extends SubsystemBase {
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
 
+    public static int LTWidth = 640;
+    public static int LTHeight = 480;
+
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
         //colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
@@ -71,6 +80,27 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("purple");
         numArtifacts = 3; // start with 3 preloads
         OuttakeMode = true; // start spindexer in outtake mode
+
+        // camera initialization
+        int LT_ID=hwMap.appContext.getResources().getIdentifier("LT_ID", "id",
+                hwMap.appContext.getPackageName());
+        LT = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class,"LT")
+                ,LT_ID); //Webcam object
+        pipeline = new LTPipeline();
+        LT.setPipeline(pipeline);
+        LT.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+                                         @Override
+                                         public void onOpened() {
+                                             LT.startStreaming(LTWidth, LTHeight);
+                                             /*Adjust height and width of camera view here*/
+                                         }
+
+                                         @Override
+                                         public void onError(int errorCode) {
+                                             // Does nothing if the cam doesn't open
+                                         }
+                                     }
+        );
     }
 
     // power spindexer based on PID
@@ -100,7 +130,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
-        TP =TP - 60.0 / 360 * ticksPerRev;
+        TP = TP - 60.0 / 360 * ticksPerRev;
         OuttakeMode = true;
     }
 
@@ -113,6 +143,9 @@ public class SpindexerSubsystem extends SubsystemBase {
     // returns angle spindexer has rotated in degrees
     public double getSpindexerAngle() {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
+    }
+    public double getTargetAngle() {
+        return TP / ticksPerRev * 360;
     }
 
     public double getSpindexerPower() {
@@ -151,6 +184,13 @@ public class SpindexerSubsystem extends SubsystemBase {
             indexer.set(2, "empty");
             numArtifacts--;
         }
+    }
+
+    public double getGreenPixels() {
+        return pipeline.GreenPixels;
+    }
+    public double getPurplePixels() {
+        return pipeline.PurplePixels;
     }
 
     // get the color the color sensor currently sees.

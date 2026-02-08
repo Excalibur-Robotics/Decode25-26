@@ -40,14 +40,16 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int presetFlywheelSpeed = 600; // preset flywheel speed
 
     public static double kickerDist = 0.7; // difference of up and down position
-    public static double kickerDown = 0.05; // kicker servo down position
+    public static double kickerDown = 0.0; // kicker servo down position
     public static double transferTime = 550; // in milliseconds
 
     private final int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
-    public static double kP = 0.014;
+    public static double kP = 0.016;
     public static double kI = 0.0;
     public static double kD = 0.001;
+
+    public static double hoodMax = 0.45;
 
     private boolean onRedTeam;
 
@@ -62,13 +64,21 @@ public class OuttakeSubsystem extends SubsystemBase {
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         turret.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         limelight.pipelineSwitch(1);
-        limelight.start();
         hoodL.setDirection(Servo.Direction.FORWARD);
         hoodR.setDirection(Servo.Direction.REVERSE);
         kicker.setDirection(Servo.Direction.REVERSE);
 
         targetSpeed = 0;
         turretPID = new LHV2PID(kP, kI, kD);
+
+        kicker.setPosition(kickerDown);
+    }
+
+    @Override
+    public void periodic() {
+        //calculateTurret(getTX());
+        //calculateFlywheelSpeed();
+        //setHood(calculateHood());
     }
 
     public void setFlywheelPower(double power) {
@@ -161,10 +171,17 @@ public class OuttakeSubsystem extends SubsystemBase {
     public double getHoodAngle() {
         return hoodR.getPosition();
     }
+    public double getHoodMax() {
+        return hoodMax;
+    }
 
     public void setTeam(boolean redTeam) {
         onRedTeam = redTeam;
         limelight.pipelineSwitch(onRedTeam ? 1 : 2);
+    }
+
+    public void startLL() {
+        limelight.start();
     }
 
     public double getTX() {
@@ -194,11 +211,6 @@ public class OuttakeSubsystem extends SubsystemBase {
             }
         }
         return id;
-    }
-
-    @Override
-    public void periodic() {
-        calculateFlywheelSpeed();
     }
 
     // start the limelight - not done in constructor b/c limelight uses up energy

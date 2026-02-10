@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.V2;
+import com.acmerobotics.dashboard.config.Config;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+@Config
 public class LTPipeline extends OpenCvPipeline{
     Mat hsv = new Mat();
     Mat green_mask = new Mat();
@@ -10,15 +13,19 @@ public class LTPipeline extends OpenCvPipeline{
 
     public double GreenPixels;
     public double PurplePixels;
+    public static int min_green_R = 0;
+    public static int min_green_G = 130;
+    public static int min_green_B = 110;
+    public static int max_green_R = 120;
+    public static int max_green_G = 255;
+    public static int max_green_B = 255;
 
     //Scalars might need tuning
     //Green (RGB range)
-    Scalar min_green = new Scalar(35, 80, 50);
-    Scalar max_green = new Scalar(85, 255, 255);
-
+    Scalar min_green = new Scalar(min_green_R, min_green_G, min_green_B);
+    Scalar max_green = new Scalar(max_green_R, max_green_G, max_green_B);
 
     //Purple (RGB range)
-
     Scalar min_purple = new Scalar(125, 80, 50);
     Scalar max_purple= new Scalar(155, 255, 255);
 

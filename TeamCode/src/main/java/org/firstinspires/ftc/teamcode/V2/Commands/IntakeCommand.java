@@ -18,7 +18,7 @@ public class IntakeCommand extends CommandBase {
     private SpindexerSubsystem spindexer;
 
     // if artifact was detected in the previous loop - used for edge detection
-    private boolean artifactPreviouslyDetected;
+    public boolean artifactPreviouslyDetected;
 
     public IntakeCommand(IntakeSubsystem intakeSub, SpindexerSubsystem spindexSub) {
         intake = intakeSub;

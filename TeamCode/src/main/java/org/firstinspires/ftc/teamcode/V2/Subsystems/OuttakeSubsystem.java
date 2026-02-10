@@ -37,7 +37,8 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int fwTicksPerRev = 112;
     private int targetSpeed; // current speed the flywheel is trying to reach
-    public static int presetFlywheelSpeed = 600; // preset flywheel speed
+    public static int flywheelSpeedFar = 900;
+    public static int flywheelSpeedClose = 550;
 
     public static double kickerDist = 0.7; // difference of up and down position
     public static double kickerDown = 0.0; // kicker servo down position
@@ -45,11 +46,12 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
-    public static double kP = 0.016;
+    public static double kP = 0.02; // needs to be tuned
     public static double kI = 0.0;
-    public static double kD = 0.001;
+    public static double kD = 0.5; // needs to be tuned
 
-    public static double hoodMax = 0.45;
+    public static double hoodPosFar = 0.45;
+    public static double hoodPosClose = 0.1;
 
     private boolean onRedTeam;
 
@@ -91,8 +93,15 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // calculate flywheel speed based on april tag
     // still have to figure this out
-    public void calculateFlywheelSpeed() {
-        setTargetSpeed(presetFlywheelSpeed);
+    public void calculateLaunch() {
+        if(getTA() == 0 || getTA() > 1) {
+            setTargetSpeed(flywheelSpeedClose);
+            setHood(hoodPosClose);
+        }
+        else {
+            setTargetSpeed(flywheelSpeedFar);
+            setHood(hoodPosFar);
+        }
     }
 
     // get flywheel speed in rpm
@@ -171,8 +180,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     public double getHoodAngle() {
         return hoodR.getPosition();
     }
-    public double getHoodMax() {
-        return hoodMax;
+    public double getHoodFar() {
+        return hoodPosFar;
+    }
+    public double getHoodClose() {
+        return hoodPosClose;
     }
 
     public void setTeam(boolean redTeam) {

@@ -15,14 +15,18 @@ public class ShootColor extends ShootArtifact {
 
     public ShootColor(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, String color) {
         super(outtakeSub, spindexSub);
+        outtake = outtakeSub;
+        spindexer = spindexSub;
+        timer = new ElapsedTime();
         this.color = color;
     }
 
     @Override
     public void initialize() {
-        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 20
+        artifactKickedUp = false;
+        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 30
                 || spindexer.getNumArtifacts() == 0) {
-            cancel();
+            this.cancel();
         }
         if(!spindexer.getIndexerState().get(2).equals(color)) {
             if(spindexer.getIndexerState().get(1).equals(color)) {
@@ -32,7 +36,7 @@ public class ShootColor extends ShootArtifact {
                 spindexer.rotateCW();
             }
             else {
-                cancel();
+                this.cancel();
             }
             timer.reset();
         }

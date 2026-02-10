@@ -46,12 +46,12 @@ public class SpindexerSubsystem extends SubsystemBase {
     private boolean OuttakeMode;
 
     // spindexer pid constants
-    public static double kP = 0.0006; //0.00012;
-    public static double kI = 0; //0.0000000025;
-    public static double kD = 0.008; //-0.0002;
+    public static double kP = 0.0006;
+    public static double kI = 0;
+    public static double kD = 0.008;
     public static int tolerance = 35;
     public static int velocityTolerance = 15;
-    public static int ticksPerRev = 8192; // cpm of bore encoder
+    public final int ticksPerRev = 8192; // cpr of bore encoder
 
     public LHV2PID PID;
     private double TP; // target position in ticks
@@ -59,19 +59,19 @@ public class SpindexerSubsystem extends SubsystemBase {
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
 
-    public static int LTWidth = 640;
-    public static int LTHeight = 480;
-
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
         //colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        int CP = spindexMotor.getCurrentPosition();
+        int ticks = 120 * ticksPerRev / 360;
+        TP = (abs(CP) + ticks/2) / ticks * ticks * CP / abs(CP);
+
         PID = new LHV2PID(kP, kI, kD);
-        TP = 0;
         timer.reset();
 
         indexer = new ArrayList<String>();
@@ -91,7 +91,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         LT.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
                                          @Override
                                          public void onOpened() {
-                                             LT.startStreaming(LTWidth, LTHeight);
+                                             LT.startStreaming(640, 480);
                                              /*Adjust height and width of camera view here*/
                                          }
 
@@ -204,15 +204,23 @@ public class SpindexerSubsystem extends SubsystemBase {
         else if(hue >= 150 && hue <= 180) {
             color = "green";
         }
-
          */
-        return "";//color;
+
+        String color = "empty";
+        if(pipeline.GreenPixels > 100000) {
+            color = "green";
+        }
+        else if(pipeline.PurplePixels > 100000) {
+            color = "purple";
+        }
+
+        return color;
     }
 
     public boolean detectsArtifact() {
-        String color = getColor();
-        return color.equals("purple") || color.equals("green");
+        /*String color = getColor();
+        return color.equals("purple") || color.equals("green");*/
+
+        return pipeline.GreenPixels > 100000 || pipeline.PurplePixels > 100000;
     }
-
-
 }

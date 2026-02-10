@@ -8,7 +8,6 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -93,6 +92,10 @@ public class V2TeleOp extends CommandOpMode {
         B.whenPressed(shootPurple);
         A.whenPressed(shootGreen);
 
+        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        telemetry.update();
+
         outtake.startLL();
 /*
         while(!isStarted() && !isStopRequested()) {
@@ -116,26 +119,32 @@ public class V2TeleOp extends CommandOpMode {
         CommandScheduler.getInstance().run();
 
         drivetrain.teleOpDrive(gamepad1);
-        outtake.calculateFlywheelSpeed();
+        outtake.calculateLaunch();
         outtake.calculateTurret(outtake.getTX());
 
-        // move hood up - dpad up
+        /*// move hood up - dpad up
         if(gamepad1.dpad_up) {
-            outtake.setHood(outtake.getHoodMax());
+            outtake.setHood(outtake.getHoodFar());
         }
 
         // move hood down - dpad down
         if(gamepad1.dpad_down) {
-            outtake.setHood(0);
+            outtake.setHood(outtake.getHoodClose());
         }
+
+         */
 
         if(gamepad1.rightBumperWasPressed()) {
             spindexer.rotateCCW();
         }
-
-        // rotate spindexer CW - left bumper
         if(gamepad1.leftBumperWasPressed()) {
             spindexer.rotateCW();
+        }
+        if(gamepad1.yWasPressed()) {
+            if(spindexer.inOuttakeMode())
+                spindexer.setToIntakeMode();
+            else
+                spindexer.setToOuttakeMode();
         }
         spindexer.powerSpindexer();
 
@@ -143,22 +152,18 @@ public class V2TeleOp extends CommandOpMode {
 
         telemetry.addData("flywheel command scheduled", activateFlywheel.isScheduled());
         telemetry.addData("shoot command scheduled", shootArtifact.isScheduled());
+        telemetry.addData("intake command scheduled", intakeCommand.isScheduled());
         telemetry.addData("purple pixels", spindexer.getPurplePixels());
         telemetry.addData("green pixels", spindexer.getGreenPixels());
+        telemetry.addData("Artifact in intake slot", spindexer.detectsArtifact());
         FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
-        telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
-        telemetry.addData("target speed", outtake.getTargetSpeed());
-        telemetry.addData("flywheel power", outtake.flywheel.getPower());
-        telemetry.addData("kicker position", outtake.getKickerPos());
-        telemetry.addData("hood angle", outtake.getHoodAngle());
-        telemetry.addData("turret position", outtake.getTurretPos());
-        telemetry.addData("tx", outtake.getTX());
-        telemetry.addData("apriltag ID", outtake.getApriltagID());
+        telemetry.addLine();
         telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
         telemetry.addData("spindexer target position", spindexer.getTargetAngle());
         telemetry.addData("spindexer power", spindexer.getSpindexerPower());
         telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
+        telemetry.addData("artifact previously detected", intakeCommand.artifactPreviouslyDetected);
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.addData("indexer state", indexer.get(0) + " " +
@@ -167,6 +172,18 @@ public class V2TeleOp extends CommandOpMode {
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
         telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
                 + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
+        telemetry.addLine();
+        telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
+        telemetry.addData("target speed", outtake.getTargetSpeed());
+        telemetry.addData("flywheel power", outtake.flywheel.getPower());
+        telemetry.addData("kicker position", outtake.getKickerPos());
+        telemetry.addData("hood angle", outtake.getHoodAngle());
+        telemetry.addData("turret position", outtake.getTurretPos());
+        telemetry.addLine();
+        telemetry.addData("tx", outtake.getTX());
+        telemetry.addData("ta", outtake.getTA());
+        telemetry.addData("apriltag ID", outtake.getApriltagID());
+
         telemetry.update();
     }
 }

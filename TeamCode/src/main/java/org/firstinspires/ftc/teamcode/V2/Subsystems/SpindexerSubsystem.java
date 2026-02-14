@@ -64,21 +64,23 @@ public class SpindexerSubsystem extends SubsystemBase {
         //colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        //spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         int CP = spindexMotor.getCurrentPosition();
         int ticks = 120 * ticksPerRev / 360;
-        TP = (abs(CP) + ticks/2) / ticks * ticks * CP / abs(CP);
+        if(CP != 0)
+            TP = (abs(CP) + ticks/2) / ticks * ticks * CP / abs(CP);
+        else
+            TP = 0;
 
         PID = new LHV2PID(kP, kI, kD);
         timer.reset();
 
         indexer = new ArrayList<String>();
-        indexer.add("purple");
-        indexer.add("green");
-        indexer.add("purple");
-        numArtifacts = 3; // start with 3 preloads
+        indexer.add("empty");
+        indexer.add("empty");
+        indexer.add("empty");
+        numArtifacts = 0; // start with 3 preloads
         OuttakeMode = true; // start spindexer in outtake mode
 
         // camera initialization
@@ -140,6 +142,10 @@ public class SpindexerSubsystem extends SubsystemBase {
         OuttakeMode = false;
     }
 
+    public void resetSpindexEncoder() {
+        spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     // returns angle spindexer has rotated in degrees
     public double getSpindexerAngle() {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
@@ -186,6 +192,16 @@ public class SpindexerSubsystem extends SubsystemBase {
         }
     }
 
+    public void setIndexerState(String[] state) {
+        int num = 0;
+        for(int i = 0; i < 3; i++) {
+            indexer.set(i, state[i]);
+            if(!state[i].equals("empty"))
+                num++;
+        }
+        numArtifacts = num;
+    }
+
     public double getGreenPixels() {
         return pipeline.GreenPixels;
     }
@@ -207,10 +223,10 @@ public class SpindexerSubsystem extends SubsystemBase {
          */
 
         String color = "empty";
-        if(pipeline.GreenPixels > 100000) {
+        if(pipeline.GreenPixels > 90000) {
             color = "green";
         }
-        else if(pipeline.PurplePixels > 100000) {
+        else if(pipeline.PurplePixels > 90000) {
             color = "purple";
         }
 

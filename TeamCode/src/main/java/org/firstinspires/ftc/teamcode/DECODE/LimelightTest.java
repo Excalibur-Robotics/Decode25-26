@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import java.util.List;
 
 //@TeleOp
-@Configurable
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
     //DrivetrainSubsystem drivetrain;

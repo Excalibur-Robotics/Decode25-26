@@ -62,6 +62,6 @@ public class IntakeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // end the command if the spindexer is full
-        return spindexer.getNumArtifacts() == 3;
+        return false; //spindexer.getNumArtifacts() == 3;
     }
 }

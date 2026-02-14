@@ -42,10 +42,11 @@ public class V2SimpleTeleOp extends OpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
 
-        activateFlywheel = new ActivateFlywheel(outtake, spindexer, gamepad1);
+        activateFlywheel = new ActivateFlywheel(outtake, gamepad1);
 
         outtake.setHood(hoodDown);
         kickerTimer = new ElapsedTime();
+        outtake.resetTurretEncoder();
     }
 
     @Override
@@ -79,8 +80,7 @@ public class V2SimpleTeleOp extends OpMode {
             outtake.kickUp();
             kickerTimer.reset();
         }
-        else if(outtake.getKickerPos() > outtake.getKickerDown() &&
-                kickerTimer.milliseconds() > outtake.getTransferTime()) {
+        else if(gamepad1.bWasPressed()) {
             outtake.resetKicker();
         }
 

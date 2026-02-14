@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+import java.util.ArrayList;
+
 /*
 This is the main OpMode for our autonomous programs.
 It creates and autonomous routine object (CloseAuto or FarAuto) which contains
@@ -28,8 +30,8 @@ public class AutoOpMode extends OpMode {
 
     // declare an autonomous routine
     AutoRoutine routine;
-    boolean onRedTeam;
-    boolean startingClose;
+    boolean onRedTeam = true;
+    boolean startingClose = false;
 
     @Override
     public void init() {
@@ -40,21 +42,25 @@ public class AutoOpMode extends OpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        telemetry.addData("Choose Team Color","press X if blue team, B if red team");
-        telemetry.addData("Team Color", "");
-        telemetry.addLine();
-        telemetry.addData("Choose starting position", "press Y if close, A if far (from goal)");
-        telemetry.addData("Starting Position", "");
+        outtake.setHood(outtake.getHoodClose());
+        spindexer.resetSpindexEncoder();
     }
 
     @Override
     public void init_loop() {
+        telemetry.addData("Choose Team Color","press square if blue team, circle if red team");
+        telemetry.addData("Team Color", "");
+        telemetry.addLine();
+        telemetry.addData("Choose starting position", "press triangle if close, X if far (from goal)");
+        telemetry.addData("Starting Position", "");
         if(gamepad1.x) {
             onRedTeam = false;
+            //outtake.setTeam(false);
             telemetry.addData("Team Color", "BLUE");
         }
         if(gamepad1.b) {
             onRedTeam = true;
+            //outtake.setTeam(true);
             telemetry.addData("Team Color", "RED");
         }
         if(gamepad1.y) {
@@ -65,6 +71,10 @@ public class AutoOpMode extends OpMode {
             startingClose = false;
             telemetry.addData("Starting Position", "FAR");
         }
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.update();
     }
 
     @Override
@@ -76,6 +86,9 @@ public class AutoOpMode extends OpMode {
     @Override
     public void loop() {
         CommandScheduler.getInstance().run();
+        outtake.calculateTurret(outtake.getTX());
+        spindexer.powerSpindexer();
+        outtake.calculateLaunch();
 
         // This is the main loop, which determines the current path
         // and makes the robot follow it
@@ -86,9 +99,21 @@ public class AutoOpMode extends OpMode {
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
         telemetry.addData("close or far:", startingClose ? "CLOSE" : "FAR");
         telemetry.addData("path state", routine.getPathState());
+        telemetry.addData("follower is busy?", follower.isBusy());
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
+                indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
+        telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
+                + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
+        telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
+        telemetry.addData("tx", outtake.getTX());
+        telemetry.addData("ta", outtake.getTA());
         telemetry.update();
     }
 }

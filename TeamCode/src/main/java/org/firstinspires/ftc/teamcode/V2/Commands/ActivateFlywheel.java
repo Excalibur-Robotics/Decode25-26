@@ -19,7 +19,6 @@ outtake mode. At the end of the command, the flywheel speed is set to 0.
 @Config
 public class ActivateFlywheel extends CommandBase {
     private OuttakeSubsystem outtake;
-    private SpindexerSubsystem spindexer;
     Gamepad gamepad;
     Gamepad.RumbleEffect rumble;
     boolean hasRumbled;
@@ -33,44 +32,34 @@ public class ActivateFlywheel extends CommandBase {
 
     public double flywheelSpeed; // in rpm
 
-    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub, Gamepad gamepad) {
+    public ActivateFlywheel(OuttakeSubsystem outtakeSub, Gamepad gamepad) {
         outtake = outtakeSub;
-        spindexer = spindexSub;
         this.gamepad = gamepad;
         rumble = new Gamepad.RumbleEffect.Builder().addStep(1, 1, 500).build();
-
-        addRequirements(spindexer);
     }
 
-    public ActivateFlywheel(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub) {
+    public ActivateFlywheel(OuttakeSubsystem outtakeSub) {
         outtake = outtakeSub;
-        spindexer = spindexSub;
         gamepad = null;
-
-        addRequirements(spindexer);
     }
 
     @Override
     public void initialize() {
-        //outtake.setFlywheelSpeed(flywheelSpeed);
-        if(!spindexer.inOuttakeMode())
-            spindexer.setToOuttakeMode();
         hasRumbled = false;
         flywheelPID = new LHV2PID(kP, kI, kD, kV);
     }
 
     @Override
     public void execute() {
-        spindexer.powerSpindexer();
         double power = 0;
-        if(gamepad.right_trigger > 0.5) {
+        if(gamepad == null || gamepad.right_trigger > 0.5) {
             power = flywheelPID.Calculate(outtake.getTargetSpeed(), outtake.getFlywheelSpeed());
         }
         else {
             power = flywheelPID.Calculate(0, outtake.getFlywheelSpeed());
         }
         outtake.setFlywheelPower(power);
-        if(gamepad != null && outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 25 && !hasRumbled) {
+        if(gamepad != null && outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30 && !hasRumbled) {
             gamepad.runRumbleEffect(rumble);
             hasRumbled = true;
         }
@@ -83,6 +72,9 @@ public class ActivateFlywheel extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return gamepad.right_trigger == 0 && Math.abs(outtake.getFlywheelSpeed()) < 10;
+        if(gamepad != null)
+            return gamepad.right_trigger == 0 && Math.abs(outtake.getFlywheelSpeed()) < 10;
+        else
+            return false;
     }
 }

@@ -69,4 +69,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         moveRobot(x, y, yaw);
     }
+    // field centric driving - pass the heading
+    public void teleOpDrive(Gamepad gamepad, double heading) {
+        double x = gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        double yaw = gamepad.right_stick_x;
+
+        double newX = x*Math.cos(heading) + y*Math.sin(heading);
+        double newY = y*Math.cos(heading) - x*Math.sin(heading);
+
+        moveRobot(newX, newY, yaw);
+    }
 }

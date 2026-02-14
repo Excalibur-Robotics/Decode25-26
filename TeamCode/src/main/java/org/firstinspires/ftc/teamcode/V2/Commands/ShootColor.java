@@ -19,15 +19,16 @@ public class ShootColor extends ShootArtifact {
         spindexer = spindexSub;
         timer = new ElapsedTime();
         this.color = color;
+
+        addRequirements(spindexer);
     }
 
     @Override
     public void initialize() {
         artifactKickedUp = false;
-        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 30
-                || spindexer.getNumArtifacts() == 0) {
-            this.cancel();
-        }
+        if(!spindexer.inOuttakeMode())
+            spindexer.setToOuttakeMode();
+
         if(!spindexer.getIndexerState().get(2).equals(color)) {
             if(spindexer.getIndexerState().get(1).equals(color)) {
                 spindexer.rotateCCW();

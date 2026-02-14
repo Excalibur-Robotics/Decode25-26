@@ -23,17 +23,15 @@ public class ShootArtifact extends CommandBase {
         outtake = outtakeSub;
         spindexer = spindexSub;
         timer = new ElapsedTime();
+
+        addRequirements(spindexer);
     }
 
     @Override
     public void initialize() {
         artifactKickedUp = false;
-        // don't allow command to run if the flywheel isn't up to speed
-        // or if the spindexer is empty
-        if(outtake.getFlywheelSpeed() < outtake.getTargetSpeed() - 30
-                /*|| spindexer.getNumArtifacts() == 0*/) {
-            this.cancel();
-        }
+        if(!spindexer.inOuttakeMode())
+            spindexer.setToOuttakeMode();
 
         // logic to rotate to correct slot
         if(spindexer.getIndexerState().get(2).equals("empty")) {
@@ -51,8 +49,8 @@ public class ShootArtifact extends CommandBase {
     public void execute() {
         spindexer.powerSpindexer();
         // make sure spindexer has fully rotated before activating the kicker
-        if(spindexer.getSpindexerPower() < 0.01 && Math.abs(spindexer.getSpindexerAngle() -
-                spindexer.getTargetAngle()) < 7 && !artifactKickedUp) {
+        if(Math.abs(spindexer.getSpindexerAngle() - spindexer.getTargetAngle()) < 6
+                && !artifactKickedUp) {
             outtake.kickUp();
             artifactKickedUp = true;
             timer.reset();
@@ -62,12 +60,14 @@ public class ShootArtifact extends CommandBase {
             outtake.resetKicker();
             if(outtake.getFlywheelSpeed() > 0)
                 spindexer.removeArtifact(); // remove artifact from indexer arraylist
+            timer.reset();
         }
     }
 
     @Override
     public boolean isFinished() {
         // ends the command when the kicker is reset
-        return (outtake.getKickerPos() == outtake.getKickerDown() && artifactKickedUp);
+        return (outtake.getKickerPos() == outtake.getKickerDown() && artifactKickedUp
+                /*&& timer.milliseconds() > outtake.getTransferTime()*/);
     }
 }

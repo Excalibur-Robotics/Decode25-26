@@ -37,21 +37,21 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int fwTicksPerRev = 112;
     private int targetSpeed; // current speed the flywheel is trying to reach
-    public static int flywheelSpeedFar = 900;
-    public static int flywheelSpeedClose = 550;
+    public static int flywheelSpeedFar = 725;
+    public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDist = 0.65; // difference of up and down position
     public static double kickerDown = 0.0; // kicker servo down position
     public static double transferTime = 550; // in milliseconds
 
     private final int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
-    public static double kP = 0.02; // needs to be tuned
+    public static double kP = 0.018; // needs to be tuned
     public static double kI = 0.0;
     public static double kD = 0.5; // needs to be tuned
 
     public static double hoodPosFar = 0.45;
-    public static double hoodPosClose = 0.1;
+    public static double hoodPosClose = 0.15;
 
     private boolean onRedTeam;
 
@@ -70,10 +70,11 @@ public class OuttakeSubsystem extends SubsystemBase {
         hoodR.setDirection(Servo.Direction.REVERSE);
         kicker.setDirection(Servo.Direction.REVERSE);
 
-        targetSpeed = 0;
+        targetSpeed = flywheelSpeedClose;
         turretPID = new LHV2PID(kP, kI, kD);
-
         kicker.setPosition(kickerDown);
+        setHood(hoodPosClose);
+        limelight.pipelineSwitch(0);
     }
 
     @Override
@@ -94,11 +95,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     // calculate flywheel speed based on april tag
     // still have to figure this out
     public void calculateLaunch() {
-        if(getTA() == 0 || getTA() > 1) {
+        if(getTA() > 1) {
             setTargetSpeed(flywheelSpeedClose);
             setHood(hoodPosClose);
         }
-        else {
+        else if(getTA() < 0.8 && getTA() > 0) {
             setTargetSpeed(flywheelSpeedFar);
             setHood(hoodPosFar);
         }
@@ -155,6 +156,10 @@ public class OuttakeSubsystem extends SubsystemBase {
         }
     }
 
+    public void resetTurretEncoder() {
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     // turret angle in degrees, straight forward is 0
     public double getTurretPos() {
         return turret.getCurrentPosition() * 360.0 / turretTicksPerRev;
@@ -163,18 +168,21 @@ public class OuttakeSubsystem extends SubsystemBase {
     // for apriltag: CP = tx
     // for specific angle: CP = angle - turret position
     public void calculateTurret(double CP) {
-        double power = turretPID.Calculate(0, CP);
-        powerTurret(power);
+        if(getTA() < 0.8 && getTA() > 0) { // offset angle for far shooting
+            if(onRedTeam)
+                powerTurret(turretPID.Calculate(4, CP));
+            else
+                powerTurret(turretPID.Calculate(-4, CP));
+        }
+        else if(getTA() > 1) {
+            powerTurret(turretPID.Calculate(0, CP));
+        }
     }
 
     // set the position of the hood
     public void setHood(double angle) {
         hoodR.setPosition(angle);
         hoodL.setPosition(angle);
-    }
-
-    public double calculateHood() {
-        return 0.45;
     }
 
     public double getHoodAngle() {
@@ -194,6 +202,10 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     public void startLL() {
         limelight.start();
+    }
+
+    public void setLLPipeline(int pipeline) {
+        limelight.pipelineSwitch(pipeline);
     }
 
     public double getTX() {

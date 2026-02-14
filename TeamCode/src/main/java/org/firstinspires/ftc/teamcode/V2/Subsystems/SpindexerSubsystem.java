@@ -105,6 +105,11 @@ public class SpindexerSubsystem extends SubsystemBase {
         );
     }
 
+    @Override
+    public void periodic() {
+        //powerSpindexer();
+    }
+
     // power spindexer based on PID
     public void powerSpindexer() {
         double CP = spindexMotor.getCurrentPosition();
@@ -144,6 +149,9 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     public void resetSpindexEncoder() {
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void setSpindexMotorPower(double power) {
+        spindexMotor.setPower(power);
     }
 
     // returns angle spindexer has rotated in degrees

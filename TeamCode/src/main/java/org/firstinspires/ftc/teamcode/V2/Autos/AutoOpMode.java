@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.Autos;
 
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -42,7 +43,7 @@ public class AutoOpMode extends OpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        outtake.setHood(outtake.getHoodClose());
+        outtake.setHood(outtake.getHoodFar());
         spindexer.resetSpindexEncoder();
     }
 
@@ -85,15 +86,29 @@ public class AutoOpMode extends OpMode {
 
     @Override
     public void loop() {
-        CommandScheduler.getInstance().run();
-        outtake.calculateTurret(outtake.getTX());
-        spindexer.powerSpindexer();
-        outtake.calculateLaunch();
-
         // This is the main loop, which determines the current path
         // and makes the robot follow it
         follower.update();
         routine.autoPathUpdate(follower);
+
+        CommandScheduler.getInstance().run();
+        outtake.calculateTurret(outtake.getTX());
+        outtake.calculateLaunch();
+        spindexer.powerSpindexer();
+
+        /*try {
+            Thread.sleep(5);
+        } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        spindexer.powerSpindexer();
+        try {
+            Thread.sleep(5);
+        } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+         */
 
         // telemetry for debugging: current path and robot pose
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
@@ -105,6 +120,7 @@ public class AutoOpMode extends OpMode {
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
         telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        telemetry.addData("spindexer power", spindexer.getSpindexerPower());
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));

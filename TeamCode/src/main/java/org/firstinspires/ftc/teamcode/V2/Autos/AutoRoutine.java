@@ -83,7 +83,7 @@ public class AutoRoutine {
         }
         else { // if starting far
             poses.add(new Pose(87, 9, Math.PI/2)); // start pose
-            poses.add(new Pose(100.0, 36, 0)); // before pickup
+            poses.add(new Pose(87, 36, Math.PI/2)); // off launch line
             poses.add(new Pose(126, 36, 0)); // after pickup
             poses.add(new Pose(87, 12, Math.PI/2)); // shoot pose
 
@@ -109,12 +109,12 @@ public class AutoRoutine {
             // set triggers for commands
             scheduleFlywheel = new Trigger(() -> pathState == 0 || pathState == 3);
             scheduleIntake = new Trigger(() -> pathState == 2);
-            scheduleShoot = new Trigger(() -> (pathState == 0 || pathState == 3) && !follower.isBusy()
+            scheduleShoot = new Trigger(() -> (pathState == 0) && !follower.isBusy()
                                                 && outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30);
 
             // bind triggers to commands
             scheduleFlywheel.whileActiveContinuous(new ActivateFlywheel(outtake));
-            scheduleIntake.whileActiveOnce(new IntakeCommand(intake, spindexer));
+            scheduleIntake.whileActiveContinuous(new IntakeCommand(intake, spindexer));
             scheduleShoot.whileActiveContinuous(new ShootArtifact(outtake, spindexer), false);
         }
 
@@ -190,15 +190,16 @@ public class AutoRoutine {
         else {
             switch (pathState) {
                 case 0:
-                    if(spindexer.getNumArtifacts() == 0) {
+                    //spindexer.powerSpindexer();
+                    if(spindexer.getNumArtifacts() < 3) {
                         follower.followPath(paths.get(0));
                         setPathState(1);
                     }
                     break;
                 case 1:
                     if(!follower.isBusy()) {
-                        follower.followPath(paths.get(1));
-                        setPathState(2);
+                        //follower.followPath(paths.get(1));
+                        setPathState(-1);
                     }
                     break;
                 case 2:

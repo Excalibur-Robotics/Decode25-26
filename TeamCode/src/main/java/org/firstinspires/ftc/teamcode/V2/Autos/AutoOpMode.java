@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.V2.Autos;
 
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -92,7 +91,7 @@ public class AutoOpMode extends OpMode {
         routine.autoPathUpdate(follower);
 
         CommandScheduler.getInstance().run();
-        outtake.calculateTurret(outtake.getTX());
+        outtake.calculateTurretLL(outtake.getTX());
         outtake.calculateLaunch();
         spindexer.powerSpindexer();
 

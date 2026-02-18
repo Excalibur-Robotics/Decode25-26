@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootColor;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
@@ -40,6 +41,7 @@ public class V2TeleOp extends CommandOpMode {
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
+    EndgameSubsystem endgame;
 
     // gamepads
     GamepadEx gp1;
@@ -71,6 +73,7 @@ public class V2TeleOp extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
+        endgame = new EndgameSubsystem(hardwareMap);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -155,10 +158,13 @@ public class V2TeleOp extends CommandOpMode {
     public void run() {
         CommandScheduler.getInstance().run();
         follower.update();
+        //if(outtake.getMegaTagPos() != null)
+        //    follower.setPose(outtake.getMegaTagPos());
 
         drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
         outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-        outtake.calculateTurret(outtake.getTX()); // aim turret at apriltag
+        outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
+        //outtake.aimTurret(follower.getPose());
         spindexer.powerSpindexer();
 
         /*
@@ -184,6 +190,13 @@ public class V2TeleOp extends CommandOpMode {
                 spindexer.setToIntakeMode();
             else
                 spindexer.setToOuttakeMode();
+        }
+
+        if(gamepad1.dpad_up) {
+            endgame.activateEndgame();
+        }
+        if(gamepad1.dpad_down) {
+            endgame.resetServos();
         }
 
 

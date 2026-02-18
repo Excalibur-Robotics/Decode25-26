@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.V2.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 
 import java.util.List;
@@ -93,7 +95,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     // calculate flywheel speed based on april tag
-    // still have to figure this out
     public void calculateLaunch() {
         if(getTA() > 1) {
             setTargetSpeed(flywheelSpeedClose);
@@ -150,10 +151,41 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // set the power of the turret motor
     public void powerTurret(double power) {
-        if(!(getTurretPos() > 110 && power > 0) &&
-                !(getTurretPos() < -90 && power < 0)) {
-            turret.setPower(power);
+        turret.setPower(power);
+    }
+
+    // aim turret with apriltag: CP = tx
+    public void calculateTurretLL(double CP) {
+        if(getTA() < 0.8 && getTA() > 0) { // offset angle for far shooting
+            if(onRedTeam)
+                turret.setPower(turretPID.Calculate(4, CP));
+            else
+                turret.setPower(turretPID.Calculate(-4, CP));
         }
+        else if(getTA() > 1) {
+            turret.setPower(turretPID.Calculate(0, CP));
+        }
+    }
+
+    // input target angle
+    public void rotateTurret(double angle) {
+        if(angle > 100) {
+            angle = 100;
+        }
+        else if(angle < -100) {
+            angle = -100;
+        }
+        turret.setPower(turretPID.Calculate(angle, (double) turret.getCurrentPosition() / turretTicksPerRev * 360));
+    }
+
+    // aim turret with robot position
+    public void aimTurret(Pose botPose) {
+        Pose goal = new Pose(onRedTeam ? 136 : 8, 142);
+        double angle = Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX()));
+        if(angle < 0)
+            angle += 180;
+        double turretAngle = angle - botPose.getHeading();
+        rotateTurret(turretAngle);
     }
 
     public void resetTurretEncoder() {
@@ -165,19 +197,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         return turret.getCurrentPosition() * 360.0 / turretTicksPerRev;
     }
 
-    // for apriltag: CP = tx
-    // for specific angle: CP = angle - turret position
-    public void calculateTurret(double CP) {
-        if(getTA() < 0.8 && getTA() > 0) { // offset angle for far shooting
-            if(onRedTeam)
-                powerTurret(turretPID.Calculate(4, CP));
-            else
-                powerTurret(turretPID.Calculate(-4, CP));
-        }
-        else if(getTA() > 1) {
-            powerTurret(turretPID.Calculate(0, CP));
-        }
-    }
 
     // set the position of the hood
     public void setHood(double angle) {
@@ -198,6 +217,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public void setTeam(boolean redTeam) {
         onRedTeam = redTeam;
         limelight.pipelineSwitch(onRedTeam ? 1 : 2);
+
     }
 
     public void startLL() {
@@ -235,6 +255,17 @@ public class OuttakeSubsystem extends SubsystemBase {
             }
         }
         return id;
+    }
+
+    public Pose getMegaTagPos() {
+        LLResult llResult = limelight.getLatestResult();
+        Pose botPose = null;
+        if (llResult != null && llResult.isValid()) {
+            Pose3D botPose3D = llResult.getBotpose();
+            botPose = new Pose(botPose3D.getPosition().x, botPose3D.getPosition().y,
+                    botPose3D.getOrientation().getYaw());
+        }
+        return botPose;
     }
 
     // start the limelight - not done in constructor b/c limelight uses up energy

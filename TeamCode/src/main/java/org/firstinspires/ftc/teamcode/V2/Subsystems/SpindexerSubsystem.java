@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.V2.Subsystems;
 
 import static java.lang.Math.abs;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -118,6 +120,7 @@ public class SpindexerSubsystem extends SubsystemBase {
                 CP = spindexMotor.getCurrentPosition();
                 double MotorPower = -PID.Calculate(TP, CP);
                 spindexMotor.setPower(MotorPower);
+                Log.i("spindexer", String.valueOf(MotorPower));
                 timer.reset();
             }
         }
@@ -149,6 +152,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     public void resetSpindexEncoder() {
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void setSpindexMotorPower(double power) {
         spindexMotor.setPower(power);

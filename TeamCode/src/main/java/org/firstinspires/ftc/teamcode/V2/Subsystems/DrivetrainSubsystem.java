@@ -75,9 +75,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         double y = -gamepad.left_stick_y;
         double yaw = gamepad.right_stick_x;
 
-        double newX = x*Math.cos(heading) + y*Math.sin(heading);
-        double newY = y*Math.cos(heading) - x*Math.sin(heading);
+        //x = x*Math.cos(heading) + y*Math.sin(heading);
+        //y = y*Math.cos(heading) - x*Math.sin(heading);
 
-        moveRobot(newX, newY, yaw);
+        moveRobot(x, y, yaw);
     }
 }

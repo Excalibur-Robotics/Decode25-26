@@ -73,7 +73,7 @@ public class V2SimpleTeleOp extends OpMode {
         CommandScheduler.getInstance().run();
 
         drivetrain.teleOpDrive(gamepad1);
-        outtake.calculateTurret(outtake.getTX()); // turret aim with apriltag
+        outtake.calculateTurretLL(outtake.getTX()); // turret aim with apriltag
 
         // kicker - X
         if(gamepad1.xWasPressed()) {

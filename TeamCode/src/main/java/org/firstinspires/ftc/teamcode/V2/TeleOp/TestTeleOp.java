@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 @TeleOp
-public class TestTeleOp extends CommandOpMode {
+public class  TestTeleOp extends CommandOpMode {
     EndgameSubsystem endgame;
 
     @Override

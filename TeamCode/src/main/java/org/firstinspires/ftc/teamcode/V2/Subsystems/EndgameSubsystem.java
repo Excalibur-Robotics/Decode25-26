@@ -18,8 +18,8 @@ public class EndgameSubsystem extends SubsystemBase {
     }
 
     public void activateEndgame() {
-        servo1.setPosition(0.25);
-        servo2.setPosition(0.25);
+        servo1.setPosition(0.15);
+        servo2.setPosition(0.15);
     }
 
     public void resetServos() {

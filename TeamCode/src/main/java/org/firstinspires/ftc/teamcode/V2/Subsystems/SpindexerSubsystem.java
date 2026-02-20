@@ -126,19 +126,16 @@ public class SpindexerSubsystem extends SubsystemBase {
         TP = TP - 120.0 / 360 * ticksPerRev;
         indexer.add(indexer.remove(0));
     }
-
     // rotate spindexer counter-clockwise one slot
     public void rotateCCW() {
         TP = TP + 120.0 / 360 * ticksPerRev;
         indexer.add(0, indexer.remove(2));
     }
-
     // rotate 60 degrees to outtake mode
     public void setToOuttakeMode() {
         TP = TP - 60.0 / 360 * ticksPerRev;
         OuttakeMode = true;
     }
-
     // rotate back 60 degrees to intake mode
     public void setToIntakeMode() {
         TP = TP + 60.0 / 360 * ticksPerRev;
@@ -190,7 +187,6 @@ public class SpindexerSubsystem extends SubsystemBase {
             numArtifacts++;
         }
     }
-
     // remove an artifact from slot 2 when outtaked
     public void removeArtifact() {
         if(!indexer.get(2).equals("empty")) {
@@ -218,17 +214,6 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     // get the color the color sensor currently sees.
     public String getColor() {
-        /*NormalizedRGBA rgba = colorSensor.getNormalizedColors();
-        double hue = JavaUtil.colorToHue(rgba.toColor());
-        String color = "empty";
-        if(hue >= 210 && hue <= 245) {
-            color = "purple";
-        }
-        else if(hue >= 150 && hue <= 180) {
-            color = "green";
-        }
-         */
-
         String color = "empty";
         if(pipeline.GreenPixels > 90000) {
             color = "green";
@@ -241,9 +226,6 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     public boolean detectsArtifact() {
-        /*String color = getColor();
-        return color.equals("purple") || color.equals("green");*/
-
-        return pipeline.GreenPixels > 100000 || pipeline.PurplePixels > 100000;
+        return pipeline.GreenPixels > 90000 || pipeline.PurplePixels > 90000;
     }
 }

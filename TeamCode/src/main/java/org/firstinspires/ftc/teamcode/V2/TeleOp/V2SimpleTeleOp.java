@@ -5,11 +5,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.LEDs;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
@@ -26,6 +28,8 @@ public class V2SimpleTeleOp extends OpMode {
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
+
+    LEDs Led;
 
     public static double hoodUp = 0.45;
     public static double hoodDown = 0;
@@ -47,6 +51,8 @@ public class V2SimpleTeleOp extends OpMode {
         outtake.setHood(hoodDown);
         kickerTimer = new ElapsedTime();
         outtake.resetTurretEncoder();
+
+        Led= new LEDs(hardwareMap);
     }
 
     @Override
@@ -55,12 +61,14 @@ public class V2SimpleTeleOp extends OpMode {
         if(gamepad1.x) {
             outtake.setTeam(false);
             onRedTeam = false;
+
         }
         if(gamepad1.b) {
             outtake.setTeam(true);
             onRedTeam = true;
         }
         telemetry.addData("Team Color", onRedTeam ? "RED" : "BLUE");
+
     }
 
     @Override
@@ -74,6 +82,13 @@ public class V2SimpleTeleOp extends OpMode {
 
         drivetrain.teleOpDrive(gamepad1);
         outtake.calculateTurretLL(outtake.getTX()); // turret aim with apriltag
+        if (gamepad1.a){
+            Led.red();
+        }
+
+        if (gamepad1.dpad_up){
+            Led.purple();
+        }
 
         // kicker - X
         if(gamepad1.xWasPressed()) {

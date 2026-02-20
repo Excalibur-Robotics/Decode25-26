@@ -10,16 +10,16 @@ public class EndgameSubsystem extends SubsystemBase {
     public Servo servo2;
 
     public EndgameSubsystem(HardwareMap hwMap) {
-        servo1 = hwMap.get(Servo.class, "kickstandR");
-        servo2 = hwMap.get(Servo.class, "kickstandL");
+        servo1 = hwMap.get(Servo.class, "endgame1");
+        servo2 = hwMap.get(Servo.class, "endgame2");
 
         servo1.setDirection(Servo.Direction.FORWARD);
         servo2.setDirection(Servo.Direction.REVERSE);
     }
 
     public void activateEndgame() {
-        servo1.setPosition(0.15);
-        servo2.setPosition(0.15);
+        servo1.setPosition(0.25);
+        servo2.setPosition(0.25);
     }
 
     public void resetServos() {

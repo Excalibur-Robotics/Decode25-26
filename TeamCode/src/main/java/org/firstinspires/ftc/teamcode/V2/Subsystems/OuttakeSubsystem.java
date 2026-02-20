@@ -70,7 +70,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         limelight.pipelineSwitch(1);
         hoodL.setDirection(Servo.Direction.FORWARD);
         hoodR.setDirection(Servo.Direction.REVERSE);
-        kicker.setDirection(Servo.Direction.REVERSE);
+        kicker.setDirection(Servo.Direction.FORWARD);
 
         targetSpeed = flywheelSpeedClose;
         turretPID = new LHV2PID(kP, kI, kD);

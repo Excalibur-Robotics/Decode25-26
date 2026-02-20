@@ -200,6 +200,7 @@ public class V2TeleOp extends CommandOpMode {
         }
 
 
+        telemetry.addData("kickstand position", endgame.getServoPos());
 
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +

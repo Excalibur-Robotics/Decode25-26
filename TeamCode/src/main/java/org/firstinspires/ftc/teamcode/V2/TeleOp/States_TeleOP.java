@@ -68,6 +68,7 @@ public class States_TeleOP extends CommandOpMode {
                 new ShootColor(outtake,spindexer, "purple"),
                 new InstantCommand(),
                 () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
-        spindexerRotating
-    }
-}
+        spindexerRotating.whenActive(new InstantCommand(() -> intake.activateIntake()))
+                .whenInactive(new InstantCommand(() -> intake.stopIntake()));
+
+}}

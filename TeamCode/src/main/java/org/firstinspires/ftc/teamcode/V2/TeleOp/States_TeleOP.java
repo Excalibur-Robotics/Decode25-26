@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -18,6 +19,14 @@ public class States_TeleOP extends CommandOpMode {
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
     GamepadEx gp1;
+
+    Trigger leftTrigger;
+    Trigger rightTrigger;
+    Button rightBumper;
+    Button X;
+    Button B;
+    Button A;
+    Trigger spindexerRotating;
 
     public void initialize(){
         intake = new IntakeSubsystem(hardwareMap);

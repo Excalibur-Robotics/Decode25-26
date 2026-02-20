@@ -44,6 +44,4 @@ public class States_TeleOP extends CommandOpMode {
         A = new GamepadButton(gp1, GamepadKeys.Button.A);
         spindexerRotating = new Trigger(() -> spindexer.getSpindexerPower() > 0.05);
     }
-
-
 }

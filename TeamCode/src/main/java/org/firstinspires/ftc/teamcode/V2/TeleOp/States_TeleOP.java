@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -17,15 +18,19 @@ import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootColor;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
+import org.firstinspires.ftc.teamcode.V2.Subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
+
+import java.util.ArrayList;
 
 public class States_TeleOP extends CommandOpMode {
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
+    EndgameSubsystem kickstand;
     GamepadEx gp1;
 
     Trigger leftTrigger;
@@ -44,6 +49,7 @@ public class States_TeleOP extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
+        kickstand = new EndgameSubsystem(hardwareMap);
 
         gp1 = new GamepadEx(gamepad1);
 
@@ -79,6 +85,44 @@ public class States_TeleOP extends CommandOpMode {
         outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
         //outtake.aimTurret(follower.getPose());
         spindexer.powerSpindexer();
+
+
+
+        telemetry.addData("kickstand position", kickstand.getServoPos());
+        ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
+                indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
+        telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
+                + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
+        telemetry.addLine();
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addLine();
+        telemetry.addData("purple pixels", spindexer.getPurplePixels());
+        telemetry.addData("green pixels", spindexer.getGreenPixels());
+        telemetry.addData("Artifact in intake slot", spindexer.detectsArtifact());
+        FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
+        telemetry.addLine();
+        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        telemetry.addData("spindexer error", Math.abs(spindexer.getSpindexerAngle()-spindexer.getTargetAngle()));
+        telemetry.addData("spindexer power", spindexer.getSpindexerPower());
+        telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
+        telemetry.addLine();
+        telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
+        telemetry.addData("target speed", outtake.getTargetSpeed());
+        telemetry.addData("flywheel error", Math.abs(outtake.getFlywheelSpeed() -outtake.getTargetSpeed()));
+        telemetry.addData("flywheel power", outtake.flywheel.getPower());
+        telemetry.addData("kicker position", outtake.getKickerPos());
+        telemetry.addData("hood angle", outtake.getHoodAngle());
+        telemetry.addData("turret position", outtake.getTurretPos());
+        telemetry.addLine();
+        telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
+        telemetry.addData("tx", outtake.getTX());
+        telemetry.addData("ta", outtake.getTA());
+        telemetry.addData("apriltag ID", outtake.getApriltagID());
     }
 
 

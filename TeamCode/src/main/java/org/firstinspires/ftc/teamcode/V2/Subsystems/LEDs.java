@@ -33,6 +33,12 @@ public class LEDs extends SubsystemBase {
         purple.on();
     }
 
+    public void off() {
+        green.off();
+        red.off();
+        purple.off();
+    }
+
 }
 
 

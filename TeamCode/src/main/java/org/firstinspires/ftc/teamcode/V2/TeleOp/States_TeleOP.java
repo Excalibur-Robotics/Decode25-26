@@ -73,17 +73,6 @@ public class States_TeleOP extends CommandOpMode {
                 .whenInactive(new InstantCommand(() -> intake.stopIntake()));
     }
 
-<<<<<<< HEAD
-        CommandScheduler.getInstance().setDefaultCommand(new InstantCommand(() -> {
-            drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
-            outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-            outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
-            //outtake.aimTurret(follower.getPose());
-            spindexer.powerSpindexer();
-        }
-    )};
-
-=======
     public void run() {
         drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
         outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
@@ -91,5 +80,7 @@ public class States_TeleOP extends CommandOpMode {
         //outtake.aimTurret(follower.getPose());
         spindexer.powerSpindexer();
     }
->>>>>>> b5cc80b71393b5ebd2b0fb29eb3ca572876f4cd5
+
+
 }
+

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -38,13 +39,13 @@ public class States_TeleOP extends CommandOpMode {
     private boolean onRedTeam = true;
     private Follower follower;
 
-    public void initialize(){
+    public void initialize() {
         intake = new IntakeSubsystem(hardwareMap);
-        spindexer= new SpindexerSubsystem(hardwareMap);
+        spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
 
-        gp1= new GamepadEx(gamepad1);
+        gp1 = new GamepadEx(gamepad1);
 
         // initialize triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -65,10 +66,18 @@ public class States_TeleOP extends CommandOpMode {
                 new InstantCommand(),
                 () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
         B.whenPressed(new ConditionalCommand(
-                new ShootColor(outtake,spindexer, "purple"),
+                new ShootColor(outtake, spindexer, "purple"),
                 new InstantCommand(),
                 () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
         spindexerRotating.whenActive(new InstantCommand(() -> intake.activateIntake()))
                 .whenInactive(new InstantCommand(() -> intake.stopIntake()));
 
-}}
+        CommandScheduler.getInstance().setDefaultCommand(new InstantCommand(() -> {
+            drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
+            outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
+            outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
+            //outtake.aimTurret(follower.getPose());
+            spindexer.powerSpindexer();
+        }
+    }
+}

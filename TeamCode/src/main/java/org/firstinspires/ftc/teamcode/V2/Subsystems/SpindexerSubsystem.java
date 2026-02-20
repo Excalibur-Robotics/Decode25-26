@@ -41,7 +41,6 @@ public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
     public OpenCvCamera LT;
     LTPipeline pipeline;
-    //public NormalizedColorSensor colorSensor;
 
     private ArrayList<String> indexer;
     private int numArtifacts;
@@ -63,8 +62,6 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
-        //colorSensor = hwMap.get(NormalizedColorSensor.class, "CS1");
-
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -115,14 +112,12 @@ public class SpindexerSubsystem extends SubsystemBase {
     // power spindexer based on PID
     public void powerSpindexer() {
         double CP = spindexMotor.getCurrentPosition();
-        if(abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance) {
-            if(timer.milliseconds()>15) {
-                CP = spindexMotor.getCurrentPosition();
-                double MotorPower = -PID.Calculate(TP, CP);
-                spindexMotor.setPower(MotorPower);
-                Log.i("spindexer", String.valueOf(MotorPower));
-                timer.reset();
-            }
+        if(timer.milliseconds()>15) {
+            CP = spindexMotor.getCurrentPosition();
+            double MotorPower = -PID.Calculate(TP, CP);
+            spindexMotor.setPower(MotorPower);
+            Log.i("spindexer", String.valueOf(MotorPower));
+            timer.reset();
         }
     }
 

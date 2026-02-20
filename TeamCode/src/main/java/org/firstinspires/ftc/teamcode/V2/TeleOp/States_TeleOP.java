@@ -1,4 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
-public class States_TeleOP {
+import com.arcrobotics.ftclib.command.CommandOpMode;
+
+public class States_TeleOP extends CommandOpMode {
+    
 }

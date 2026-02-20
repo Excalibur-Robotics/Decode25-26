@@ -71,13 +71,13 @@ public class States_TeleOP extends CommandOpMode {
                 () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
         spindexerRotating.whenActive(new InstantCommand(() -> intake.activateIntake()))
                 .whenInactive(new InstantCommand(() -> intake.stopIntake()));
+    }
 
-        CommandScheduler.getInstance().setDefaultCommand(new InstantCommand(() -> {
-            drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
-            outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-            outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
-            //outtake.aimTurret(follower.getPose());
-            spindexer.powerSpindexer();
-        }
+    public void run() {
+        drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
+        outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
+        outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
+        //outtake.aimTurret(follower.getPose());
+        spindexer.powerSpindexer();
     }
 }

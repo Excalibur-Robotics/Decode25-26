@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -33,6 +34,9 @@ public class States_TeleOP extends CommandOpMode {
     Button B;
     Button A;
     Trigger spindexerRotating;
+
+    private boolean onRedTeam = true;
+    private Follower follower;
 
     public void initialize(){
         intake = new IntakeSubsystem(hardwareMap);
@@ -60,5 +64,10 @@ public class States_TeleOP extends CommandOpMode {
                 new ShootColor(outtake, spindexer, "green"),
                 new InstantCommand(),
                 () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
+        B.whenPressed(new ConditionalCommand(
+                new ShootColor(outtake,spindexer, "purple"),
+                new InstantCommand(),
+                () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
+        spindexerRotating
     }
 }

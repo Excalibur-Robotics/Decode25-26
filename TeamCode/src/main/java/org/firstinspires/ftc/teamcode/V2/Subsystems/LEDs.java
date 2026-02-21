@@ -18,7 +18,7 @@ public class LEDs extends SubsystemBase {
     }
 
     public void green() {
-        led_light.setPosition(1.0);
+        led_light.setPosition(0.5);
     }
 /*
     public void red(){

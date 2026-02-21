@@ -11,26 +11,26 @@ public class LEDs extends SubsystemBase {
 
     public LEDs (HardwareMap hardware){
         green = hardware.get(LED.class,"GreenLED");
-        red = hardware.get(LED.class,"RedLED");
-        purple = hardware.get(LED.class,"purpleLED");
+        //red = hardware.get(LED.class,"RedLED");
+        //purple = hardware.get(LED.class,"purpleLED");
     }
 
     public void green() {
         green.on();
-        red.off();
-        purple.off();
+        //red.off();
+        //purple.off();
     }
 
     public void red(){
         green.off();
-        red.on();
-        purple.off();
+        //red.on();
+        //purple.off();
     }
 
     public void purple(){
         green.off();
-        red.off();
-        purple.on();
+        //red.off();
+        //purple.on();
     }
 
     public void off() {

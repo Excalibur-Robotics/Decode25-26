@@ -82,12 +82,10 @@ public class V2SimpleTeleOp extends OpMode {
 
         drivetrain.teleOpDrive(gamepad1);
         outtake.calculateTurretLL(outtake.getTX()); // turret aim with apriltag
-        if (gamepad1.a){
-            Led.red();
-        }
+
 
         if (gamepad1.dpad_up){
-            Led.purple();
+            Led.green();
         }
 
         // kicker - X

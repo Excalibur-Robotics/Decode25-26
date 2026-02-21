@@ -14,13 +14,13 @@ public class LEDs extends SubsystemBase {
     Servo led_light;
 
     public LEDs (HardwareMap hardware){
-        led_light = hardware.get(Servo.class,"GreenLED")
+        led_light = hardware.get(Servo.class,"GreenLED");
     }
 
     public void green() {
-        led_light.setPosition(0.2);
+        led_light.setPosition(1.0);
     }
-
+/*
     public void red(){
 
     }
@@ -32,7 +32,7 @@ public class LEDs extends SubsystemBase {
     public void off() {
 
     }
-
+*/
 }
 
 

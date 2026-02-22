@@ -58,7 +58,7 @@ public class ShootArtifact extends CommandBase {
         // once kicker is all the way up, it is reset
         if(timer.milliseconds() > outtake.getTransferTime() && artifactKickedUp) {
             outtake.resetKicker();
-            if(outtake.getFlywheelSpeed() > 0)
+            //if(outtake.getFlywheelSpeed() > 0)
                 spindexer.removeArtifact(); // remove artifact from indexer arraylist
             timer.reset();
         }

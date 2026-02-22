@@ -13,7 +13,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
@@ -36,7 +35,7 @@ automatically rotating the spindexer to the correct position
  */
 
 @TeleOp
-public class V2TeleOp extends CommandOpMode {
+public class V2TeleOpBlue extends CommandOpMode {
     // subsystems
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
@@ -57,9 +56,7 @@ public class V2TeleOp extends CommandOpMode {
     Button A;
     Trigger spindexerRotating;
 
-    private boolean onRedTeam = true;
-
-    ElapsedTime timer;
+    private boolean onRedTeam = false;
 
     private Follower follower;
     private final Pose startPose = new Pose(9, 39, 0); // just for testing
@@ -87,6 +84,7 @@ public class V2TeleOp extends CommandOpMode {
         A = new GamepadButton(gp1, GamepadKeys.Button.A);
         spindexerRotating = new Trigger(() -> spindexer.getSpindexerPower() > 0.05);
 
+        outtake.setTeam(onRedTeam);
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new ConditionalCommand(
@@ -112,27 +110,15 @@ public class V2TeleOp extends CommandOpMode {
                         outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
         // automatically activate intake when spindexer is spinning
         spindexerRotating.whenActive(new InstantCommand(() -> intake.activateIntake()))
-                         .whenInactive(new InstantCommand(() -> intake.stopIntake()));
+                .whenInactive(new InstantCommand(() -> intake.stopIntake()));
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         follower.update();
 
         outtake.startLL();
-        timer = new ElapsedTime();
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("Choose Team Color", "press X if blue team, B if red team");
-            if (gamepad1.x) {
-                outtake.setTeam(false);
-                onRedTeam = false;
-            }
-            if (gamepad1.b) {
-                outtake.setTeam(true);
-                onRedTeam = true;
-            }
-            telemetry.addData("Team Color", onRedTeam ? "RED" : "BLUE");
-            telemetry.addLine();
             telemetry.addData("Starting spindexer state",
                     "press dpad up if starting with a full spindexer, dpad down if starting empty");
             if(gamepad1.dpad_up) {
@@ -204,9 +190,8 @@ public class V2TeleOp extends CommandOpMode {
         }
 
 
-        telemetry.addData("loop time", timer.milliseconds());
-        timer.reset();
         telemetry.addData("kickstand position", endgame.getServoPos());
+
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));

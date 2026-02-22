@@ -11,6 +11,8 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -22,9 +24,11 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.EndgameSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.ArrayList;
 
+@TeleOp
 public class States_TeleOP extends CommandOpMode {
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
@@ -43,7 +47,9 @@ public class States_TeleOP extends CommandOpMode {
 
     private boolean onRedTeam = true;
     private Follower follower;
+    private final Pose startPose = new Pose(9, 39, 0); // just for testing
 
+    @Override
     public void initialize() {
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
@@ -52,6 +58,8 @@ public class States_TeleOP extends CommandOpMode {
         kickstand = new EndgameSubsystem(hardwareMap);
 
         gp1 = new GamepadEx(gamepad1);
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
 
         // initialize triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -79,8 +87,10 @@ public class States_TeleOP extends CommandOpMode {
                 .whenInactive(new InstantCommand(() -> intake.stopIntake()));
     }
 
+    @Override
     public void run() {
-        drivetrain.teleOpDrive(gamepad1, follower.getPose().getHeading());
+        CommandScheduler.getInstance().run();
+        drivetrain.teleOpDrive(gamepad1);
         outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
         outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
         //outtake.aimTurret(follower.getPose());

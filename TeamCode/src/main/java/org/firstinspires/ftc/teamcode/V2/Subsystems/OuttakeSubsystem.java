@@ -42,7 +42,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int flywheelSpeedFar = 725;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.65; // difference of up and down position
+    public static double kickerDist = 1; // difference of up and down position
     public static double kickerDown = 0.0; // kicker servo down position
     public static double transferTime = 550; // in milliseconds
 
@@ -76,7 +76,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         turretPID = new LHV2PID(kP, kI, kD);
         kicker.setPosition(kickerDown);
         setHood(hoodPosClose);
-        limelight.pipelineSwitch(0);
     }
 
     @Override
@@ -164,6 +163,9 @@ public class OuttakeSubsystem extends SubsystemBase {
         }
         else if(getTA() > 1) {
             turret.setPower(turretPID.Calculate(0, CP));
+        }
+        else {
+            turret.setPower(0);
         }
     }
 

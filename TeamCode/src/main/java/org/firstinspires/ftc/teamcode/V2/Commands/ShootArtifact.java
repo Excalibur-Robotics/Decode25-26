@@ -18,6 +18,7 @@ public class ShootArtifact extends CommandBase {
     private ElapsedTime timer;
 
     private boolean artifactKickedUp;
+    private boolean transferDown;
 
     public ShootArtifact(OuttakeSubsystem outtakeSub, SpindexerSubsystem spindexSub) {
         outtake = outtakeSub;
@@ -30,6 +31,7 @@ public class ShootArtifact extends CommandBase {
     @Override
     public void initialize() {
         artifactKickedUp = false;
+        transferDown = false;
         if(!spindexer.inOuttakeMode())
             spindexer.setToOuttakeMode();
 
@@ -56,10 +58,11 @@ public class ShootArtifact extends CommandBase {
             timer.reset();
         }
         // once kicker is all the way up, it is reset
-        if(timer.milliseconds() > outtake.getTransferTime() && artifactKickedUp) {
+        if(timer.milliseconds() > outtake.getTransferTime() && artifactKickedUp && !transferDown) {
             outtake.resetKicker();
             //if(outtake.getFlywheelSpeed() > 0)
                 spindexer.removeArtifact(); // remove artifact from indexer arraylist
+            transferDown = true;
             timer.reset();
         }
     }
@@ -68,6 +71,6 @@ public class ShootArtifact extends CommandBase {
     public boolean isFinished() {
         // ends the command when the kicker is reset
         return (outtake.getKickerPos() == outtake.getKickerDown() && artifactKickedUp
-                /*&& timer.milliseconds() > outtake.getTransferTime()*/);
+                && timer.milliseconds() > outtake.getTransferTime());
     }
 }

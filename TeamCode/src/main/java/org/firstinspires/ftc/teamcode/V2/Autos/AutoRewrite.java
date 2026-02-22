@@ -94,8 +94,8 @@ public class AutoRewrite extends CommandOpMode {
         switch (pathState) {
             case 0:
                 //new ActivateFlywheel(outtake).schedule();
-                new ShootArtifact(outtake, spindexer).schedule(false);
-                if(spindexer.getNumArtifacts() == 0) {
+                //new ShootArtifact(outtake, spindexer).schedule(false);
+                if(spindexer.getNumArtifacts() == 3) {
                     follower.followPath(goToShoot);
                     pathState = 1;
                 }

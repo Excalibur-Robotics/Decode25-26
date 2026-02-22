@@ -76,10 +76,10 @@ public class SpindexerSubsystem extends SubsystemBase {
         timer.reset();
 
         indexer = new ArrayList<String>();
-        indexer.add("empty");
-        indexer.add("empty");
-        indexer.add("empty");
-        numArtifacts = 0; // start with 3 preloads
+        indexer.add("purple");
+        indexer.add("green");
+        indexer.add("purple");
+        numArtifacts = 3; // start with 3 preloads
         OuttakeMode = true; // start spindexer in outtake mode
 
         // camera initialization

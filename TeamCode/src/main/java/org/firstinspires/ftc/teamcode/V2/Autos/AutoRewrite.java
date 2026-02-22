@@ -7,7 +7,11 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
+import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
@@ -31,6 +35,7 @@ public class AutoRewrite extends CommandOpMode {
     PathChain secondShoot;
 
     private int pathState;
+    private ElapsedTime opModeTimer, pathTimer;
 
     @Override
     public void initialize() {
@@ -62,6 +67,8 @@ public class AutoRewrite extends CommandOpMode {
                 .build();
 
         pathState = 0;
+        opModeTimer = new ElapsedTime();
+        pathTimer = new ElapsedTime();
     }
 
     @Override
@@ -70,23 +77,32 @@ public class AutoRewrite extends CommandOpMode {
         autoPathUpdate();
 
         spindexer.powerSpindexer();
+        outtake.calculateTurretLL(outtake.getTX());
+        outtake.calculateLaunch();
+
+        telemetry.addData("path state", pathState);
+        telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
+        opModeTimer.reset();
+        telemetry.update();
     }
 
     public void autoPathUpdate() {
         switch (pathState) {
             case 0:
-                spindexer.rotateCW();
+                //new ActivateFlywheel(outtake).schedule();
                 follower.followPath(goToShoot);
                 pathState = 1;
                 break;
             case 1:
-                if(!follower.isBusy()) {
+                new ShootArtifact(outtake, spindexer).schedule(false);
+                if(!follower.isBusy() && spindexer.getNumArtifacts() == 0) {
                     follower.followPath(goToIntake);
                     pathState = 2;
                 }
                 break;
             case 2:
                 if(!follower.isBusy()) {
+                    //new IntakeCommand(intake, spindexer).schedule();
                     follower.followPath(intakeBalls);
                     pathState = 3;
                 }

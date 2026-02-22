@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.Autos;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -73,6 +74,8 @@ public class AutoRewrite extends CommandOpMode {
 
     @Override
     public void run() {
+        CommandScheduler.getInstance().run();
+
         follower.update();
         autoPathUpdate();
 
@@ -95,7 +98,7 @@ public class AutoRewrite extends CommandOpMode {
             case 0:
                 //new ActivateFlywheel(outtake).schedule();
                 new ShootArtifact(outtake, spindexer).schedule(false);
-                if(spindexer.getNumArtifacts() != 4) {
+                if(spindexer.getNumArtifacts() == 0) {
                     follower.followPath(goToShoot);
                     pathState = 1;
                 }

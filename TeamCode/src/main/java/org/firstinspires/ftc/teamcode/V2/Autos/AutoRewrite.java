@@ -80,7 +80,11 @@ public class AutoRewrite extends CommandOpMode {
         outtake.calculateTurretLL(outtake.getTX());
         outtake.calculateLaunch();
 
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("path state", pathState);
+        telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
         telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
         opModeTimer.reset();
         telemetry.update();
@@ -90,8 +94,11 @@ public class AutoRewrite extends CommandOpMode {
         switch (pathState) {
             case 0:
                 //new ActivateFlywheel(outtake).schedule();
-                follower.followPath(goToShoot);
-                pathState = 1;
+                new ShootArtifact(outtake, spindexer).schedule(false);
+                if(spindexer.getNumArtifacts() == 0) {
+                    follower.followPath(goToShoot);
+                    pathState = 1;
+                }
                 break;
             case 1:
                 new ShootArtifact(outtake, spindexer).schedule(false);

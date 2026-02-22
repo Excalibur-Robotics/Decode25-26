@@ -115,6 +115,10 @@ public class OuttakeSubsystem extends SubsystemBase {
         return targetSpeed;
     }
 
+    public boolean atTargetSpeed() {
+        return getFlywheelSpeed() > targetSpeed - 30;
+    }
+
     public int getFWTicksPerRev() {
         return fwTicksPerRev;
     }
@@ -171,11 +175,11 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // input target angle
     public void rotateTurret(double angle) {
-        if(angle > 100) {
-            angle = 100;
+        if(angle > 180) {
+            angle = 180;
         }
-        else if(angle < -100) {
-            angle = -100;
+        else if(angle < -90) {
+            angle = -90;
         }
         turret.setPower(turretPID.Calculate(angle, (double) turret.getCurrentPosition() / turretTicksPerRev * 360));
     }

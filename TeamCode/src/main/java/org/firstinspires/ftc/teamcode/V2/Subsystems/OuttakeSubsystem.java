@@ -97,7 +97,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelPower(double power) {
-        flywheel.setPower(power);
+        flywheel.setPower(-power);
     }
 
     public void setTargetSpeed(int speed) {

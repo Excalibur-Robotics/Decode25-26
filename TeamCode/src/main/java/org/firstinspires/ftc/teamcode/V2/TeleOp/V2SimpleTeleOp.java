@@ -51,6 +51,7 @@ public class V2SimpleTeleOp extends OpMode {
         outtake.setHood(hoodDown);
         kickerTimer = new ElapsedTime();
         outtake.resetTurretEncoder();
+        spindexer.resetSpindexEncoder();
 
         Led= new LEDs(hardwareMap);
     }

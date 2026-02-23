@@ -57,15 +57,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static double hoodPosFar = 0.45;
     public static double hoodPosClose = 0.15;
 
-    LUT<Double, Double> hoodLUT = new LUT<Double, Double>()
-    {{
-        add(1.0,2.0);
-
-    }};
-
-    InterpLUT flywheelLUT = new InterpLUT();
-    //flywheelLUT.add(1.0, 2.0);
-
     private boolean onRedTeam;
 
     public OuttakeSubsystem(HardwareMap hwMap) {
@@ -114,6 +105,14 @@ public class OuttakeSubsystem extends SubsystemBase {
             setTargetSpeed(flywheelSpeedFar);
             setHood(hoodPosFar);
         }
+    }
+
+    // need to finish
+    public void calculateHood(Pose botPose) {
+        InterpLUT hoodLUT = new InterpLUT();
+        hoodLUT.add(1.0, 2.0); // need to measure right values
+        hoodLUT.createLUT();
+        
     }
 
     // get flywheel speed in rpm

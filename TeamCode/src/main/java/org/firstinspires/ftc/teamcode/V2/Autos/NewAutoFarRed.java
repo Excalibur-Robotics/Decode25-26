@@ -65,6 +65,8 @@ public class NewAutoFarRed extends CommandOpMode {
         pathState = 0;
         opModeTimer = new ElapsedTime();
         pathTimer = new ElapsedTime();
+
+        outtake.setTeam(true);
     }
 
     @Override

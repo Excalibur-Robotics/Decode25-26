@@ -36,7 +36,7 @@ automatically rotating the spindexer to the correct position
  */
 
 @TeleOp
-public class V2TeleOp extends CommandOpMode {
+public class V2TeleOpRed extends CommandOpMode {
     // subsystems
     IntakeSubsystem intake;
     SpindexerSubsystem spindexer;
@@ -87,7 +87,6 @@ public class V2TeleOp extends CommandOpMode {
         A = new GamepadButton(gp1, GamepadKeys.Button.A);//shoot one color
         spindexerRotating = new Trigger(() -> spindexer.getSpindexerPower() > 0.05);
 
-
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new ConditionalCommand(
                 new IntakeCommand(intake, spindexer),
@@ -118,23 +117,11 @@ public class V2TeleOp extends CommandOpMode {
         follower.setStartingPose(startPose);
         follower.update();
 
+        outtake.setTeam(onRedTeam);
         outtake.startLL();
         timer = new ElapsedTime();
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("Starting spindexer state",
-                    "press dpad up if starting with a full spindexer, dpad down if starting empty");
-            if(gamepad1.dpad_up) {
-                String[] state = {"green", "purple", "purple"};
-                spindexer.setIndexerState(state);
-                telemetry.addData("Starting spindexer state", "full");
-            }
-            if(gamepad1.dpad_down) {
-                String[] state = {"empty", "empty", "empty"};
-                spindexer.setIndexerState(state);
-                telemetry.addData("Starting spindexer state", "empty");
-            }
-            telemetry.addLine();
             telemetry.addData("press right bumper to reset spindexer encoder", "");
             if(gamepad1.rightBumperWasPressed()) {
                 spindexer.resetSpindexEncoder();

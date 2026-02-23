@@ -79,12 +79,12 @@ public class V2TeleOp extends CommandOpMode {
         endgame = new EndgameSubsystem(hardwareMap);
 
         // set buttons/triggers
-        leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
+        leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
         rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
         rightBumper = new GamepadButton(gp1, GamepadKeys.Button.RIGHT_BUMPER);
-        X = new GamepadButton(gp1, GamepadKeys.Button.X);
-        B = new GamepadButton(gp1, GamepadKeys.Button.B);
-        A = new GamepadButton(gp1, GamepadKeys.Button.A);
+        X = new GamepadButton(gp1, GamepadKeys.Button.X);//transfer
+        B = new GamepadButton(gp1, GamepadKeys.Button.B);//Shoot one color
+        A = new GamepadButton(gp1, GamepadKeys.Button.A);//shoot one color
         spindexerRotating = new Trigger(() -> spindexer.getSpindexerPower() > 0.05);
 
 
@@ -165,7 +165,7 @@ public class V2TeleOp extends CommandOpMode {
         //if(outtake.getMegaTagPos() != null)
         //    follower.setPose(outtake.getMegaTagPos());
 
-        drivetrain.teleOpDrive(gamepad1);
+        drivetrain.teleOpDrive(gamepad2);//moving the robot
         outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
         outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
         //outtake.aimTurret(follower.getPose());

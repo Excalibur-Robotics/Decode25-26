@@ -131,6 +131,7 @@ public class V2TeleOpRed extends CommandOpMode {
             telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
             telemetry.addData("spindexer target position", spindexer.getTargetAngle());
             telemetry.update();
+            outtake.resetTurretEncoder();
         }
     }
 

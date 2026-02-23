@@ -211,7 +211,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // turret angle in degrees, straight forward is 0
     public double getTurretPos() {
-        return turret.getCurrentPosition() * 360.0 / turretTicksPerRev;
+        return turret.getCurrentPosition() * 11.93/7 * 360.0 / turretTicksPerRev;
     }
 
 

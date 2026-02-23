@@ -13,6 +13,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
@@ -58,6 +59,8 @@ public class V2TeleOpBlue extends CommandOpMode {
 
     private boolean onRedTeam = false;
 
+    ElapsedTime timer;
+
     private Follower follower;
     private final Pose startPose = new Pose(9, 39, 0); // just for testing
 
@@ -76,15 +79,13 @@ public class V2TeleOpBlue extends CommandOpMode {
         endgame = new EndgameSubsystem(hardwareMap);
 
         // set buttons/triggers
-        leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
+        leftTrigger = new Trigger(() -> gp2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
         rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
         rightBumper = new GamepadButton(gp1, GamepadKeys.Button.RIGHT_BUMPER);
-        X = new GamepadButton(gp1, GamepadKeys.Button.X);
-        B = new GamepadButton(gp1, GamepadKeys.Button.B);
-        A = new GamepadButton(gp1, GamepadKeys.Button.A);
+        X = new GamepadButton(gp1, GamepadKeys.Button.X);//transfer
+        B = new GamepadButton(gp1, GamepadKeys.Button.B);//Shoot one color
+        A = new GamepadButton(gp1, GamepadKeys.Button.A);//shoot one color
         spindexerRotating = new Trigger(() -> spindexer.getSpindexerPower() > 0.05);
-
-        outtake.setTeam(onRedTeam);
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveOnce(new ConditionalCommand(
@@ -116,22 +117,11 @@ public class V2TeleOpBlue extends CommandOpMode {
         follower.setStartingPose(startPose);
         follower.update();
 
+        outtake.setTeam(onRedTeam);
         outtake.startLL();
+        timer = new ElapsedTime();
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("Starting spindexer state",
-                    "press dpad up if starting with a full spindexer, dpad down if starting empty");
-            if(gamepad1.dpad_up) {
-                String[] state = {"green", "purple", "purple"};
-                spindexer.setIndexerState(state);
-                telemetry.addData("Starting spindexer state", "full");
-            }
-            if(gamepad1.dpad_down) {
-                String[] state = {"empty", "empty", "empty"};
-                spindexer.setIndexerState(state);
-                telemetry.addData("Starting spindexer state", "empty");
-            }
-            telemetry.addLine();
             telemetry.addData("press right bumper to reset spindexer encoder", "");
             if(gamepad1.rightBumperWasPressed()) {
                 spindexer.resetSpindexEncoder();
@@ -151,7 +141,7 @@ public class V2TeleOpBlue extends CommandOpMode {
         //if(outtake.getMegaTagPos() != null)
         //    follower.setPose(outtake.getMegaTagPos());
 
-        drivetrain.teleOpDrive(gamepad1);
+        drivetrain.teleOpDrive(gamepad2);//moving the robot
         outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
         outtake.calculateTurretLL(outtake.getTX()); // aim turret at apriltag
         //outtake.aimTurret(follower.getPose());
@@ -182,16 +172,16 @@ public class V2TeleOpBlue extends CommandOpMode {
                 spindexer.setToOuttakeMode();
         }
 
-        if(gamepad1.dpad_up) {
+        if(gamepad2.dpad_up) {
             endgame.activateEndgame();
         }
-        if(gamepad1.dpad_down) {
+        if(gamepad2.dpad_down) {
             endgame.resetServos();
         }
 
 
-        telemetry.addData("kickstand position", endgame.getServoPos());
 
+        telemetry.addData("kickstand position", endgame.getServoPos());
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
@@ -226,6 +216,8 @@ public class V2TeleOpBlue extends CommandOpMode {
         telemetry.addData("tx", outtake.getTX());
         telemetry.addData("ta", outtake.getTA());
         telemetry.addData("apriltag ID", outtake.getApriltagID());
+        telemetry.addData("loop time", timer.milliseconds());
+        timer.reset();
 
         telemetry.update();
     }

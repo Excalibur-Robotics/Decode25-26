@@ -65,8 +65,8 @@ public class V2TeleOpBlue extends CommandOpMode {
     public void initialize() {
         CommandScheduler.getInstance().reset();
         // initialize gamepads
-        gp1 = new GamepadEx(gamepad1); // driving
-        gp2 = new GamepadEx(gamepad2); // intake/outtake
+        gp1 = new GamepadEx(gamepad1); // outtake
+        gp2 = new GamepadEx(gamepad2); // driving, intake, kickstand
 
         // initialize subsystems
         intake = new IntakeSubsystem(hardwareMap);

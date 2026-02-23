@@ -68,8 +68,8 @@ public class V2TeleOp extends CommandOpMode {
     public void initialize() {
         CommandScheduler.getInstance().reset();
         // initialize gamepads
-        gp1 = new GamepadEx(gamepad1); // driving
-        gp2 = new GamepadEx(gamepad2); // intake/outtake
+        gp1 = new GamepadEx(gamepad1); // outtake
+        gp2 = new GamepadEx(gamepad2); // driving, intake, kickstand
 
         // initialize subsystems
         intake = new IntakeSubsystem(hardwareMap);
@@ -122,17 +122,6 @@ public class V2TeleOp extends CommandOpMode {
         timer = new ElapsedTime();
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("Choose Team Color", "press X if blue team, B if red team");
-            if (gamepad1.x) {
-                outtake.setTeam(false);
-                onRedTeam = false;
-            }
-            if (gamepad1.b) {
-                outtake.setTeam(true);
-                onRedTeam = true;
-            }
-            telemetry.addData("Team Color", onRedTeam ? "RED" : "BLUE");
-            telemetry.addLine();
             telemetry.addData("Starting spindexer state",
                     "press dpad up if starting with a full spindexer, dpad down if starting empty");
             if(gamepad1.dpad_up) {
@@ -196,16 +185,15 @@ public class V2TeleOp extends CommandOpMode {
                 spindexer.setToOuttakeMode();
         }
 
-        if(gamepad1.dpad_up) {
+        if(gamepad2.dpad_up) {
             endgame.activateEndgame();
         }
-        if(gamepad1.dpad_down) {
+        if(gamepad2.dpad_down) {
             endgame.resetServos();
         }
 
 
-        telemetry.addData("loop time", timer.milliseconds());
-        timer.reset();
+
         telemetry.addData("kickstand position", endgame.getServoPos());
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
@@ -241,6 +229,8 @@ public class V2TeleOp extends CommandOpMode {
         telemetry.addData("tx", outtake.getTX());
         telemetry.addData("ta", outtake.getTA());
         telemetry.addData("apriltag ID", outtake.getApriltagID());
+        telemetry.addData("loop time", timer.milliseconds());
+        timer.reset();
 
         telemetry.update();
     }

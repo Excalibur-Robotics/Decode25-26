@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.V2.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.util.InterpLUT;
+import com.arcrobotics.ftclib.util.LUT;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -46,7 +48,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static double kickerDown = 0.0; // kicker servo down position
     public static double transferTime = 550; // in milliseconds
 
-    private final int turretTicksPerRev = 2151;
+    public static int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
     public static double kP = 0.018; // needs to be tuned
     public static double kI = 0.0;
@@ -54,6 +56,15 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     public static double hoodPosFar = 0.45;
     public static double hoodPosClose = 0.15;
+
+    LUT<Double, Double> hoodLUT = new LUT<Double, Double>()
+    {{
+        add(1.0,2.0);
+
+    }};
+
+    InterpLUT flywheelLUT = new InterpLUT();
+    //flywheelLUT.add(1.0, 2.0);
 
     private boolean onRedTeam;
 
@@ -196,6 +207,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     public void resetTurretEncoder() {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     // turret angle in degrees, straight forward is 0

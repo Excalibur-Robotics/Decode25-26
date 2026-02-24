@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -68,13 +69,14 @@ public class OuttakeSubsystem extends SubsystemBase {
         limelight = hwMap.get(Limelight3A.class, "limelight");
 
         flywheel.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         limelight.pipelineSwitch(1);
         hoodL.setDirection(Servo.Direction.FORWARD);
         hoodR.setDirection(Servo.Direction.REVERSE);
         kicker.setDirection(Servo.Direction.FORWARD);
 
-        targetSpeed = flywheelSpeedClose;
+        targetSpeed = flywheelSpeedFar;
         turretPID = new LHV2PID(kP, kI, kD);
         kicker.setPosition(kickerDown);
         setHood(hoodPosClose);
@@ -88,7 +90,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void setFlywheelPower(double power) {
-        flywheel.setPower(-power);
+        flywheel.setPower(power);
     }
 
     public void setTargetSpeed(int speed) {
@@ -112,7 +114,26 @@ public class OuttakeSubsystem extends SubsystemBase {
         InterpLUT hoodLUT = new InterpLUT();
         hoodLUT.add(1.0, 2.0); // need to measure right values
         hoodLUT.createLUT();
-        
+
+        setHood(hoodLUT.get(distFromGoal(botPose)));
+    }
+    public void calculateFlywheel(Pose botPose) {
+        InterpLUT fwLUT = new InterpLUT();
+        fwLUT.add(1.0, 2.0); // need to measure right values
+        fwLUT.createLUT();
+
+        targetSpeed = (int) (fwLUT.get(distFromGoal(botPose)));
+    }
+
+    public double distFromGoal(Pose botPose) {
+        double dist = 0;
+        if(onRedTeam) {
+            dist = Math.sqrt(Math.pow(144.0-botPose.getX(), 2) + Math.pow(144.0-botPose.getY(), 2));
+        }
+        else {
+            dist = Math.sqrt(Math.pow(botPose.getX(), 2) + Math.pow(144.0-botPose.getY(), 2));
+        }
+        return dist;
     }
 
     // get flywheel speed in rpm
@@ -191,13 +212,13 @@ public class OuttakeSubsystem extends SubsystemBase {
         else if(angle < -90) {
             angle = -90;
         }
-        turret.setPower(turretPID.Calculate(angle, (double) turret.getCurrentPosition() / turretTicksPerRev * 360));
+        turret.setPower(turretPID.Calculate(angle, getTurretPos()));
     }
 
     // aim turret with robot position
     public void aimTurret(Pose botPose) {
         Pose goal = new Pose(onRedTeam ? 136 : 8, 142);
-        double angle = Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX()));
+        double angle = Math.toDegrees(Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX())));
         if(angle < 0)
             angle += 180;
         double turretAngle = angle - botPose.getHeading();
@@ -213,7 +234,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     public double getTurretPos() {
         return turret.getCurrentPosition() * 11.93/7 * 360.0 / turretTicksPerRev;
     }
-
 
     // set the position of the hood
     public void setHood(double angle) {

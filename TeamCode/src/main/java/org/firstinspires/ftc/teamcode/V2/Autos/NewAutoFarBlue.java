@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name="FarRed")
+@Autonomous(name="FarBlue")
 public class NewAutoFarBlue extends CommandOpMode {
     Follower follower;
     IntakeSubsystem intake;

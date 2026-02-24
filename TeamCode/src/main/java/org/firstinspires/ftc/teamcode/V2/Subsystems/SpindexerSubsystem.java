@@ -50,8 +50,6 @@ public class SpindexerSubsystem extends SubsystemBase {
     public static double kP = 0.0006;
     public static double kI = 0;
     public static double kD = 0.008;
-    public static int tolerance = 35;
-    public static int velocityTolerance = 15;
     public final int ticksPerRev = 8192; // cpr of bore encoder
 
     public LHV2PID PID;
@@ -64,13 +62,15 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+/*
         int CP = spindexMotor.getCurrentPosition();
         int ticks = 120 * ticksPerRev / 360;
         if(CP != 0)
             TP = (abs(CP) + ticks/2) / ticks * ticks * CP / abs(CP);
         else
             TP = 0;
+
+ */
 
         PID = new LHV2PID(kP, kI, kD);
         timer.reset();
@@ -215,7 +215,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     // get the color the color sensor currently sees.
     public String getColor() {
         String color = "empty";
-        if(pipeline.GreenPixels > 90000) {
+        if(pipeline.GreenPixels > 80000) {
             color = "green";
         }
         else if(pipeline.PurplePixels > 90000) {
@@ -226,6 +226,6 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     public boolean detectsArtifact() {
-        return pipeline.GreenPixels > 90000 || pipeline.PurplePixels > 90000;
+        return pipeline.GreenPixels > 80000 || pipeline.PurplePixels > 90000;
     }
 }

@@ -210,11 +210,11 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // input target angle
     public void rotateTurret(double angle) {
-        if(angle > 180) {
-            angle = 180;
+        if(angle > 215) {
+            angle = 215;
         }
-        else if(angle < -90) {
-            angle = -90;
+        else if(angle < -110) {
+            angle = -110;
         }
         turret.setPower(turretPID.Calculate(angle, getTurretPos()));
     }
@@ -297,8 +297,9 @@ public class OuttakeSubsystem extends SubsystemBase {
         return id;
     }
     // position of green ball in motif (1, 2, or 3)
+    // -1 if apriltag not seen
     public int getMotif() {
-        int motif = 0;
+        int motif = -1;
         if(getApriltagID() > 20 && getApriltagID() < 24) {
             return getApriltagID() - 21;
         }

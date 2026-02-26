@@ -170,6 +170,10 @@ public class SpindexerSubsystem extends SubsystemBase {
         return OuttakeMode;
     }
 
+    public boolean isSpindexing() {
+        return Math.abs(getTargetAngle()-getSpindexerAngle()) > 8;
+    }
+
     // get the arraylist of the artifacts
     public ArrayList<String> getIndexerState() {
         return indexer;
@@ -203,6 +207,20 @@ public class SpindexerSubsystem extends SubsystemBase {
                 num++;
         }
         numArtifacts = num;
+    }
+
+    public void sort(int id) {
+        if(indexer.contains("green")) {
+            int motif = 2 - (id - 21);
+            int greenPos = indexer.indexOf("green");
+            int rot = motif - greenPos;
+            if(rot == 1 || rot == -2) {
+                rotateCCW();
+            }
+            else if(rot == -1 || rot == 2) {
+                rotateCW();
+            }
+        }
     }
 
     public double getGreenPixels() {

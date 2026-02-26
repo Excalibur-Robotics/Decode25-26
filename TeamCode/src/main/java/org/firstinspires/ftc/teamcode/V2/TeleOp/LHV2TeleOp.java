@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,7 +18,8 @@ import static java.lang.Math.abs;
 
 // This is the Spindex code so far :)
 // Feel free to make changes and tell me improvements
-@Config
+@Disabled
+//@Config
 @TeleOp(name="SpindexTester")
 public class LHV2TeleOp extends OpMode {
     /* Color Sensor Variables*/

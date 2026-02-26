@@ -90,30 +90,25 @@ public class V2TeleOpBlue extends CommandOpMode {
         spindexerRotating = new Trigger(() -> Math.abs(spindexer.getSpindexerPower()) > 0.0);
 
         // Bind buttons/triggers with commands
-        leftTrigger.whileActiveOnce(new ConditionalCommand(
+        leftTrigger.whileActiveContinuous(new ConditionalCommand(
                 new IntakeCommand(intake, spindexer),
                 new InstantCommand(),
                 () -> /*spindexer.getNumArtifacts() < 3 &&*/
                         outtake.getKickerPos() < outtake.getKickerDown()+0.01));
         rightTrigger.whenActive(new ActivateFlywheel(outtake, gamepad1));
-        /*X.whenPressed(new ConditionalCommand(
-                new InstantCommand(() -> new ShootArtifact(outtake, spindexer).schedule(false)),
+        X.whenPressed(new ConditionalCommand(
+                new ShootArtifact(outtake, spindexer),
                 new InstantCommand(),
-                () -> outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));*/
-        X.whenPressed(new ShootArtifact(outtake, spindexer));
+                () -> outtake.atTargetSpeed()), false);
+        //X.whenPressed(new ShootArtifact(outtake, spindexer));
         B.whenPressed(new ConditionalCommand(
-                new InstantCommand(() -> new ShootColor(outtake, spindexer, "purple").schedule(false)),
+                new ShootColor(outtake, spindexer, "purple"),
                 new InstantCommand(),
-                () -> spindexer.getIndexerState().contains("purple") &&
-                        outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
+                () -> spindexer.getIndexerState().contains("purple") && outtake.atTargetSpeed()), false);
         A.whenPressed(new ConditionalCommand(
-                new InstantCommand(() -> new ShootColor(outtake, spindexer, "green").schedule(false)),
+                new ShootColor(outtake, spindexer, "green"),
                 new InstantCommand(),
-                () -> spindexer.getIndexerState().contains("green") &&
-                        outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30));
-        // automatically activate intake when spindexer is spinning
-        //spindexerRotating.whenActive(new InstantCommand(() -> intake.activateIntake()))
-        //                 .whenInactive(new InstantCommand(() -> intake.stopIntake()));
+                () -> spindexer.getIndexerState().contains("green") && outtake.atTargetSpeed()), false);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
@@ -126,12 +121,6 @@ public class V2TeleOpBlue extends CommandOpMode {
         spindexer.resetSpindexEncoder();
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("press right bumper to reset spindexer encoder", "");
-            if(gamepad1.rightBumperWasPressed()) {
-                spindexer.resetSpindexEncoder();
-                telemetry.addData("press right bumper to reset spindexer encoder",
-                        "spindexer encoder reset");
-            }
             telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
             telemetry.addData("spindexer target position", spindexer.getTargetAngle());
             FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
@@ -163,18 +152,6 @@ public class V2TeleOpBlue extends CommandOpMode {
                 outtake.calculateTurretLL(outtake.getTX());
         }
 
-
-        /*
-        // move hood up - dpad up
-        if(gamepad1.dpad_up) {
-            outtake.setHood(outtake.getHoodFar());
-        }
-
-        // move hood down - dpad down
-        if(gamepad1.dpad_down) {
-            outtake.setHood(outtake.getHoodClose());
-        }
-         */
         // manual spindexer controls if something goes wrong with the automated actions
         if(gamepad1.rightBumperWasPressed()) {
             spindexer.rotateCCW();
@@ -195,12 +172,10 @@ public class V2TeleOpBlue extends CommandOpMode {
         if(gamepad1.dpad_down) {
             endgame.resetServos();
         }
-        if(gamepad1.dpad_right){
-            outtake.rotateTurret(0);
-        }
         if(gamepad1.dpad_left) {
             intake.setIntakePower(-1);
         }
+        // automatically activate intake when spindexer is spinning
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
         }

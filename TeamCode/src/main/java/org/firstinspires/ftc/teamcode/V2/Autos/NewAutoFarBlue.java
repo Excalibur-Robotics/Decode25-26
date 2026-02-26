@@ -77,28 +77,28 @@ public class NewAutoFarBlue extends CommandOpMode {
                 .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
                 .build();
         toSecondIntake = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, beforeFirstIntake))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstIntake.getHeading())
+                .addPath(new BezierLine(shootPose, beforeSecondIntake))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), beforeSecondIntake.getHeading())
                 .build();
         intakeSecondBalls = follower.pathBuilder()
-                .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
+                .addPath(new BezierLine(beforeSecondIntake, afterSecondIntake))
                 .setConstantHeadingInterpolation(Math.PI)
                 .build();
         toSecondShoot = follower.pathBuilder()
-                .addPath(new BezierLine(afterFirstIntake, shootPose))
-                .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(afterSecondIntake, shootPose))
+                .setLinearHeadingInterpolation(afterSecondIntake.getHeading(), shootPose.getHeading())
                 .build();
         toThirdIntake = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, beforeFirstIntake))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstIntake.getHeading())
+                .addPath(new BezierLine(shootPose, beforeThirdIntake))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), beforeThirdIntake.getHeading())
                 .build();
         intakeThirdBalls = follower.pathBuilder()
-                .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
+                .addPath(new BezierLine(beforeThirdIntake, afterThirdIntake))
                 .setConstantHeadingInterpolation(Math.PI)
                 .build();
         toThirdShoot = follower.pathBuilder()
-                .addPath(new BezierLine(afterFirstIntake, shootPose))
-                .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
+                .addPath(new BezierLine(afterThirdIntake, shootPose))
+                .setLinearHeadingInterpolation(afterThirdIntake.getHeading(), shootPose.getHeading())
                 .build();
 
         pathState = 0;
@@ -138,6 +138,7 @@ public class NewAutoFarBlue extends CommandOpMode {
         telemetry.addData("turret position", outtake.getTurretPos());
         telemetry.addData("tx", outtake.getTX());
         telemetry.addData("ta", outtake.getTA());
+        telemetry.addData("motif", motif);
         telemetry.addLine();
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
@@ -190,10 +191,61 @@ public class NewAutoFarBlue extends CommandOpMode {
                     if(outtake.atTargetSpeed()) {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
+                            follower.followPath(toSecondIntake);
+                            pathState = 5;
+                        }
+                    }
+                }
+                break;
+            case 5:
+                if(!follower.isBusy()) {
+                    new IntakeCommand(intake, spindexer).schedule();
+                    follower.followPath(intakeSecondBalls);
+                    pathState = 6;
+                }
+                break;
+            case 6:
+                if(!follower.isBusy()) {
+                    new ActivateFlywheel(outtake).schedule();
+                    follower.followPath(toSecondShoot);
+                    pathState = 7;
+                }
+                break;
+            case 7:
+                if(!follower.isBusy()) {
+                    if(outtake.atTargetSpeed()) {
+                        new ShootArtifact(outtake, spindexer).schedule(false);
+                        if (spindexer.getNumArtifacts() == 0) {
+                            follower.followPath(toThirdIntake);
+                            pathState = 8;
+                        }
+                    }
+                }
+                break;
+            case 8:
+                if(!follower.isBusy()) {
+                    new IntakeCommand(intake, spindexer).schedule();
+                    follower.followPath(intakeThirdBalls);
+                    pathState = 9;
+                }
+                break;
+            case 9:
+                if(!follower.isBusy()) {
+                    new ActivateFlywheel(outtake).schedule();
+                    follower.followPath(toThirdShoot);
+                    pathState = 10;
+                }
+                break;
+            case 10:
+                if(!follower.isBusy()) {
+                    if(outtake.atTargetSpeed()) {
+                        new ShootArtifact(outtake, spindexer).schedule(false);
+                        if (spindexer.getNumArtifacts() == 0) {
                             pathState = -1;
                         }
                     }
                 }
+                break;
         }
     }
 }

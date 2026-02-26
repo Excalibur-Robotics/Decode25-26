@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.V2.Autos;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
@@ -20,6 +21,7 @@ each routine. It also creates the follower, which is what makes the robot
 actually follow the path.
 */
 
+@Disabled
 @Autonomous
 public class AutoOpMode extends OpMode {
     // declare the follower

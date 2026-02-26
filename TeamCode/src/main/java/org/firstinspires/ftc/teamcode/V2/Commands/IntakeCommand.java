@@ -18,7 +18,8 @@ public class IntakeCommand extends CommandBase {
     private SpindexerSubsystem spindexer;
 
     // if artifact was detected in the previous loop - used for edge detection
-    public boolean artifactPreviouslyDetected;
+    private boolean artifactPreviouslyDetected;
+    private boolean spindexing;
 
     public IntakeCommand(IntakeSubsystem intakeSub, SpindexerSubsystem spindexSub) {
         intake = intakeSub;
@@ -39,16 +40,24 @@ public class IntakeCommand extends CommandBase {
         intake.activateIntake();
 
         artifactPreviouslyDetected = true;
+        spindexing = true;
     }
 
     @Override
     public void execute() {
         boolean artifactDetected = spindexer.detectsArtifact();
-        if(artifactDetected && !artifactPreviouslyDetected) {
-            if(spindexer.getIndexerState().get(0).equals("empty"))
+        if(!spindexer.isSpindexing()) {
+            if(artifactDetected && !artifactPreviouslyDetected) {
                 spindexer.addArtifact(spindexer.getColor());
-            spindexer.rotateCCW();
+                spindexer.rotateCCW();
+                spindexing = true;
+            }
         }
+        /*else {
+            if(spindexer.isSpindexing()) {
+                spindexing = false;
+            }
+        }*/
         spindexer.powerSpindexer();
         artifactPreviouslyDetected = artifactDetected;
     }

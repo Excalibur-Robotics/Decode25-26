@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,8 +21,9 @@ Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
  */
 
+@Disabled
 //@Config
-//@TeleOp
+@TeleOp
 public class TurretTest extends CommandOpMode {
     DcMotor turret;
     Servo hoodR;

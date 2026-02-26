@@ -26,16 +26,27 @@ public class NewAutoFarBlue extends CommandOpMode {
 
     Pose startPose;
     Pose shootPose;
-    Pose beforeIntakePose;
-    Pose afterIntakePose;
+    Pose beforeFirstIntake;
+    Pose afterFirstIntake;
+    Pose beforeSecondIntake;
+    Pose afterSecondIntake;
+    Pose beforeThirdIntake;
+    Pose afterThirdIntake;
 
-    PathChain goToShoot;
-    PathChain goToIntake;
-    PathChain intakeBalls;
-    PathChain secondShoot;
+    PathChain toFirstShoot;
+    PathChain toFirstIntake;
+    PathChain intakeFirstBalls;
+    PathChain toSecondShoot;
+    PathChain toSecondIntake;
+    PathChain intakeSecondBalls;
+    PathChain toThirdShoot;
+    PathChain toThirdIntake;
+    PathChain intakeThirdBalls;
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
+    private int motif;
+    private boolean motifSeen = false;
 
     @Override
     public void initialize() {
@@ -44,22 +55,50 @@ public class NewAutoFarBlue extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        startPose = new Pose(57, 9, Math.PI/2);
-        shootPose = new Pose(57, 12, Math.PI/2);
-        beforeIntakePose = new Pose(44, 36, 0);
-        afterIntakePose = new Pose(18, 36, 0);
+        startPose = new Pose(58, 8, Math.PI/2);
+        shootPose = new Pose(58, 12, Math.PI/2);
+        beforeFirstIntake = new Pose(48, 36, Math.PI);
+        afterFirstIntake = new Pose(18, 36, Math.PI);
+        beforeSecondIntake = new Pose(48, 60, Math.PI);
+        afterSecondIntake = new Pose(18, 60, Math.PI);
+        beforeThirdIntake = new Pose(48, 84, Math.PI);
+        afterThirdIntake = new Pose(18, 84, Math.PI);
 
-        goToIntake = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, beforeIntakePose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeIntakePose.getHeading())
+        toFirstIntake = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, beforeFirstIntake))
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstIntake.getHeading())
                 .build();
-        intakeBalls = follower.pathBuilder()
-                .addPath(new BezierLine(beforeIntakePose, afterIntakePose))
-                .setConstantHeadingInterpolation(0)
+        intakeFirstBalls = follower.pathBuilder()
+                .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
+                .setConstantHeadingInterpolation(Math.PI)
                 .build();
-        goToShoot = follower.pathBuilder()
-                .addPath(new BezierLine(afterIntakePose, shootPose))
-                .setLinearHeadingInterpolation(afterIntakePose.getHeading(), shootPose.getHeading())
+        toFirstShoot = follower.pathBuilder()
+                .addPath(new BezierLine(afterFirstIntake, shootPose))
+                .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
+                .build();
+        toSecondIntake = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, beforeFirstIntake))
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstIntake.getHeading())
+                .build();
+        intakeSecondBalls = follower.pathBuilder()
+                .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
+                .setConstantHeadingInterpolation(Math.PI)
+                .build();
+        toSecondShoot = follower.pathBuilder()
+                .addPath(new BezierLine(afterFirstIntake, shootPose))
+                .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
+                .build();
+        toThirdIntake = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, beforeFirstIntake))
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstIntake.getHeading())
+                .build();
+        intakeThirdBalls = follower.pathBuilder()
+                .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
+                .setConstantHeadingInterpolation(Math.PI)
+                .build();
+        toThirdShoot = follower.pathBuilder()
+                .addPath(new BezierLine(afterFirstIntake, shootPose))
+                .setLinearHeadingInterpolation(afterFirstIntake.getHeading(), shootPose.getHeading())
                 .build();
 
         pathState = 0;
@@ -67,6 +106,11 @@ public class NewAutoFarBlue extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(false);
+        outtake.setLLPipeline(0);
+        outtake.resetTurretEncoder();
+        spindexer.resetSpindexEncoder();
+        follower.setStartingPose(startPose);
+        outtake.startLL();
     }
 
     @Override
@@ -77,9 +121,24 @@ public class NewAutoFarBlue extends CommandOpMode {
         autoPathUpdate();
 
         spindexer.powerSpindexer();
-        outtake.calculateTurretLL(outtake.getTX());
+        //outtake.calculateTurretLL(outtake.getTX());
+        if(motifSeen)
+            outtake.aimTurret(follower.getPose());
         outtake.calculateLaunch();
+        if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
+            intake.activateIntake();
+        }
 
+        telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
+        telemetry.addData("target speed", outtake.getTargetSpeed());
+        telemetry.addData("flywheel error", Math.abs(outtake.getFlywheelSpeed() - outtake.getTargetSpeed()));
+        telemetry.addData("flywheel power", outtake.flywheel.getPower());
+        telemetry.addData("kicker position", outtake.getKickerPos());
+        telemetry.addData("hood angle", outtake.getHoodAngle());
+        telemetry.addData("turret position", outtake.getTurretPos());
+        telemetry.addData("tx", outtake.getTX());
+        telemetry.addData("ta", outtake.getTA());
+        telemetry.addLine();
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
@@ -97,11 +156,17 @@ public class NewAutoFarBlue extends CommandOpMode {
                 pathState = 1;
                 break;
             case 1:
-                if(outtake.atTargetSpeed()) {
+                if(!outtake.atTargetSpeed()) {
+                    if (!motifSeen && outtake.getMotif() != 0) {
+                        motif = outtake.getMotif();
+                        motifSeen = true;
+                        outtake.setLLPipeline(2);
+                    }
+                }
+                else {
                     new ShootArtifact(outtake, spindexer).schedule(false);
                     if(spindexer.getNumArtifacts() == 0) {
-
-                        follower.followPath(goToIntake);
+                        follower.followPath(toFirstIntake);
                         pathState = 2;
                     }
                 }
@@ -109,23 +174,26 @@ public class NewAutoFarBlue extends CommandOpMode {
             case 2:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
-                    follower.followPath(intakeBalls);
+                    follower.followPath(intakeFirstBalls);
                     pathState = 3;
                 }
                 break;
             case 3:
                 if(!follower.isBusy()) {
                     new ActivateFlywheel(outtake).schedule();
-                    follower.followPath(goToShoot);
+                    follower.followPath(toFirstShoot);
                     pathState = 4;
                 }
                 break;
             case 4:
                 if(!follower.isBusy()) {
-
+                    if(outtake.atTargetSpeed()) {
+                        new ShootArtifact(outtake, spindexer).schedule(false);
+                        if (spindexer.getNumArtifacts() == 0) {
+                            pathState = -1;
+                        }
+                    }
                 }
         }
     }
-
-
 }

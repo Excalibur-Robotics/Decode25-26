@@ -31,7 +31,7 @@ public class V2SimpleTeleOp extends OpMode {
 
     LEDs Led;
 
-    public static double hoodUp = 0.45;
+    public static double hoodUp = 1;
     public static double hoodDown = 0;
 
     private ElapsedTime kickerTimer;

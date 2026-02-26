@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.V2.LHV2PID;
 
@@ -42,12 +43,12 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int fwTicksPerRev = 112;
     private int targetSpeed; // current speed the flywheel is trying to reach
-    public static int flywheelSpeedFar = 725;
+    public static int flywheelSpeedFar = 740;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 1; // difference of up and down position
-    public static double kickerDown = 0.0; // kicker servo down position
-    public static double transferTime = 550; // in milliseconds
+    public static double kickerDist = 0.8; // difference of up and down position
+    public static double kickerDown = 0.28; // kicker servo down position
+    public static double transferTime = 650; // in milliseconds
 
     public static int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
@@ -55,7 +56,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static double kI = 0.0;
     public static double kD = 0.5; // needs to be tuned
 
-    public static double hoodPosFar = 0.45;
+    public static double hoodPosFar = 0.9;
     public static double hoodPosClose = 0.15;
 
     private boolean onRedTeam;
@@ -113,8 +114,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     public void calculateHood(Pose botPose) {
         InterpLUT hoodLUT = new InterpLUT();
         hoodLUT.add(1.0, 2.0); // need to measure right values
-        hoodLUT.createLUT();
 
+        hoodLUT.createLUT();
         setHood(hoodLUT.get(distFromGoal(botPose)));
     }
     public void calculateFlywheel(Pose botPose) {
@@ -147,7 +148,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public boolean atTargetSpeed() {
-        return getFlywheelSpeed() > targetSpeed - 30;
+        return getFlywheelSpeed() > targetSpeed - 20;
     }
 
     public int getFWTicksPerRev() {
@@ -191,10 +192,13 @@ public class OuttakeSubsystem extends SubsystemBase {
     // aim turret with apriltag: CP = tx
     public void calculateTurretLL(double CP) {
         if(getTA() < 0.8 && getTA() > 0) { // offset angle for far shooting
-            if(onRedTeam)
+            /*if(onRedTeam)
                 turret.setPower(turretPID.Calculate(4, CP));
             else
                 turret.setPower(turretPID.Calculate(-4, CP));
+
+             */
+            turret.setPower(turretPID.Calculate(0, CP));
         }
         else if(getTA() > 1) {
             turret.setPower(turretPID.Calculate(0, CP));
@@ -221,7 +225,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         double angle = Math.toDegrees(Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX())));
         if(angle < 0)
             angle += 180;
-        double turretAngle = angle - botPose.getHeading();
+        double turretAngle = angle - Math.toDegrees(botPose.getHeading());
         rotateTurret(turretAngle);
     }
 
@@ -242,7 +246,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public double getHoodAngle() {
-        return hoodR.getPosition();
+        return hoodL.getPosition();
     }
     public double getHoodFar() {
         return hoodPosFar;
@@ -254,7 +258,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     public void setTeam(boolean redTeam) {
         onRedTeam = redTeam;
         limelight.pipelineSwitch(onRedTeam ? 1 : 2);
-
     }
 
     public void startLL() {
@@ -293,20 +296,29 @@ public class OuttakeSubsystem extends SubsystemBase {
         }
         return id;
     }
+    // position of green ball in motif (1, 2, or 3)
+    public int getMotif() {
+        int motif = 0;
+        if(getApriltagID() > 20 && getApriltagID() < 24) {
+            return getApriltagID() - 21;
+        }
+        return motif;
+    }
 
     public Pose getMegaTagPos() {
         LLResult llResult = limelight.getLatestResult();
         Pose botPose = null;
         if (llResult != null && llResult.isValid()) {
             Pose3D botPose3D = llResult.getBotpose();
-            botPose = new Pose(botPose3D.getPosition().x, botPose3D.getPosition().y,
-                    botPose3D.getOrientation().getYaw());
+            double x = botPose3D.getPosition().y * 3.28 * 12 + 72;
+            double y = -botPose3D.getPosition().x * 3.28 * 12 + 72;
+            double heading = (botPose3D.getOrientation().getYaw(AngleUnit.RADIANS) - Math.PI/2)
+                              - Math.toRadians(getTurretPos());
+            botPose = new Pose(x, y, heading);
+        }
+        else {
+            botPose = new Pose(0, 0, 0);
         }
         return botPose;
-    }
-
-    // start the limelight - not done in constructor b/c limelight uses up energy
-    public void startLimelight() {
-        limelight.start();
     }
 }

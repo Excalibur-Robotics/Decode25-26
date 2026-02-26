@@ -32,7 +32,6 @@ public class NewAutoFarRed extends CommandOpMode {
     PathChain goToShoot;
     PathChain goToIntake;
     PathChain intakeBalls;
-    PathChain secondShoot;
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
@@ -44,9 +43,9 @@ public class NewAutoFarRed extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        startPose = new Pose(87, 9, Math.PI/2);
-        shootPose = new Pose(87, 12, Math.PI/2);
-        beforeIntakePose = new Pose(100.0, 36, 0);
+        startPose = new Pose(86, 8, Math.PI/2);
+        shootPose = new Pose(86, 12, Math.PI/2);
+        beforeIntakePose = new Pose(96, 36, 0);
         afterIntakePose = new Pose(126.0, 36, 0);
 
         goToIntake = follower.pathBuilder()
@@ -67,6 +66,10 @@ public class NewAutoFarRed extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(true);
+        outtake.resetTurretEncoder();
+        spindexer.resetSpindexEncoder();
+        follower.setStartingPose(startPose);
+        outtake.startLL();
     }
 
     @Override
@@ -77,8 +80,13 @@ public class NewAutoFarRed extends CommandOpMode {
         autoPathUpdate();
 
         spindexer.powerSpindexer();
-        outtake.calculateTurretLL(outtake.getTX());
+        //outtake.calculateTurretLL(outtake.getTX());
+        outtake.aimTurret(follower.getPose());
         outtake.calculateLaunch();
+        if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
+            intake.activateIntake();
+        }
+
 
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
@@ -122,10 +130,13 @@ public class NewAutoFarRed extends CommandOpMode {
                 break;
             case 4:
                 if(!follower.isBusy()) {
-
+                    if(outtake.atTargetSpeed()) {
+                        new ShootArtifact(outtake, spindexer).schedule(false);
+                        if (spindexer.getNumArtifacts() == 0) {
+                            pathState = -1;
+                        }
+                    }
                 }
         }
     }
-
-
 }

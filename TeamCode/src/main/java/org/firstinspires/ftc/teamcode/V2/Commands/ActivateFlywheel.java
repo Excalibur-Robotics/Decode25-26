@@ -59,7 +59,7 @@ public class ActivateFlywheel extends CommandBase {
             power = flywheelPID.Calculate(0, outtake.getFlywheelSpeed());
         }
         outtake.setFlywheelPower(power);
-        if(gamepad != null && outtake.getFlywheelSpeed() > outtake.getTargetSpeed() - 30 && !hasRumbled) {
+        if(gamepad != null && outtake.atTargetSpeed() && !hasRumbled) {
             gamepad.runRumbleEffect(rumble);
             hasRumbled = true;
         }

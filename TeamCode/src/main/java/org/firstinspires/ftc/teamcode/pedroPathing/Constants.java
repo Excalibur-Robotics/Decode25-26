@@ -40,7 +40,7 @@ public class Constants {
             .yVelocity(38.65271452655942); // use LateralVelocityTuner to tune
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-1.093) // y offset in inches
+            .forwardPodY(1.093) // y offset in inches
             .strafePodX(-5.69) // x offset in inches
             .distanceUnit(DistanceUnit.INCH) // units
             .hardwareMapName("pinpoint")

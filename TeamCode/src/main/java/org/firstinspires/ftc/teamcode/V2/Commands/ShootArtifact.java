@@ -43,8 +43,8 @@ public class ShootArtifact extends CommandBase {
             else if(!spindexer.getIndexerState().get(0).equals("empty")){
                 spindexer.rotateCW();
             }
-            timer.reset();
         }
+        timer.reset();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ShootArtifact extends CommandBase {
     @Override
     public boolean isFinished() {
         // ends the command when the kicker is reset
-        return (outtake.getKickerPos() == outtake.getKickerDown() && artifactKickedUp
+        return (outtake.getKickerPos() < outtake.getKickerDown() + 0.01 && transferDown
                 && timer.milliseconds() > outtake.getTransferTime());
     }
 }

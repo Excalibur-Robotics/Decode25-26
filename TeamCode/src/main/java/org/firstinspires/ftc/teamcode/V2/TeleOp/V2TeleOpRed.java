@@ -61,11 +61,12 @@ public class V2TeleOpRed extends CommandOpMode {
 
     private boolean onRedTeam = true;
     private boolean localized = false;
+    public static int motifID;
 
     ElapsedTime timer;
 
     private Follower follower;
-    private Pose startPose = new Pose(9, 39, 0); // just for testing
+    private Pose startPose = new Pose(86, 8, Math.PI/2); // just for testing
 
     @Override
     public void initialize() {
@@ -102,7 +103,6 @@ public class V2TeleOpRed extends CommandOpMode {
                 new ShootArtifact(outtake, spindexer),
                 new InstantCommand(),
                 () -> outtake.atTargetSpeed()), false);
-        //X.whenPressed(new ShootArtifact(outtake, spindexer));
         B.whenPressed(new ConditionalCommand(
                 new ShootColor(outtake, spindexer, "purple"),
                 new InstantCommand(),
@@ -112,7 +112,7 @@ public class V2TeleOpRed extends CommandOpMode {
                 new InstantCommand(),
                 () -> spindexer.getIndexerState().contains("green") && outtake.atTargetSpeed()), false);
         Y.whenPressed(new ConditionalCommand(
-                new ShootAll(outtake, spindexer),
+                new ShootAll(outtake, spindexer, motifID),
                 new InstantCommand(),
                 () -> outtake.atTargetSpeed()), false);
 
@@ -121,6 +121,7 @@ public class V2TeleOpRed extends CommandOpMode {
         follower.update();
 
         outtake.setTeam(onRedTeam);
+        outtake.setLLPipeline(0);
         outtake.startLL();
         timer = new ElapsedTime();
         outtake.resetTurretEncoder();
@@ -146,18 +147,40 @@ public class V2TeleOpRed extends CommandOpMode {
         //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
         outtake.calculateFlywheel(follower.getPose());
         outtake.calculateHood(follower.getPose());
-        if(!localized) {
-            if(outtake.getTX() != 0) {
+        if (!localized) {
+            if (outtake.getTX() != 0) {
                 follower.setPose(outtake.getMegaTagPos());
                 localized = true;
             }
         }
         else {
-            if(outtake.getTX() == 0)
+            if (outtake.getTX() == 0)
                 outtake.aimTurret(follower.getPose());
             else
                 outtake.calculateTurretLL(outtake.getTX());
         }
+        /*if(!localized) {
+            if(motifID == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+                motifID = outtake.getApriltagID();
+                outtake.setTeam(onRedTeam);
+            }
+            if(outtake.getApriltagID() == (onRedTeam ? 24 : 20)) {
+                follower.setPose(outtake.getMegaTagPos());
+                localized = true;
+            }
+        }
+        else {
+            if(motifID == 0) {
+                motifID = outtake.scanMotif(follower.getPose());
+            }
+            else {
+                outtake.setTeam(onRedTeam);
+                if (outtake.getApriltagID() == 0)
+                    outtake.aimTurret(follower.getPose());
+                else
+                    outtake.calculateTurretLL(outtake.getTX());
+            }
+        }*/
 
         // manual spindexer controls if something goes wrong with the automated actions
         if(gamepad1.rightBumperWasPressed()) {
@@ -198,13 +221,8 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
                 + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
         telemetry.addData("# artifacts", spindexer.getNumArtifacts());
+        telemetry.addData("motif", motifID);
         telemetry.addLine();
-        /*telemetry.addLine("Megatag position");
-        telemetry.addData("x", outtake.getMegaTagPos().getX());
-        telemetry.addData("y", outtake.getMegaTagPos().getY());
-        telemetry.addData("heading", Math.toDegrees(outtake.getMegaTagPos().getHeading()));*/
-        telemetry.addLine();
-
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
@@ -214,13 +232,6 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("green pixels", spindexer.getGreenPixels());
         telemetry.addData("Artifact in intake slot", spindexer.detectsArtifact());
         FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
-        telemetry.addLine();
-        telemetry.addData("spindexer rotating", spindexer.isSpindexing());
-        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
-        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
-        telemetry.addData("spindexer error", Math.abs(spindexer.getSpindexerAngle()-spindexer.getTargetAngle()));
-        telemetry.addData("spindexer power", spindexer.getSpindexerPower());
-        telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
         telemetry.addLine();
         telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
         telemetry.addData("target speed", outtake.getTargetSpeed());
@@ -236,6 +247,13 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("ta", outtake.getTA());
         telemetry.addData("apriltag ID", outtake.getApriltagID());
         telemetry.addData("loop time", timer.milliseconds());
+        telemetry.addLine();
+        telemetry.addData("spindexer rotating", spindexer.isSpindexing());
+        telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
+        telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+        telemetry.addData("spindexer error", Math.abs(spindexer.getSpindexerAngle()-spindexer.getTargetAngle()));
+        telemetry.addData("spindexer power", spindexer.getSpindexerPower());
+        telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
         timer.reset();
 
         telemetry.update();

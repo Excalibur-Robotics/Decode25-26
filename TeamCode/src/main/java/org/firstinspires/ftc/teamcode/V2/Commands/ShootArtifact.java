@@ -51,8 +51,7 @@ public class ShootArtifact extends CommandBase {
     public void execute() {
         spindexer.powerSpindexer();
         // make sure spindexer has fully rotated before activating the kicker
-        if(Math.abs(spindexer.getSpindexerAngle() - spindexer.getTargetAngle()) < 6
-                && !artifactKickedUp) {
+        if(!spindexer.isSpindexing() && !artifactKickedUp) {
             outtake.kickUp();
             artifactKickedUp = true;
             timer.reset();
@@ -60,7 +59,7 @@ public class ShootArtifact extends CommandBase {
         // once kicker is all the way up, it is reset
         if(timer.milliseconds() > outtake.getTransferTime() && artifactKickedUp && !transferDown) {
             outtake.resetKicker();
-            //if(outtake.getFlywheelSpeed() > 0)
+            if(outtake.getFlywheelSpeed() > 0)
                 spindexer.removeArtifact(); // remove artifact from indexer arraylist
             transferDown = true;
             timer.reset();

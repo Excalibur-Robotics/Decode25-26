@@ -178,7 +178,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     public boolean isSpindexing() {
-        return Math.abs(getTargetAngle()-getSpindexerAngle()) > 8;
+        return Math.abs(getTargetAngle()-getSpindexerAngle()) > 6;
     }
 
     // get the arraylist of the artifacts

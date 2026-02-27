@@ -113,14 +113,38 @@ public class OuttakeSubsystem extends SubsystemBase {
     // need to finish
     public void calculateHood(Pose botPose) {
         InterpLUT hoodLUT = new InterpLUT();
-        hoodLUT.add(1.0, 2.0); // need to measure right values
-
+        hoodLUT.add(25, 0.15);
+        hoodLUT.add(55, 0.6);
+        hoodLUT.add(70, 0.7);
+        hoodLUT.add(85, 0.8);
+        hoodLUT.add(100, 0.85);
+        hoodLUT.add(111, 0.9); // need to measure right values
+        hoodLUT.add(120, 0.9);
+        hoodLUT.add(128, 0.9);
+        hoodLUT.add(135, 0.9);
+        hoodLUT.add(142, 0.9);
+        hoodLUT.add(149, 0.9);
+        hoodLUT.add(160, 0.9);
+        hoodLUT.add(200, 0.9);
         hoodLUT.createLUT();
+
         setHood(hoodLUT.get(distFromGoal(botPose)));
     }
     public void calculateFlywheel(Pose botPose) {
         InterpLUT fwLUT = new InterpLUT();
-        fwLUT.add(1.0, 2.0); // need to measure right values
+        fwLUT.add(25, 500);
+        fwLUT.add(55, 525);
+        fwLUT.add(70, 560);
+        fwLUT.add(85, 595);
+        fwLUT.add(100,615);
+        fwLUT.add(111,625); // need to measure right values
+        fwLUT.add(120,655);
+        fwLUT.add(128,675);
+        fwLUT.add(135,680);
+        fwLUT.add(142,695);
+        fwLUT.add(149,720);
+        fwLUT.add(160,745);
+        fwLUT.add(200,820);
         fwLUT.createLUT();
 
         targetSpeed = (int) (fwLUT.get(distFromGoal(botPose)));

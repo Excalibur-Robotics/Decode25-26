@@ -45,8 +45,8 @@ public class NewAutoFarRed extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private int motif;
     private boolean motifSeen = false;
+    private boolean onRedTeam = true;
 
     @Override
     public void initialize() {
@@ -70,7 +70,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 .build();
         intakeFirstBalls = follower.pathBuilder()
                 .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeFirstIntake.getHeading())
                 .build();
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterFirstIntake, shootPose))
@@ -82,7 +82,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 .build();
         intakeSecondBalls = follower.pathBuilder()
                 .addPath(new BezierLine(beforeSecondIntake, afterSecondIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeFirstIntake.getHeading())
                 .build();
         toSecondShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterSecondIntake, shootPose))
@@ -94,7 +94,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 .build();
         intakeThirdBalls = follower.pathBuilder()
                 .addPath(new BezierLine(beforeThirdIntake, afterThirdIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeFirstIntake.getHeading())
                 .build();
         toThirdShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterThirdIntake, shootPose))
@@ -105,7 +105,7 @@ public class NewAutoFarRed extends CommandOpMode {
         opModeTimer = new ElapsedTime();
         pathTimer = new ElapsedTime();
 
-        outtake.setTeam(true);
+        outtake.setTeam(onRedTeam);
         outtake.setLLPipeline(0);
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
@@ -122,15 +122,19 @@ public class NewAutoFarRed extends CommandOpMode {
 
         spindexer.powerSpindexer();
         //outtake.calculateTurretLL(outtake.getTX());
-        if(!motifSeen)
-            outtake.rotateTurret(10);
-        else
+        if(motifSeen)
             outtake.aimTurret(follower.getPose());
         outtake.calculateLaunch();
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
         }
 
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("path state", pathState);
+        telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
+        telemetry.addLine();
         telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
         telemetry.addData("target speed", outtake.getTargetSpeed());
         telemetry.addData("flywheel error", Math.abs(outtake.getFlywheelSpeed() - outtake.getTargetSpeed()));
@@ -138,17 +142,9 @@ public class NewAutoFarRed extends CommandOpMode {
         telemetry.addData("kicker position", outtake.getKickerPos());
         telemetry.addData("hood angle", outtake.getHoodAngle());
         telemetry.addData("turret position", outtake.getTurretPos());
+        telemetry.addLine();
         telemetry.addData("tx", outtake.getTX());
         telemetry.addData("ta", outtake.getTA());
-        telemetry.addData("apriltag id", outtake.getApriltagID());
-        telemetry.addData("motif", motif);
-        telemetry.addData("motif seen", motifSeen);
-        telemetry.addLine();
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("path state", pathState);
-        telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
         telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
         opModeTimer.reset();
         telemetry.update();
@@ -162,11 +158,10 @@ public class NewAutoFarRed extends CommandOpMode {
                 break;
             case 1:
                 if(!outtake.atTargetSpeed()) {
-                    if (!motifSeen && outtake.getMotif() != -1) {
-                        motif = outtake.getMotif();
+                    if (!motifSeen && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
                         spindexer.sort(outtake.getApriltagID());
                         motifSeen = true;
-                        outtake.setLLPipeline(1);
+                        outtake.setTeam(onRedTeam);
                     }
                 }
                 else {

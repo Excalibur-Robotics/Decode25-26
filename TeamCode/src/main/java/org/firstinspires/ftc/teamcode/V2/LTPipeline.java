@@ -20,14 +20,21 @@ public class LTPipeline extends OpenCvPipeline{
     public static int max_green_G = 255;
     public static int max_green_B = 255;
 
+    public static int min_purple_R = 125;
+    public static int min_purple_G = 80;
+    public static int min_purple_B = 50;
+    public static int max_purple_R = 255;
+    public static int max_purple_G = 155;
+    public static int max_purple_B = 255;
+
     //Scalars might need tuning
     //Green (RGB range)
     Scalar min_green = new Scalar(min_green_R, min_green_G, min_green_B);
     Scalar max_green = new Scalar(max_green_R, max_green_G, max_green_B);
 
     //Purple (RGB range)
-    Scalar min_purple = new Scalar(125, 80, 50);
-    Scalar max_purple= new Scalar(155, 255, 255);
+    Scalar min_purple = new Scalar(min_purple_R, min_purple_G, min_purple_B);
+    Scalar max_purple= new Scalar(max_purple_R, max_purple_G, max_purple_B);
 
     public Mat processFrame(Mat input) {
         //Converts RGB to HSV

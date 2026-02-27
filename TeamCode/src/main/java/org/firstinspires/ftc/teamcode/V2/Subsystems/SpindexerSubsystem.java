@@ -47,13 +47,18 @@ public class SpindexerSubsystem extends SubsystemBase {
     private boolean OuttakeMode;
 
     // spindexer pid constants
-    public static double kP = 0.0006;
+    public static double kP = 0.0004;
     public static double kI = 0;
-    public static double kD = 0.008;
+    public static double kD = 0.004;
     public final int ticksPerRev = 8192; // cpr of bore encoder
+    private double tolerance = 35;
+    private double velocityTolerance = 15;
 
     public LHV2PID PID;
     private double TP; // target position in ticks
+
+    public static int purpleTolerance = 140000;
+    public static int greenTolerance = 140000;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -112,12 +117,14 @@ public class SpindexerSubsystem extends SubsystemBase {
     // power spindexer based on PID
     public void powerSpindexer() {
         double CP = spindexMotor.getCurrentPosition();
-        if(timer.milliseconds()>15) {
-            CP = spindexMotor.getCurrentPosition();
-            double MotorPower = -PID.Calculate(TP, CP);
-            spindexMotor.setPower(MotorPower);
-            Log.i("spindexer", String.valueOf(MotorPower));
-            timer.reset();
+        if(abs((TP) - CP) > tolerance || abs(spindexMotor.getVelocity()) > velocityTolerance) {
+            if (timer.milliseconds() > 15) {
+                CP = spindexMotor.getCurrentPosition();
+                double MotorPower = -PID.Calculate(TP, CP);
+                spindexMotor.setPower(MotorPower);
+                Log.i("spindexer", String.valueOf(MotorPower));
+                timer.reset();
+            }
         }
     }
 
@@ -233,10 +240,10 @@ public class SpindexerSubsystem extends SubsystemBase {
     // get the color the color sensor currently sees.
     public String getColor() {
         String color = "empty";
-        if(pipeline.GreenPixels > 80000) {
+        if(pipeline.GreenPixels > greenTolerance) {
             color = "green";
         }
-        else if(pipeline.PurplePixels > 90000) {
+        else if(pipeline.PurplePixels > purpleTolerance) {
             color = "purple";
         }
 
@@ -244,6 +251,6 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     public boolean detectsArtifact() {
-        return pipeline.GreenPixels > 80000 || pipeline.PurplePixels > 90000;
+        return pipeline.GreenPixels > greenTolerance || pipeline.PurplePixels > purpleTolerance;
     }
 }

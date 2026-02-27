@@ -41,15 +41,15 @@ public class ShootAll extends CommandBase {
 
     @Override
     public void execute() {
-        if(motif != null) {
+        /*if(motif != null) {
             if (spindexer.getIndexerState().contains(motif[count]))
                 new ShootColor(outtake, spindexer, motif[count]).schedule(false);
             else
                 new ShootArtifact(outtake, spindexer).schedule(false);
         }
-        else {
+        else {*/
             new ShootArtifact(outtake, spindexer).schedule(false);
-        }
+        //}
     }
 
     @Override

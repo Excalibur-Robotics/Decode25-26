@@ -143,7 +143,9 @@ public class V2TeleOpRed extends CommandOpMode {
 
         drivetrain.teleOpDrive(gamepad1);//moving the robot
         spindexer.powerSpindexer();
-        outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
+        //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
+        outtake.calculateFlywheel(follower.getPose());
+        outtake.calculateHood(follower.getPose());
         if(!localized) {
             if(outtake.getTX() != 0) {
                 follower.setPose(outtake.getMegaTagPos());
@@ -190,11 +192,6 @@ public class V2TeleOpRed extends CommandOpMode {
 
 
 
-        telemetry.addLine("Megatag position");
-        telemetry.addData("x", outtake.getMegaTagPos().getX());
-        telemetry.addData("y", outtake.getMegaTagPos().getY());
-        telemetry.addData("heading", Math.toDegrees(outtake.getMegaTagPos().getHeading()));
-        telemetry.addLine();
         ArrayList<String> indexer = spindexer.getIndexerState();
         telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
@@ -202,6 +199,12 @@ public class V2TeleOpRed extends CommandOpMode {
                 + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
         telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.addLine();
+        /*telemetry.addLine("Megatag position");
+        telemetry.addData("x", outtake.getMegaTagPos().getX());
+        telemetry.addData("y", outtake.getMegaTagPos().getY());
+        telemetry.addData("heading", Math.toDegrees(outtake.getMegaTagPos().getHeading()));*/
+        telemetry.addLine();
+
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));

@@ -118,7 +118,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         hoodLUT.add(70, 0.7);
         hoodLUT.add(85, 0.8);
         hoodLUT.add(100, 0.85);
-        hoodLUT.add(111, 0.9); // need to measure right values
+        hoodLUT.add(111, 0.9);
         hoodLUT.add(120, 0.9);
         hoodLUT.add(128, 0.9);
         hoodLUT.add(135, 0.9);
@@ -137,13 +137,13 @@ public class OuttakeSubsystem extends SubsystemBase {
         fwLUT.add(70, 560);
         fwLUT.add(85, 595);
         fwLUT.add(100,615);
-        fwLUT.add(111,625); // need to measure right values
+        fwLUT.add(111,625);
         fwLUT.add(120,655);
         fwLUT.add(128,675);
         fwLUT.add(135,680);
         fwLUT.add(142,695);
-        fwLUT.add(149,720);
-        fwLUT.add(160,745);
+        fwLUT.add(149,745);
+        fwLUT.add(160,765);
         fwLUT.add(200,820);
         fwLUT.createLUT();
 
@@ -220,7 +220,6 @@ public class OuttakeSubsystem extends SubsystemBase {
                 turret.setPower(turretPID.Calculate(4, CP));
             else
                 turret.setPower(turretPID.Calculate(-4, CP));
-
              */
             turret.setPower(turretPID.Calculate(0, CP));
         }
@@ -234,11 +233,11 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // input target angle
     public void rotateTurret(double angle) {
-        if(angle > 215) {
-            angle = 215;
+        if(angle > 210) {
+            angle = 210;
         }
-        else if(angle < -110) {
-            angle = -110;
+        else if(angle < -120) {
+            angle = -120;
         }
         turret.setPower(turretPID.Calculate(angle, getTurretPos()));
     }
@@ -249,8 +248,27 @@ public class OuttakeSubsystem extends SubsystemBase {
         double angle = Math.toDegrees(Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX())));
         if(angle < 0)
             angle += 180;
-        double turretAngle = angle - Math.toDegrees(botPose.getHeading());
+        double botHeading = Math.toDegrees(botPose.getHeading());
+        if(!onRedTeam && botHeading < -90)
+            botHeading += 360;
+        double turretAngle = angle - botHeading;
         rotateTurret(turretAngle);
+    }
+
+    public int scanMotif(Pose botPose) {
+        int id = 0;
+        double angle = Math.toDegrees(Math.atan((144 - botPose.getY()) / (72 - botPose.getX())));
+        if(angle < 0)
+            angle += 180;
+        double botHeading = Math.toDegrees(botPose.getHeading());
+        if(!onRedTeam && botHeading < -90)
+            botHeading += 360;
+        double turretAngle = angle - botHeading;
+        rotateTurret(turretAngle);
+        if(getApriltagID() > 20 && getApriltagID() < 24) {
+            id = getApriltagID();
+        }
+        return id;
     }
 
     public void resetTurretEncoder() {

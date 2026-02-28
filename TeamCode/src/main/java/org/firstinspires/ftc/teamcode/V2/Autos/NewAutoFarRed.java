@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.V2.Autos;
 
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
@@ -15,6 +16,8 @@ import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.V2.TeleOp.V2TeleOpBlue;
+import org.firstinspires.ftc.teamcode.V2.TeleOp.V2TeleOpRed;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name="FarRed")
@@ -46,6 +49,7 @@ public class NewAutoFarRed extends CommandOpMode {
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
     private boolean motifSeen = false;
+    private int id = 0;
     private boolean onRedTeam = true;
 
     @Override
@@ -132,6 +136,9 @@ public class NewAutoFarRed extends CommandOpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addLine();
+        telemetry.addData("motif ID", id);
+        telemetry.addData("motif has been seen", motifSeen);
         telemetry.addData("path state", pathState);
         telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
         telemetry.addLine();
@@ -159,7 +166,10 @@ public class NewAutoFarRed extends CommandOpMode {
             case 1:
                 if(!outtake.atTargetSpeed()) {
                     if (!motifSeen && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
-                        spindexer.sort(outtake.getApriltagID());
+                        id = outtake.getApriltagID();
+                        V2TeleOpRed.motifID = id;
+                        V2TeleOpBlue.motifID = id;
+                        spindexer.sort(id);
                         motifSeen = true;
                         outtake.setTeam(onRedTeam);
                     }
@@ -189,6 +199,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 break;
             case 4:
                 if(!follower.isBusy()) {
+                    spindexer.sort(id);
                     if(outtake.atTargetSpeed()) {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
@@ -214,6 +225,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 break;
             case 7:
                 if(!follower.isBusy()) {
+                    spindexer.sort(id);
                     if(outtake.atTargetSpeed()) {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
@@ -239,6 +251,7 @@ public class NewAutoFarRed extends CommandOpMode {
                 break;
             case 10:
                 if(!follower.isBusy()) {
+                    spindexer.sort(id);
                     if(outtake.atTargetSpeed()) {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {

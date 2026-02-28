@@ -44,7 +44,7 @@ public class V2TeleOpBlue extends CommandOpMode {
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
-    EndgameSubsystem endgame;
+    //EndgameSubsystem endgame;
 
     // gamepads
     GamepadEx gp1;
@@ -79,7 +79,7 @@ public class V2TeleOpBlue extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
-        endgame = new EndgameSubsystem(hardwareMap);
+        //endgame = new EndgameSubsystem(hardwareMap);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -97,7 +97,7 @@ public class V2TeleOpBlue extends CommandOpMode {
                 new InstantCommand(),
                 () -> outtake.getKickerPos() < outtake.getKickerDown()+0.01
                 /*&& spindexer.getNumArtifacts() < 3 &&*/));
-        rightTrigger.whenActive(new ActivateFlywheel(outtake, gamepad1));
+        rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake));
         X.whenPressed(new ConditionalCommand(
                 new ShootArtifact(outtake, spindexer),
                 new InstantCommand(),
@@ -172,13 +172,15 @@ public class V2TeleOpBlue extends CommandOpMode {
             else
                 spindexer.setToOuttakeMode();
         }*/
-
+/*
         if(gamepad1.dpad_up) {
             endgame.activateEndgame();
         }
         if(gamepad1.dpad_down) {
             endgame.resetServos();
         }
+
+ */
         if(gamepad1.dpad_left) {
             intake.setIntakePower(-1);
         }
@@ -229,7 +231,7 @@ public class V2TeleOpBlue extends CommandOpMode {
         telemetry.addData("kicker position", outtake.getKickerPos());
         telemetry.addData("hood angle", outtake.getHoodAngle());
         telemetry.addData("turret position", outtake.getTurretPos());
-        telemetry.addData("kickstand position", endgame.getServoPos());
+        //telemetry.addData("kickstand position", endgame.getServoPos());
         telemetry.addLine();
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
         telemetry.addData("tx", outtake.getTX());

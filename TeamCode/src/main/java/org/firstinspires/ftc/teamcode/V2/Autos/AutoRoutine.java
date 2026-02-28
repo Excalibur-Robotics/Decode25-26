@@ -123,7 +123,7 @@ public class AutoRoutine {
 
         outtake.setLLPipeline(0);
         String[] colors = {"green", "purple", "purple"};
-        spindexer.setIndexerState(colors);
+        //spindexer.setIndexerState(colors);
     }
 
     // set the path state

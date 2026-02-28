@@ -44,7 +44,7 @@ public class V2TeleOpRed extends CommandOpMode {
     SpindexerSubsystem spindexer;
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
-    //EndgameSubsystem endgame;
+    EndgameSubsystem endgame;
 
     // gamepads
     GamepadEx gp1;
@@ -62,11 +62,12 @@ public class V2TeleOpRed extends CommandOpMode {
     private boolean onRedTeam = true;
     private boolean localized = false;
     public static int motifID;
+    public static ArrayList<String> indexer;
 
     ElapsedTime timer;
 
     private Follower follower;
-    private Pose startPose = new Pose(86, 8, Math.PI/2); // just for testing
+    private Pose startPose = new Pose(onRedTeam ? 86 : 58, 8, Math.PI/2); // just for testing
 
     @Override
     public void initialize() {
@@ -80,7 +81,7 @@ public class V2TeleOpRed extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
-        //endgame = new EndgameSubsystem(hardwareMap);
+        endgame = new EndgameSubsystem(hardwareMap);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -97,12 +98,13 @@ public class V2TeleOpRed extends CommandOpMode {
                 new IntakeCommand(intake, spindexer),
                 new InstantCommand(),
                 () -> outtake.getKickerPos() < outtake.getKickerDown()+0.01
-                    /*&& spindexer.getNumArtifacts() < 3 &&*/));
-        rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake));
-        X.whenPressed(new ConditionalCommand(
+                /*&& spindexer.getNumArtifacts() < 3 &&*/));
+        rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake, gamepad1));
+        /*X.whenPressed(new ConditionalCommand(
                 new ShootArtifact(outtake, spindexer),
                 new InstantCommand(),
-                () -> outtake.atTargetSpeed()), false);
+                () -> outtake.atTargetSpeed()), false);*/
+        X.whenPressed(new ShootArtifact(outtake, spindexer));
         B.whenPressed(new ConditionalCommand(
                 new ShootColor(outtake, spindexer, "purple"),
                 new InstantCommand(),
@@ -121,15 +123,17 @@ public class V2TeleOpRed extends CommandOpMode {
         follower.update();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0);
         outtake.startLL();
         timer = new ElapsedTime();
-        outtake.resetTurretEncoder();
-        spindexer.resetSpindexEncoder();
+        if(indexer != null)
+            spindexer.setIndexerState(indexer);
+        //outtake.resetTurretEncoder();
+        //spindexer.resetSpindexEncoder();
 
         while(!isStarted() && !isStopRequested()) {
             telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
             telemetry.addData("spindexer target position", spindexer.getTargetAngle());
+            telemetry.addData("turret position", outtake.getTurretPos());
             FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
             telemetry.addData("purple pixels", spindexer.getPurplePixels());
             telemetry.addData("green pixels", spindexer.getGreenPixels());
@@ -159,34 +163,12 @@ public class V2TeleOpRed extends CommandOpMode {
             else
                 outtake.calculateTurretLL(outtake.getTX());
         }
-        /*if(!localized) {
-            if(motifID == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
-                motifID = outtake.getApriltagID();
-                outtake.setTeam(onRedTeam);
-            }
-            if(outtake.getApriltagID() == (onRedTeam ? 24 : 20)) {
-                follower.setPose(outtake.getMegaTagPos());
-                localized = true;
-            }
-        }
-        else {
-            if(motifID == 0) {
-                motifID = outtake.scanMotif(follower.getPose());
-            }
-            else {
-                outtake.setTeam(onRedTeam);
-                if (outtake.getApriltagID() == 0)
-                    outtake.aimTurret(follower.getPose());
-                else
-                    outtake.calculateTurretLL(outtake.getTX());
-            }
-        }*/
 
         // manual spindexer controls if something goes wrong with the automated actions
-        if(gamepad1.rightBumperWasPressed()) {
+        if (gamepad1.rightBumperWasPressed()) {
             spindexer.rotateCCW();
         }
-        if(gamepad1.leftBumperWasPressed()) {
+        if (gamepad1.leftBumperWasPressed()) {
             spindexer.rotateCW();
         }
         /*if(gamepad1.yWasPressed()) {
@@ -195,30 +177,29 @@ public class V2TeleOpRed extends CommandOpMode {
             else
                 spindexer.setToOuttakeMode();
         }*/
-/*
-        if(gamepad1.dpad_up) {
+
+
+        if (gamepad1.dpad_up) {
             endgame.activateEndgame();
         }
-        if(gamepad1.dpad_down) {
+        if (gamepad1.dpad_down) {
             endgame.resetServos();
         }
 
- */
-        if(gamepad1.dpad_left) {
+
+        if (gamepad1.dpad_left) {
             intake.setIntakePower(-1);
         }
         // automatically activate intake when spindexer is spinning
-        if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
+        if (Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
-        }
-        else if(gamepad1.left_trigger <= 0.5) {
+        } else if (gamepad1.left_trigger <= 0.5) {
             intake.stopIntake();
         }
 
 
-
         ArrayList<String> indexer = spindexer.getIndexerState();
-        telemetry.addData("spindexer" , spindexer.inOuttakeMode() ? "  " +
+        telemetry.addData("spindexer", spindexer.inOuttakeMode() ? "  " +
                 indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
         telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
                 + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
@@ -242,7 +223,7 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("kicker position", outtake.getKickerPos());
         telemetry.addData("hood angle", outtake.getHoodAngle());
         telemetry.addData("turret position", outtake.getTurretPos());
-        //                                                                                                                      telemetry.addData("kickstand position", endgame.getServoPos());
+        telemetry.addData("kickstand position", endgame.getServoPos());
         telemetry.addLine();
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
         telemetry.addData("tx", outtake.getTX());
@@ -253,7 +234,7 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("spindexer rotating", spindexer.isSpindexing());
         telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
         telemetry.addData("spindexer target position", spindexer.getTargetAngle());
-        telemetry.addData("spindexer error", Math.abs(spindexer.getSpindexerAngle()-spindexer.getTargetAngle()));
+        telemetry.addData("spindexer error", Math.abs(spindexer.getSpindexerAngle() - spindexer.getTargetAngle()));
         telemetry.addData("spindexer power", spindexer.getSpindexerPower());
         telemetry.addData("spindexer mode", spindexer.inOuttakeMode() ? "outtake" : "intake");
         timer.reset();

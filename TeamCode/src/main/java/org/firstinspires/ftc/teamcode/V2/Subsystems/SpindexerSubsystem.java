@@ -76,15 +76,16 @@ public class SpindexerSubsystem extends SubsystemBase {
             TP = 0;
 
  */
+        TP = spindexMotor.getCurrentPosition();
 
         PID = new LHV2PID(kP, kI, kD);
         timer.reset();
 
         indexer = new ArrayList<String>();
-        indexer.add("purple");
-        indexer.add("green");
-        indexer.add("purple");
-        numArtifacts = 3; // start with 3 preloads
+        indexer.add("empty");
+        indexer.add("empty");
+        indexer.add("empty");
+        numArtifacts = 0; // start with 3 preloads
         OuttakeMode = true; // start spindexer in outtake mode
 
         // camera initialization
@@ -152,6 +153,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public void resetSpindexEncoder() {
         spindexMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        TP = 0;
     }
     public void setSpindexMotorPower(double power) {
         spindexMotor.setPower(power);
@@ -206,14 +208,13 @@ public class SpindexerSubsystem extends SubsystemBase {
         }
     }
 
-    public void setIndexerState(String[] state) {
-        int num = 0;
-        for(int i = 0; i < 3; i++) {
-            indexer.set(i, state[i]);
-            if(!state[i].equals("empty"))
-                num++;
+    public void setIndexerState(ArrayList<String> state) {
+        indexer = state;
+        numArtifacts = 0;
+        for(String i : state) {
+            if(!i.equals("empty"))
+                numArtifacts++;
         }
-        numArtifacts = num;
     }
 
     public void sort(int id) {

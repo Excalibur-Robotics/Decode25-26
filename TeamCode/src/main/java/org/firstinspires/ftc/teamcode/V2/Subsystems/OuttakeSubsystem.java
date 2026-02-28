@@ -46,8 +46,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int flywheelSpeedFar = 740;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.8; // difference of up and down position
-    public static double kickerDown = 0.28; // kicker servo down position
+    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDown = 0.17; // kicker servo down position
     public static double transferTime = 650; // in milliseconds
 
     public static int turretTicksPerRev = 2151;
@@ -113,6 +113,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     // need to finish
     public void calculateHood(Pose botPose) {
         InterpLUT hoodLUT = new InterpLUT();
+        hoodLUT.add(0, 0.15);
         hoodLUT.add(25, 0.15);
         hoodLUT.add(55, 0.6);
         hoodLUT.add(70, 0.7);
@@ -132,6 +133,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
     public void calculateFlywheel(Pose botPose) {
         InterpLUT fwLUT = new InterpLUT();
+        fwLUT.add(0, 500);
         fwLUT.add(25, 500);
         fwLUT.add(55, 525);
         fwLUT.add(70, 560);

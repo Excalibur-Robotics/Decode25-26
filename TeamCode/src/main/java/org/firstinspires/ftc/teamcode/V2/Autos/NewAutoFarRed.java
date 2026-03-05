@@ -133,8 +133,12 @@ public class NewAutoFarRed extends CommandOpMode {
 
         spindexer.powerSpindexer();
         //outtake.calculateTurretLL(outtake.getTX());
-        if(motifSeen)
-            outtake.aimTurret(follower.getPose());
+        if(motifSeen) {
+            if (outtake.getTX() == 0)
+                outtake.aimTurret(follower.getPose());
+            else
+                outtake.calculateTurretLL(outtake.getTX());
+        }
         outtake.calculateLaunch();
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();

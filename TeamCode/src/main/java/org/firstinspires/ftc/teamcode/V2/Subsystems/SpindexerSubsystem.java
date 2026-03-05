@@ -67,7 +67,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-/*
+
         int CP = spindexMotor.getCurrentPosition();
         int ticks = 120 * ticksPerRev / 360;
         if(CP != 0)
@@ -75,8 +75,8 @@ public class SpindexerSubsystem extends SubsystemBase {
         else
             TP = 0;
 
- */
-        TP = spindexMotor.getCurrentPosition();
+
+        //TP = spindexMotor.getCurrentPosition();
 
         PID = new LHV2PID(kP, kI, kD);
         timer.reset();

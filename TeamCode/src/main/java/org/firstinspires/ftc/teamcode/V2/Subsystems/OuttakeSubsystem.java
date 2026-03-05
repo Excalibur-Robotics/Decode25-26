@@ -46,7 +46,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int flywheelSpeedFar = 740;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDist = 0.75; // difference of up and down position
     public static double kickerDown = 0.17; // kicker servo down position
     public static double transferTime = 650; // in milliseconds
 

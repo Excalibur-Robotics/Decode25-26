@@ -174,25 +174,20 @@ public class V2TeleOpBlue extends CommandOpMode {
             else
                 spindexer.setToOuttakeMode();
         }*/
-<<<<<<< HEAD
 /*
         if(gamepad1.dpad_up) {
-=======
 
         if (gamepad1.dpad_up) {
->>>>>>> ede4a955e122207a4fac77808307782f65691066
             endgame.activateEndgame();
         }
         if (gamepad1.dpad_down) {
             endgame.resetServos();
         }
-<<<<<<< HEAD
 
  */
         if(gamepad1.dpad_left) {
-=======
+
         if (gamepad1.dpad_left) {
->>>>>>> ede4a955e122207a4fac77808307782f65691066
             intake.setIntakePower(-1);
         }
         // automatically activate intake when spindexer is spinning
@@ -246,4 +241,4 @@ public class V2TeleOpBlue extends CommandOpMode {
 
         telemetry.update();
     }
-}
+}}

@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.V2.TeleOp.V2TeleOpBlue;
 import org.firstinspires.ftc.teamcode.V2.TeleOp.V2TeleOpRed;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+import java.util.ArrayList;
+
 @Autonomous(name="FarRed")
 public class NewAutoFarRed extends CommandOpMode {
     Follower follower;
@@ -113,6 +115,11 @@ public class NewAutoFarRed extends CommandOpMode {
         outtake.setLLPipeline(0);
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
+        ArrayList<String> spindexerState = new ArrayList<String>();
+        spindexerState.add("purple");
+        spindexerState.add("green");
+        spindexerState.add("purple");
+        spindexer.setIndexerState(spindexerState);
         follower.setStartingPose(startPose);
         outtake.startLL();
     }
@@ -126,8 +133,12 @@ public class NewAutoFarRed extends CommandOpMode {
 
         spindexer.powerSpindexer();
         //outtake.calculateTurretLL(outtake.getTX());
-        if(motifSeen)
-            outtake.aimTurret(follower.getPose());
+        if(motifSeen) {
+            if (outtake.getTX() == 0)
+                outtake.aimTurret(follower.getPose());
+            else
+                outtake.calculateTurretLL(outtake.getTX());
+        }
         outtake.calculateLaunch();
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
@@ -155,6 +166,13 @@ public class NewAutoFarRed extends CommandOpMode {
         telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
         opModeTimer.reset();
         telemetry.update();
+    }
+
+    @Override
+    public void reset() {
+        CommandScheduler.getInstance().reset();
+        V2TeleOpBlue.indexer = spindexer.getIndexerState();
+        V2TeleOpRed.indexer = spindexer.getIndexerState();
     }
 
     public void autoPathUpdate() {

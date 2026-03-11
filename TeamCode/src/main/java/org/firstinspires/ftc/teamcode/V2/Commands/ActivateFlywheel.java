@@ -28,7 +28,7 @@ public class ActivateFlywheel extends CommandBase {
     public static double kP = 0.015;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kV = 0.000795; // feedforward constant
+    public static double kV = 0.001; // feedforward constant
 
     public double flywheelSpeed; // in rpm
 
@@ -52,9 +52,10 @@ public class ActivateFlywheel extends CommandBase {
     @Override
     public void execute() {
         double power = 0;
-        if(gamepad == null || gamepad.right_trigger > 0.5) {
+        if(gamepad == null || gamepad.right_trigger > -1) {
             power = flywheelPID.Calculate(outtake.getTargetSpeed(), outtake.getFlywheelSpeed());
         }
+
         else {
             power = flywheelPID.Calculate(0, outtake.getFlywheelSpeed());
         }

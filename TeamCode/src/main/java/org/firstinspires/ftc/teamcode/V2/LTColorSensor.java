@@ -27,7 +27,7 @@ public class LTColorSensor extends OpMode {
         LT.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
              @Override
              public void onOpened() {
-                 LT.startStreaming(640, 480);
+                 LT.startStreaming(480, 640);
                  /*Adjust height and width of camera view here*/
              }
 

@@ -149,15 +149,17 @@ public class V2TeleOpRed extends CommandOpMode {
         drivetrain.teleOpDrive(gamepad1);//moving the robot
         spindexer.powerSpindexer();
         //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-        outtake.calculateFlywheel(follower.getPose());
-        outtake.calculateHood(follower.getPose());
         if (!localized) {
+            outtake.calculateFlywheel(new Pose(onRedTeam ? 144 : 0, 144));
+            outtake.calculateHood(new Pose(onRedTeam ? 144 : 0, 144));
             if (outtake.getTX() != 0) {
                 follower.setPose(outtake.getMegaTagPos());
                 localized = true;
             }
         }
         else {
+            outtake.calculateFlywheel(follower.getPose());
+            outtake.calculateHood(follower.getPose());
             if (outtake.getTX() == 0)
                 outtake.aimTurret(follower.getPose());
             else

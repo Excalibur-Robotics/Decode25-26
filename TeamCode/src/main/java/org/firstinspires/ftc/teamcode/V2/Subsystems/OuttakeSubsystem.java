@@ -110,7 +110,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         }
     }
 
-    // need to finish
     public void calculateHood(Pose botPose) {
         InterpLUT hoodLUT = new InterpLUT();
         hoodLUT.add(-1, 0.15);
@@ -217,15 +216,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // aim turret with apriltag: CP = tx
     public void calculateTurretLL(double CP) {
-        if(getTA() < 0.8 && getTA() > 0) { // offset angle for far shooting
-            /*if(onRedTeam)
-                turret.setPower(turretPID.Calculate(4, CP));
-            else
-                turret.setPower(turretPID.Calculate(-4, CP));
-             */
-            turret.setPower(turretPID.Calculate(0, CP));
-        }
-        else if(getTA() > 1) {
+        if(getTA() > 0) {
             turret.setPower(turretPID.Calculate(0, CP));
         }
         else {

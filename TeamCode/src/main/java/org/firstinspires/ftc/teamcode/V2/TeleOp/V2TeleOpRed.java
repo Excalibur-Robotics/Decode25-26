@@ -35,7 +35,7 @@ This is the OpMode for our TeleOp for V1. It uses a command based system with
 FTCLib. The robot can intake artifacts, which are detected by a color sensor
 and stored in the spindexer, and launch artifacts of a specified color by
 automatically rotating the spindexer to the correct position
- */
+*/
 
 @TeleOp
 public class V2TeleOpRed extends CommandOpMode {
@@ -61,11 +61,14 @@ public class V2TeleOpRed extends CommandOpMode {
 
     private boolean onRedTeam = true;
     private boolean localized = false;
+    
+
     public static int motifID;
     public static ArrayList<String> indexer;
+    public static double startingSpindexAngle = 0; 
 
     ElapsedTime timer;
-
+    
     private Follower follower;
     private Pose startPose = new Pose(onRedTeam ? 86 : 58, 8, Math.PI/2); // just for testing
 

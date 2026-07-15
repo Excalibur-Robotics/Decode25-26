@@ -62,7 +62,7 @@ public class V2TeleOpRed extends CommandOpMode {
     private boolean onRedTeam = true;
     private boolean localized = false;
     
-
+    // STATIC VARIABLES (Passing data from Auto)
     public static int motifID;
     public static ArrayList<String> indexer;
     public static double startingSpindexAngle = 0; 
@@ -75,6 +75,7 @@ public class V2TeleOpRed extends CommandOpMode {
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
+        
         // initialize gamepads
         gp1 = new GamepadEx(gamepad1); // outtake
         gp2 = new GamepadEx(gamepad2); // driving, intake, kickstand
@@ -86,6 +87,9 @@ public class V2TeleOpRed extends CommandOpMode {
         drivetrain = new DrivetrainSubsystem(hardwareMap);
         endgame = new EndgameSubsystem(hardwareMap);
 
+      
+        spindexer.setTargetAngle(startingSpindexAngle);
+
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
         rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
@@ -94,7 +98,6 @@ public class V2TeleOpRed extends CommandOpMode {
         B = new GamepadButton(gp1, GamepadKeys.Button.B);//Shoot one color
         A = new GamepadButton(gp1, GamepadKeys.Button.A);//shoot one color
         Y = new GamepadButton(gp1, GamepadKeys.Button.Y);
-
 
         // Bind buttons/triggers with commands
         leftTrigger.whileActiveContinuous(new ConditionalCommand(
@@ -130,6 +133,7 @@ public class V2TeleOpRed extends CommandOpMode {
         timer = new ElapsedTime();
         if(indexer != null)
             spindexer.setIndexerState(indexer);
+        
         //outtake.resetTurretEncoder();
         //spindexer.resetSpindexEncoder();
 

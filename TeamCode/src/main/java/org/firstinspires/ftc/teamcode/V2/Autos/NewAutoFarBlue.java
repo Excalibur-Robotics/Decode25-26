@@ -173,6 +173,9 @@ public class NewAutoFarBlue extends CommandOpMode {
         CommandScheduler.getInstance().reset();
         V2TeleOpBlue.indexer = spindexer.getIndexerState();
         V2TeleOpRed.indexer = spindexer.getIndexerState();
+
+        V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
+        V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
     }
 
     public void autoPathUpdate() {

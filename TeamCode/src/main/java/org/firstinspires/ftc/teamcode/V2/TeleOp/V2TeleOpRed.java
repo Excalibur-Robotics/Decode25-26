@@ -65,7 +65,7 @@ public class V2TeleOpRed extends CommandOpMode {
     // STATIC VARIABLES (Passing data from Auto)
     public static int motifID;
     public static ArrayList<String> indexer;
-    public static double startingSpindexAngle = 0; 
+    public static double startingSpindexAngle = 0;
 
     ElapsedTime timer;
     
@@ -86,7 +86,6 @@ public class V2TeleOpRed extends CommandOpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
         endgame = new EndgameSubsystem(hardwareMap);
-
       
         spindexer.setTargetAngle(startingSpindexAngle);
 

@@ -175,7 +175,7 @@ public void reset() {
     V2TeleOpRed.indexer = spindexer.getIndexerState();
     
    
-    V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle(); 
+    V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
     V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
 }
 

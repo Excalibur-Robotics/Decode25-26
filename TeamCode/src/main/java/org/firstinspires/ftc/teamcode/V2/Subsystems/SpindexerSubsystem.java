@@ -163,6 +163,10 @@ public class SpindexerSubsystem extends SubsystemBase {
     public double getSpindexerAngle() {
         return (double) spindexMotor.getCurrentPosition() / ticksPerRev * 360;
     }
+
+    public void setTargetAngle(double startingAngle) {
+        TP = startingAngle * ticksPerRev / 360;
+    }
     public double getTargetAngle() {
         return TP / ticksPerRev * 360;
     }

@@ -61,8 +61,11 @@ public class V2TeleOpBlue extends CommandOpMode {
 
     private boolean onRedTeam = false;
     private boolean localized = false;
+
+    // Static variables
     public static int motifID;
     public static ArrayList<String> indexer;
+    public static double startingSpindexAngle = 0;
 
     ElapsedTime timer;
 
@@ -82,6 +85,8 @@ public class V2TeleOpBlue extends CommandOpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
         endgame = new EndgameSubsystem(hardwareMap);
+
+        spindexer.setTargetAngle(startingSpindexAngle);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);

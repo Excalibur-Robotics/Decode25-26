@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.V2.TeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -38,6 +39,7 @@ automatically rotating the spindexer to the correct position
 */
 
 @TeleOp
+@Config
 public class V2TeleOpRed extends CommandOpMode {
     // subsystems
     IntakeSubsystem intake;
@@ -67,6 +69,8 @@ public class V2TeleOpRed extends CommandOpMode {
     public static ArrayList<String> indexer;
     public static double startingSpindexAngle = 0;
 
+    public static double intakePower = 0.0;
+
     ElapsedTime timer;
     
     private Follower follower;
@@ -87,7 +91,7 @@ public class V2TeleOpRed extends CommandOpMode {
         drivetrain = new DrivetrainSubsystem(hardwareMap);
         endgame = new EndgameSubsystem(hardwareMap);
       
-        spindexer.setTargetAngle(startingSpindexAngle);
+        //spindexer.setTargetAngle(startingSpindexAngle);
 
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
@@ -156,8 +160,8 @@ public class V2TeleOpRed extends CommandOpMode {
         spindexer.powerSpindexer();
         //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
         if (!localized) {
-            outtake.calculateFlywheel(new Pose(onRedTeam ? 144 : 0, 144));
-            outtake.calculateHood(new Pose(onRedTeam ? 144 : 0, 144));
+            outtake.calculateFlywheel(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
+            outtake.calculateHood(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
             if (outtake.getTX() != 0) {
                 follower.setPose(outtake.getMegaTagPos());
                 localized = true;
@@ -200,7 +204,7 @@ public class V2TeleOpRed extends CommandOpMode {
         }
         // automatically activate intake when spindexer is spinning
         if (Math.abs(spindexer.getSpindexerPower()) > 0.1) {
-            intake.activateIntake();
+            intake.setIntakePower(1);
         } else if (gamepad1.left_trigger <= 0.5) {
             intake.stopIntake();
         }

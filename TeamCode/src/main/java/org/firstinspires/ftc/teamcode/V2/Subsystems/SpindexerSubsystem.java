@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -39,6 +40,7 @@ When this happens, the state of the indexer arraylist doesn't change.
 @Config
 public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
+    //public Servo light;
     public OpenCvCamera LT;
     LTPipeline pipeline;
 
@@ -65,6 +67,8 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
+        //light = hwMap.get(Servo.class, "light");
+
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -74,7 +78,6 @@ public class SpindexerSubsystem extends SubsystemBase {
             TP = (abs(CP) + ticks/2) / ticks * ticks * CP / abs(CP);
         else
             TP = 0;
-
 
         //TP = spindexMotor.getCurrentPosition();
 
@@ -222,7 +225,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     }
 
     public void sort(int id) {
-        if(indexer.contains("green")) {
+        if(indexer.contains("green") && id != 0) {
             int motif = 2 - (id - 21);
             int greenPos = indexer.indexOf("green");
             int rot = motif - greenPos;
@@ -258,4 +261,10 @@ public class SpindexerSubsystem extends SubsystemBase {
     public boolean detectsArtifact() {
         return pipeline.GreenPixels > greenTolerance || pipeline.PurplePixels > purpleTolerance;
     }
+
+    /*
+    public void setLight(double color) {
+        light.setPosition(1);
+    }
+    */
 }

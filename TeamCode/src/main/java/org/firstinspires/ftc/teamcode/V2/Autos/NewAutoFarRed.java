@@ -169,15 +169,14 @@ public class NewAutoFarRed extends CommandOpMode {
     }
 
     @Override
-public void reset() {
-    CommandScheduler.getInstance().reset();
-    V2TeleOpBlue.indexer = spindexer.getIndexerState();
-    V2TeleOpRed.indexer = spindexer.getIndexerState();
-    
-   
-    V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
-    V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
-}
+    public void reset() {
+        CommandScheduler.getInstance().reset();
+        V2TeleOpBlue.indexer = spindexer.getIndexerState();
+        V2TeleOpRed.indexer = spindexer.getIndexerState();
+
+        V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
+        V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
+    }
 
     public void autoPathUpdate() {
         switch (pathState) {

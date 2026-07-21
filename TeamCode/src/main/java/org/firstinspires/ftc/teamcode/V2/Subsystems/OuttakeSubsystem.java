@@ -46,9 +46,9 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int flywheelSpeedFar = 740;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.75; // difference of up and down position
-    public static double kickerDown = 0.17; // kicker servo down position
-    public static double transferTime = 650; // in milliseconds
+    public static double kickerDist = 0.73; // difference of up and down position
+    public static double kickerDown = 0.02; // kicker servo down position
+    public static double transferTime = 700; // in milliseconds
 
     public static int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
@@ -80,7 +80,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         targetSpeed = flywheelSpeedFar;
         turretPID = new LHV2PID(kP, kI, kD);
         kicker.setPosition(kickerDown);
-        setHood(hoodPosClose);
+        //setHood(hoodPosClose);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         hoodLUT.add(142, 0.9);
         hoodLUT.add(149, 0.9);
         hoodLUT.add(160, 0.9);
-        hoodLUT.add(200, 0.9);
+        hoodLUT.add(1000, 0.9);
         hoodLUT.createLUT();
 
         setHood(hoodLUT.get(distFromGoal(botPose)));
@@ -145,7 +145,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         fwLUT.add(142,695);
         fwLUT.add(149,745);
         fwLUT.add(160,765);
-        fwLUT.add(200,820);
+        fwLUT.add(1000,820);
         fwLUT.createLUT();
 
         targetSpeed = (int) (fwLUT.get(distFromGoal(botPose)));

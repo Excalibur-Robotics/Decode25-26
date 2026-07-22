@@ -31,13 +31,13 @@ public class IntakeCommand extends CommandBase {
     @Override
     public void initialize() {
         // Don't allow command to run if spindexer is full
-        if(spindexer.getNumArtifacts() < 3) {
+        //if(spindexer.getNumArtifacts() < 3) {
             if (spindexer.inOuttakeMode()) {
                 spindexer.setToIntakeMode();
             }
             // activate intake at start of command
             intake.activateIntake();
-        }
+        //}
 
         artifactPreviouslyDetected = true;
     }
@@ -64,6 +64,6 @@ public class IntakeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // end the command if the spindexer is full
-        return spindexer.getNumArtifacts() == 3;
+        return false;//spindexer.getNumArtifacts() == 3;
     }
 }

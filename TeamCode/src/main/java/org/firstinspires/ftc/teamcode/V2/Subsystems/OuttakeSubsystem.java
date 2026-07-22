@@ -12,7 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -46,8 +48,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static int flywheelSpeedFar = 740;
     public static int flywheelSpeedClose = 575;
 
-    public static double kickerDist = 0.73; // difference of up and down position
-    public static double kickerDown = 0.02; // kicker servo down position
+    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDown = 0.0; // kicker servo down position
     public static double transferTime = 700; // in milliseconds
 
     public static int turretTicksPerRev = 2151;

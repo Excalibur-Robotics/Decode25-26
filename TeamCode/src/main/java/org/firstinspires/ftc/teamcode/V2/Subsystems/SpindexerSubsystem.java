@@ -40,8 +40,8 @@ When this happens, the state of the indexer arraylist doesn't change.
 @Config
 public class SpindexerSubsystem extends SubsystemBase {
     public DcMotorEx spindexMotor;
-    //public Servo light;
-    public OpenCvCamera LT;
+    public Servo light;
+    public OpenCvCamera webcam;
     LTPipeline pipeline;
 
     private ArrayList<String> indexer;
@@ -67,7 +67,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
-        //light = hwMap.get(Servo.class, "light");
+        light = hwMap.get(Servo.class, "light");
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -94,14 +94,14 @@ public class SpindexerSubsystem extends SubsystemBase {
         // camera initialization
         int LT_ID=hwMap.appContext.getResources().getIdentifier("LT_ID", "id",
                 hwMap.appContext.getPackageName());
-        LT = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class,"LT")
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class,"webcam")
                 ,LT_ID); //Webcam object
         pipeline = new LTPipeline();
-        LT.setPipeline(pipeline);
-        LT.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        webcam.setPipeline(pipeline);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
                                          @Override
                                          public void onOpened() {
-                                             LT.startStreaming(640, 480);
+                                             webcam.startStreaming(640, 480);
                                              /*Adjust height and width of camera view here*/
                                          }
 
@@ -113,10 +113,13 @@ public class SpindexerSubsystem extends SubsystemBase {
         );
     }
 
+    /*
     @Override
     public void periodic() {
-        //powerSpindexer();
+        powerSpindexer();
     }
+
+     */
 
     // power spindexer based on PID
     public void powerSpindexer() {
@@ -262,9 +265,11 @@ public class SpindexerSubsystem extends SubsystemBase {
         return pipeline.GreenPixels > greenTolerance || pipeline.PurplePixels > purpleTolerance;
     }
 
-    /*
-    public void setLight(double color) {
+
+    public void turnOnLight() {
         light.setPosition(1);
     }
-    */
+    public double getLight() {
+        return light.getPosition();
+    }
 }

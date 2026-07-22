@@ -49,7 +49,7 @@ public class CloseRedAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = false;
+    private boolean motifSeen = true; // make false if trying to scan motif
     private int id = 0;
     private boolean onRedTeam = true;
 
@@ -60,12 +60,12 @@ public class CloseRedAuto extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        startPose = new Pose(125, 123, Math.toRadians(36));
+        startPose = new Pose(122.5, 120.5, Math.toRadians(36));
         firstShootPose = new Pose(95, 101, Math.toRadians(44));
-        beforeFirstIntake = new Pose(100.0, 84.0, 0);
-        afterFirstIntake = new Pose(126.0, 84.0, 0);
-        beforeSecondIntake = new Pose(100.0, 60.0, 0);
-        afterSecondIntake = new Pose(126.0, 60.0, 0);
+        beforeFirstIntake = new Pose(98.0, 82.0, 0);
+        afterFirstIntake = new Pose(120.0, 82.0, 0);
+        beforeSecondIntake = new Pose(100.0, 58.0, 0);
+        afterSecondIntake = new Pose(120.0, 58.0, 0);
         shootPose = new Pose(96, 96, 0);
         gatePose = new Pose(130, 59, Math.toRadians(35));
 
@@ -111,7 +111,7 @@ public class CloseRedAuto extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0);
+        //outtake.setLLPipeline(0);  uncomment if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
@@ -121,6 +121,8 @@ public class CloseRedAuto extends CommandOpMode {
         spindexer.setIndexerState(spindexerState);
         follower.setStartingPose(startPose);
         outtake.startLL();
+
+        telemetry.addLine("initialized");
     }
 
     @Override
@@ -142,6 +144,11 @@ public class CloseRedAuto extends CommandOpMode {
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
         }
+        if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+            id = outtake.getApriltagID();
+            outtake.setTeam(onRedTeam);
+            motifSeen = true;
+        }
 
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
@@ -161,6 +168,14 @@ public class CloseRedAuto extends CommandOpMode {
 
         V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
         V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
+
+        V2TeleOpRed.startX = follower.getPose().getX();
+        V2TeleOpRed.startY = follower.getPose().getY();
+        V2TeleOpRed.startHeading = follower.getPose().getHeading();
+
+        V2TeleOpBlue.startX = follower.getPose().getX();
+        V2TeleOpBlue.startY = follower.getPose().getY();
+        V2TeleOpBlue.startHeading = follower.getPose().getHeading();
     }
 
     public void autoPathUpdate() {

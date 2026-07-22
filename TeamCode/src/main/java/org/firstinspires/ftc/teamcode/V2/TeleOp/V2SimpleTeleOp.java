@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
@@ -152,7 +151,7 @@ public class V2SimpleTeleOp extends OpMode {
 
         telemetry.addData("purple pixels", spindexer.getPurplePixels());
         telemetry.addData("green pixels", spindexer.getGreenPixels());
-        FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
+        FtcDashboard.getInstance().startCameraStream(spindexer.webcam, 0);
         telemetry.addData("team color", onRedTeam ? "RED" : "BLUE");
         telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
         telemetry.addData("target speed", outtake.getTargetSpeed());

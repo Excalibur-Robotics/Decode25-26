@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "CloseRed")
+@Autonomous(name = "CloseBlue")
 public class CloseBlueAuto extends CommandOpMode {
     Follower follower;
     IntakeSubsystem intake;
@@ -49,7 +49,7 @@ public class CloseBlueAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = false;
+    private boolean motifSeen = true; // make false if trying to scan motif
     private int id = 0;
     private boolean onRedTeam = false;
 
@@ -60,7 +60,7 @@ public class CloseBlueAuto extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        startPose = new Pose(19, 123, Math.toRadians(144));
+        startPose = new Pose(21.5, 120.5, Math.toRadians(144));
         firstShootPose = new Pose(49, 101, Math.toRadians(136));
         beforeFirstIntake = new Pose(44, 84.0, Math.PI);
         afterFirstIntake = new Pose(18, 84.0, Math.PI);
@@ -111,7 +111,7 @@ public class CloseBlueAuto extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0);
+        //outtake.setLLPipeline(0);  uncomment if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
@@ -121,6 +121,8 @@ public class CloseBlueAuto extends CommandOpMode {
         spindexer.setIndexerState(spindexerState);
         follower.setStartingPose(startPose);
         outtake.startLL();
+
+        telemetry.addLine("initialized");
     }
 
     @Override
@@ -142,6 +144,11 @@ public class CloseBlueAuto extends CommandOpMode {
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
         }
+        if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+            id = outtake.getApriltagID();
+            outtake.setTeam(onRedTeam);
+            motifSeen = true;
+        }
 
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
@@ -161,6 +168,14 @@ public class CloseBlueAuto extends CommandOpMode {
 
         V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
         V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
+
+        V2TeleOpRed.startX = follower.getPose().getX();
+        V2TeleOpRed.startY = follower.getPose().getY();
+        V2TeleOpRed.startHeading = follower.getPose().getHeading();
+
+        V2TeleOpBlue.startX = follower.getPose().getX();
+        V2TeleOpBlue.startY = follower.getPose().getY();
+        V2TeleOpBlue.startHeading = follower.getPose().getHeading();
     }
 
     public void autoPathUpdate() {

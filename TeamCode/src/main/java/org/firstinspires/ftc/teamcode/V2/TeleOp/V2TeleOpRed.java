@@ -16,7 +16,6 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootAll;
@@ -63,18 +62,22 @@ public class V2TeleOpRed extends CommandOpMode {
 
     private boolean onRedTeam = true;
     private boolean localized = false;
+    private boolean posFromAuto;
     
     // STATIC VARIABLES (Passing data from Auto)
-    public static int motifID;
+    public static int motifID = 0;
     public static ArrayList<String> indexer;
     public static double startingSpindexAngle = 0;
+    public static double startX = 0;
+    public static double startY = 0;
+    public static double startHeading = 0;
 
-    public static double intakePower = 0.0;
+    public static double intakePower = 0.2;
 
     ElapsedTime timer;
     
     private Follower follower;
-    private Pose startPose = new Pose(onRedTeam ? 86 : 58, 8, Math.PI/2); // just for testing
+    private Pose startPose = new Pose(startX, startY, startHeading); // just for testing
 
     @Override
     public void initialize() {
@@ -106,7 +109,7 @@ public class V2TeleOpRed extends CommandOpMode {
         leftTrigger.whileActiveContinuous(new ConditionalCommand(
                 new IntakeCommand(intake, spindexer),
                 new InstantCommand(),
-                () -> outtake.getKickerPos() < outtake.getKickerDown()+0.01
+                () -> outtake.getKickerPos() < outtake.getKickerDown()+0.05
                 /*&& spindexer.getNumArtifacts() < 3 &&*/));
         rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake, gamepad1));
         /*X.whenPressed(new ConditionalCommand(
@@ -130,9 +133,12 @@ public class V2TeleOpRed extends CommandOpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         follower.update();
+        posFromAuto = startX != 0;
 
         outtake.setTeam(onRedTeam);
+        //outtake.setLLPipeline(0);  if scanning motif first
         outtake.startLL();
+        spindexer.turnOnLight();
         timer = new ElapsedTime();
         if(indexer != null)
             spindexer.setIndexerState(indexer);
@@ -144,7 +150,7 @@ public class V2TeleOpRed extends CommandOpMode {
             telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
             telemetry.addData("spindexer target position", spindexer.getTargetAngle());
             telemetry.addData("turret position", outtake.getTurretPos());
-            FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
+            FtcDashboard.getInstance().startCameraStream(spindexer.webcam, 0);
             telemetry.addData("purple pixels", spindexer.getPurplePixels());
             telemetry.addData("green pixels", spindexer.getGreenPixels());
             telemetry.update();
@@ -159,21 +165,32 @@ public class V2TeleOpRed extends CommandOpMode {
         drivetrain.teleOpDrive(gamepad1);//moving the robot
         spindexer.powerSpindexer();
         //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-        if (!localized) {
-            outtake.calculateFlywheel(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
-            outtake.calculateHood(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
-            if (outtake.getTX() != 0) {
-                follower.setPose(outtake.getMegaTagPos());
-                localized = true;
-            }
-        }
-        else {
+        if(posFromAuto) {
             outtake.calculateFlywheel(follower.getPose());
             outtake.calculateHood(follower.getPose());
-            if (outtake.getTX() == 0)
-                outtake.aimTurret(follower.getPose());
-            else
-                outtake.calculateTurretLL(outtake.getTX());
+            outtake.aimTurret(follower.getPose());
+        }
+        else {
+            if (!localized) {
+                outtake.calculateFlywheel(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
+                outtake.calculateHood(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
+                if (outtake.getTX() != 0) {
+                    follower.setPose(outtake.getMegaTagPos());
+                    localized = true;
+                }
+            } else {
+                outtake.calculateFlywheel(follower.getPose());
+                outtake.calculateHood(follower.getPose());
+                //if (outtake.getTX() == 0)
+                    outtake.aimTurret(follower.getPose());
+                /*else
+                outtake.calculateTurretLL(outtake.getTX());*/
+            }
+        }
+
+        if(motifID == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+            motifID = outtake.getApriltagID();
+            outtake.setTeam(onRedTeam);
         }
 
         // manual spindexer controls if something goes wrong with the automated actions
@@ -203,10 +220,13 @@ public class V2TeleOpRed extends CommandOpMode {
             intake.setIntakePower(-1);
         }
         // automatically activate intake when spindexer is spinning
-        if (Math.abs(spindexer.getSpindexerPower()) > 0.1) {
-            intake.setIntakePower(1);
-        } else if (gamepad1.left_trigger <= 0.5) {
-            intake.stopIntake();
+        if(gamepad1.left_trigger <= 0.5) {
+            if (Math.abs(spindexer.getSpindexerPower()) > 0.1) {
+                intake.setIntakePower(intakePower);
+            }
+            else {
+                intake.stopIntake();
+            }
         }
 
 
@@ -218,6 +238,8 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.addData("motif", motifID);
         telemetry.addLine();
+        telemetry.addData("light", spindexer.getLight());
+        telemetry.addLine();
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
@@ -226,7 +248,7 @@ public class V2TeleOpRed extends CommandOpMode {
         telemetry.addData("purple pixels", spindexer.getPurplePixels());
         telemetry.addData("green pixels", spindexer.getGreenPixels());
         telemetry.addData("Artifact in intake slot", spindexer.detectsArtifact());
-        FtcDashboard.getInstance().startCameraStream(spindexer.LT, 0);
+        FtcDashboard.getInstance().startCameraStream(spindexer.webcam, 0);
         telemetry.addLine();
         telemetry.addData("flywheel speed", outtake.getFlywheelSpeed()); // in rpm
         telemetry.addData("target speed", outtake.getTargetSpeed());

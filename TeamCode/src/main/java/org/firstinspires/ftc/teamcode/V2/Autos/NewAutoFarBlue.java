@@ -37,6 +37,7 @@ public class NewAutoFarBlue extends CommandOpMode {
     Pose afterSecondIntake;
     Pose beforeThirdIntake;
     Pose afterThirdIntake;
+    Pose cornerIntake;
 
     PathChain toFirstShoot;
     PathChain toFirstIntake;
@@ -47,6 +48,8 @@ public class NewAutoFarBlue extends CommandOpMode {
     PathChain toThirdShoot;
     PathChain toThirdIntake;
     PathChain intakeThirdBalls;
+    PathChain toCornerIntake;
+    PathChain cornerToShoot;
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
@@ -62,13 +65,14 @@ public class NewAutoFarBlue extends CommandOpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
 
         startPose = new Pose(58, 8, Math.PI/2);
-        shootPose = new Pose(58, 12, Math.PI/2);
+        shootPose = new Pose(58, 12, Math.PI);
         beforeFirstIntake = new Pose(48, 36, Math.PI);
         afterFirstIntake = new Pose(18, 36, Math.PI);
         beforeSecondIntake = new Pose(48, 60, Math.PI);
         afterSecondIntake = new Pose(18, 60, Math.PI);
         beforeThirdIntake = new Pose(48, 84, Math.PI);
         afterThirdIntake = new Pose(18, 84, Math.PI);
+        cornerIntake = new Pose(130, 9, Math.PI);
 
         toFirstIntake = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, beforeFirstIntake))
@@ -105,6 +109,14 @@ public class NewAutoFarBlue extends CommandOpMode {
         toThirdShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterThirdIntake, shootPose))
                 .setLinearHeadingInterpolation(afterThirdIntake.getHeading(), shootPose.getHeading())
+                .build();
+        toCornerIntake = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, cornerIntake))
+                .setConstantHeadingInterpolation(0)
+                .build();
+        cornerToShoot = follower.pathBuilder()
+                .addPath(new BezierLine(cornerIntake, shootPose))
+                .setConstantHeadingInterpolation(0)
                 .build();
 
         pathState = 0;
@@ -224,27 +236,33 @@ public class NewAutoFarBlue extends CommandOpMode {
                     if(outtake.atTargetSpeed()) {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
-                            follower.followPath(toSecondIntake);
+                            follower.followPath(toCornerIntake);
                             pathState = 5;
+                            pathTimer.reset();
                         }
                     }
                 }
                 break;
             case 5:
+                if(spindexer.getNumArtifacts() == 3 || pathTimer.milliseconds() > 3000) {
+                    follower.followPath(cornerToShoot);
+                    pathState = 4;
+                }
+            case 6:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
                     follower.followPath(intakeSecondBalls);
                     pathState = 6;
                 }
                 break;
-            case 6:
+            case 7:
                 if(!follower.isBusy()) {
                     new ActivateFlywheel(outtake).schedule();
                     follower.followPath(toSecondShoot);
                     pathState = 7;
                 }
                 break;
-            case 7:
+            case 8:
                 if(!follower.isBusy()) {
                     spindexer.sort(id);
                     if(outtake.atTargetSpeed()) {
@@ -256,21 +274,21 @@ public class NewAutoFarBlue extends CommandOpMode {
                     }
                 }
                 break;
-            case 8:
+            case 9:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
                     follower.followPath(intakeThirdBalls);
                     pathState = 9;
                 }
                 break;
-            case 9:
+            case 10:
                 if(!follower.isBusy()) {
                     new ActivateFlywheel(outtake).schedule();
                     follower.followPath(toThirdShoot);
                     pathState = 10;
                 }
                 break;
-            case 10:
+            case 11:
                 if(!follower.isBusy()) {
                     spindexer.sort(id);
                     if(outtake.atTargetSpeed()) {

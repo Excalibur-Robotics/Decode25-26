@@ -68,16 +68,16 @@ public class V2TeleOpBlue extends CommandOpMode {
     public static int motifID = 0;
     public static ArrayList<String> indexer;
     public static double startingSpindexAngle = 0;
-    public static double startX = 0;
-    public static double startY = 0;
-    public static double startHeading = 0;
+    public static double startX = 72;
+    public static double startY = 72;
+    public static double startHeading = 90;
 
     public static double intakePower = 0.2;
 
     ElapsedTime timer;
 
     private Follower follower;
-    private Pose startPose = new Pose(startX, startY, startHeading); // just for testing
+    private Pose startPose = new Pose(startX, startY, Math.toRadians(startHeading)); // just for testing
 
     @Override
     public void initialize() {
@@ -165,28 +165,26 @@ public class V2TeleOpBlue extends CommandOpMode {
         drivetrain.teleOpDrive(gamepad1);//moving the robot
         spindexer.powerSpindexer();
         //outtake.calculateLaunch(); // set hood angle and target flywheel speed based on apriltag
-        if(posFromAuto) {
-            outtake.calculateFlywheel(follower.getPose());
-            outtake.calculateHood(follower.getPose());
+        outtake.calculateFlywheel(follower.getPose());
+        outtake.calculateHood(follower.getPose());
+
+        /*if(posFromAuto) {
             outtake.aimTurret(follower.getPose());
         }
-        else {
-            if (!localized) {
-                outtake.calculateFlywheel(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
-                outtake.calculateHood(follower.getPose()/*new Pose(onRedTeam ? 144 : 0, 144)*/);
-                if (outtake.getTX() != 0) {
-                    follower.setPose(outtake.getMegaTagPos());
-                    localized = true;
-                }
-            } else {
-                outtake.calculateFlywheel(follower.getPose());
-                outtake.calculateHood(follower.getPose());
-                //if (outtake.getTX() == 0)
-                outtake.aimTurret(follower.getPose());
-                /*else
-                outtake.calculateTurretLL(outtake.getTX());*/
+        else {*/
+        if (!localized) {
+            if (outtake.getTX() != 0 && outtake.getApriltagID() == (onRedTeam ? 24 : 20)) {
+                follower.setPose(outtake.getMegaTagPos());
+                localized = true;
             }
         }
+        else {
+            //if (outtake.getTX() == 0)
+                outtake.aimTurret(follower.getPose());
+            //else
+            //    outtake.calculateTurretLL(outtake.getTX());
+        }
+        /*}*/
 
         if(motifID == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
             motifID = outtake.getApriltagID();

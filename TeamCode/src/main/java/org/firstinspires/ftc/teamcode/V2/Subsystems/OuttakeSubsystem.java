@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.V2.Subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.util.InterpLUT;
-import com.arcrobotics.ftclib.util.LUT;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -12,9 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -45,21 +42,18 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     private final int fwTicksPerRev = 112;
     private int targetSpeed; // current speed the flywheel is trying to reach
-    public static int flywheelSpeedFar = 740;
-    public static int flywheelSpeedClose = 575;
+    public static int testFlywheelSpeed = 575;
+    public static double testHoodAngle = 0.9;
 
-    public static double kickerDist = 0.7; // difference of up and down position
+    public static double kickerDist = 1.0; // difference of up and down position
     public static double kickerDown = 0.0; // kicker servo down position
-    public static double transferTime = 700; // in milliseconds
+    public static double transferTime = 600; // in milliseconds
 
     public static int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
     public static double kP = 0.018; // needs to be tuned
     public static double kI = 0.0;
     public static double kD = 0.5; // needs to be tuned
-
-    public static double hoodPosFar = 0.9;
-    public static double hoodPosClose = 0.15;
 
     private boolean onRedTeam;
 
@@ -79,7 +73,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         hoodR.setDirection(Servo.Direction.REVERSE);
         kicker.setDirection(Servo.Direction.FORWARD);
 
-        targetSpeed = flywheelSpeedFar;
         turretPID = new LHV2PID(kP, kI, kD);
         kicker.setPosition(kickerDown);
         //setHood(hoodPosClose);
@@ -102,32 +95,27 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // calculate flywheel speed based on april tag
     public void calculateLaunch() {
-        if(getTA() > 1) {
-            setTargetSpeed(flywheelSpeedClose);
-            setHood(hoodPosClose);
-        }
-        else if(getTA() < 0.8 && getTA() > 0) {
-            setTargetSpeed(flywheelSpeedFar);
-            setHood(hoodPosFar);
-        }
+        setTargetSpeed(testFlywheelSpeed);
+        setHood(testHoodAngle);
     }
 
     public void calculateHood(Pose botPose) {
         InterpLUT hoodLUT = new InterpLUT();
         hoodLUT.add(-1, 0.15);
         hoodLUT.add(25, 0.15);
-        hoodLUT.add(55, 0.6);
-        hoodLUT.add(70, 0.7);
-        hoodLUT.add(85, 0.8);
-        hoodLUT.add(100, 0.85);
-        hoodLUT.add(111, 0.9);
-        hoodLUT.add(120, 0.9);
-        hoodLUT.add(128, 0.9);
-        hoodLUT.add(135, 0.9);
-        hoodLUT.add(142, 0.9);
-        hoodLUT.add(149, 0.9);
-        hoodLUT.add(160, 0.9);
-        hoodLUT.add(1000, 0.9);
+        hoodLUT.add(40, 0.4);
+        hoodLUT.add(55, 0.7);
+        hoodLUT.add(70, 0.9);
+        hoodLUT.add(85, 1);
+        hoodLUT.add(100, 1);
+        hoodLUT.add(111, 1);
+        hoodLUT.add(120, 1);
+        hoodLUT.add(128, 1);
+        hoodLUT.add(135, 1);
+        hoodLUT.add(142, 1);
+        hoodLUT.add(149, 1);
+        hoodLUT.add(160, 1);
+        hoodLUT.add(1000, 1);
         hoodLUT.createLUT();
 
         setHood(hoodLUT.get(distFromGoal(botPose)));
@@ -136,16 +124,17 @@ public class OuttakeSubsystem extends SubsystemBase {
         InterpLUT fwLUT = new InterpLUT();
         fwLUT.add(-1, 500);
         fwLUT.add(25, 500);
-        fwLUT.add(55, 525);
-        fwLUT.add(70, 560);
-        fwLUT.add(85, 595);
-        fwLUT.add(100,615);
-        fwLUT.add(111,625);
-        fwLUT.add(120,655);
-        fwLUT.add(128,675);
-        fwLUT.add(135,680);
-        fwLUT.add(142,695);
-        fwLUT.add(149,745);
+        fwLUT.add(40, 475);
+        fwLUT.add(55, 515);
+        fwLUT.add(70, 545);
+        fwLUT.add(85, 580);
+        fwLUT.add(100,625);
+        fwLUT.add(111,640);
+        fwLUT.add(120,665);
+        fwLUT.add(128,685);
+        fwLUT.add(135,700);
+        fwLUT.add(142,725);
+        fwLUT.add(149,735);
         fwLUT.add(160,765);
         fwLUT.add(1000,820);
         fwLUT.createLUT();
@@ -228,11 +217,11 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // input target angle
     public void rotateTurret(double angle) {
-        if(angle > 210) {
-            angle = 210;
+        if(angle > 230) {
+            angle = 230;
         }
-        else if(angle < -120) {
-            angle = -120;
+        else if(angle < -130) {
+            angle = -130;
         }
         turret.setPower(turretPID.Calculate(angle, getTurretPos()));
     }
@@ -250,7 +239,19 @@ public class OuttakeSubsystem extends SubsystemBase {
         rotateTurret(turretAngle);
     }
 
-    public int scanMotif(Pose botPose) {
+    public void scanMotif(Pose botPose) {
+        Pose goal = new Pose(72, 144);
+        double angle = Math.toDegrees(Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX())));
+        if(angle < 0)
+            angle += 180;
+        double botHeading = Math.toDegrees(botPose.getHeading());
+        if(!onRedTeam && botHeading < -90)
+            botHeading += 360;
+        double turretAngle = angle - botHeading;
+        rotateTurret(turretAngle);
+    }
+
+    /*public int scanMotif(Pose botPose) {
         int id = 0;
         double angle = Math.toDegrees(Math.atan((144 - botPose.getY()) / (72 - botPose.getX())));
         if(angle < 0)
@@ -264,7 +265,7 @@ public class OuttakeSubsystem extends SubsystemBase {
             id = getApriltagID();
         }
         return id;
-    }
+    }*/
 
     public void resetTurretEncoder() {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -285,11 +286,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     public double getHoodAngle() {
         return hoodL.getPosition();
     }
-    public double getHoodFar() {
-        return hoodPosFar;
-    }
-    public double getHoodClose() {
-        return hoodPosClose;
+    public double getTestHoodAngle() {
+        return testHoodAngle;
     }
 
     public void setTeam(boolean redTeam) {

@@ -60,14 +60,14 @@ public class CloseBlueAuto extends CommandOpMode {
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
-        startPose = new Pose(21.5, 120.5, Math.toRadians(144));
+        startPose = new Pose(20.1, 123.1, Math.toRadians(144));
         firstShootPose = new Pose(49, 101, Math.toRadians(136));
-        beforeFirstIntake = new Pose(44, 84.0, Math.PI);
-        afterFirstIntake = new Pose(18, 84.0, Math.PI);
-        beforeSecondIntake = new Pose(44, 60.0, Math.PI);
-        afterSecondIntake = new Pose(18, 60.0, Math.PI);
-        shootPose = new Pose(48, 96, Math.PI);
-        gatePose = new Pose(14, 59, Math.toRadians(145));
+        beforeFirstIntake = new Pose(48, 83.0, Math.PI);
+        afterFirstIntake = new Pose(18, 83.0, Math.PI);
+        beforeSecondIntake = new Pose(48, 59.0, Math.PI);
+        afterSecondIntake = new Pose(18, 57.0, Math.PI);
+        shootPose = new Pose(50, 94, Math.PI);
+        gatePose = new Pose(14, 62, Math.toRadians(145));
 
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, firstShootPose))
@@ -79,7 +79,7 @@ public class CloseBlueAuto extends CommandOpMode {
                 .build();
         intakeFirstRow = follower.pathBuilder()
                 .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeFirstIntake.getHeading())
                 .build();
         toSecondShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterFirstIntake, firstShootPose))
@@ -87,15 +87,15 @@ public class CloseBlueAuto extends CommandOpMode {
                 .build();
         toSecondRow = follower.pathBuilder()
                 .addPath(new BezierLine(firstShootPose, beforeSecondIntake))
-                .setLinearHeadingInterpolation(firstShootPose.getHeading(), 0)
+                .setLinearHeadingInterpolation(firstShootPose.getHeading(), beforeSecondIntake.getHeading())
                 .build();
         intakeSecondRow = follower.pathBuilder()
                 .addPath(new BezierLine(beforeSecondIntake, afterSecondIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeSecondIntake.getHeading())
                 .build();
         toThirdShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterSecondIntake, shootPose))
-                .setLinearHeadingInterpolation(0, shootPose.getHeading())
+                .setLinearHeadingInterpolation(afterSecondIntake.getHeading(), shootPose.getHeading())
                 .build();
         toGate = follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, gatePose))
@@ -139,16 +139,20 @@ public class CloseBlueAuto extends CommandOpMode {
             else
                 outtake.calculateTurretLL(outtake.getTX());
         }
+        else {
+            outtake.scanMotif(follower.getPose());
+            if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+                id = outtake.getApriltagID();
+                outtake.setTeam(onRedTeam);
+                motifSeen = true;
+            }
+        }
         outtake.calculateHood(follower.getPose());
         outtake.calculateFlywheel(follower.getPose());
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
             intake.activateIntake();
         }
-        if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
-            id = outtake.getApriltagID();
-            outtake.setTeam(onRedTeam);
-            motifSeen = true;
-        }
+
 
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
@@ -187,6 +191,7 @@ public class CloseBlueAuto extends CommandOpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
+                    motifSeen = true;
                     if(outtake.atTargetSpeed()) {
                         new ShootAll(outtake, spindexer, id).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
@@ -247,7 +252,7 @@ public class CloseBlueAuto extends CommandOpMode {
                 }
                 break;
             case 8:
-                if(spindexer.getNumArtifacts() == 3 || pathTimer.milliseconds() == 10000) {
+                if(spindexer.getNumArtifacts() == 3 || pathTimer.milliseconds() > 4000) {
                     follower.followPath(toShoot);
                     pathState = 7;
                 }

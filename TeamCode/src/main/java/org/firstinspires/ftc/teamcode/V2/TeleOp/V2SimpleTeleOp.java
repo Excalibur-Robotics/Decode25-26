@@ -3,6 +3,11 @@ package org.firstinspires.ftc.teamcode.V2.TeleOp;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.button.Trigger;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,6 +18,7 @@ import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.LEDs;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.ArrayList;
 
@@ -28,7 +34,7 @@ public class V2SimpleTeleOp extends OpMode {
     OuttakeSubsystem outtake;
     DrivetrainSubsystem drivetrain;
 
-    LEDs Led;
+    GamepadEx gp1;
 
     public static double hoodUp = 1;
     public static double hoodDown = 0;
@@ -36,7 +42,13 @@ public class V2SimpleTeleOp extends OpMode {
     private ElapsedTime kickerTimer;
     private boolean onRedTeam = true;
 
-    ActivateFlywheel activateFlywheel;
+    Trigger rightTrigger;
+
+    public static double startX = 72;
+    public static double startY = 72;
+    public static double startHeading = 90;
+    private Follower follower;
+    private Pose startPose = new Pose(startX, startY, Math.toRadians(startHeading)); // just for testing
 
     @Override
     public void init() {
@@ -45,14 +57,19 @@ public class V2SimpleTeleOp extends OpMode {
         outtake = new OuttakeSubsystem(hardwareMap);
         drivetrain = new DrivetrainSubsystem(hardwareMap);
 
-        activateFlywheel = new ActivateFlywheel(outtake, gamepad1);
+        gp1 = new GamepadEx(gamepad1); // outtake
+
+        rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
+        rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake, gamepad1));
 
         outtake.setHood(hoodDown);
         kickerTimer = new ElapsedTime();
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
 
-        Led= new LEDs(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
+        follower.update();
     }
 
     @Override
@@ -79,21 +96,17 @@ public class V2SimpleTeleOp extends OpMode {
     @Override
     public void loop() {
         CommandScheduler.getInstance().run();
+        follower.update();
 
         drivetrain.teleOpDrive(gamepad1);
         outtake.calculateTurretLL(outtake.getTX()); // turret aim with apriltag
-
-
-        if (gamepad1.dpad_up){
-            Led.green();
-        }
 
         // kicker - X
         if(gamepad1.xWasPressed()) {
             outtake.kickUp();
             kickerTimer.reset();
         }
-        else if(gamepad1.bWasPressed()) {
+        else if(kickerTimer.milliseconds() > outtake.getTransferTime()) {
             outtake.resetKicker();
         }
 
@@ -110,13 +123,14 @@ public class V2SimpleTeleOp extends OpMode {
 
         outtake.calculateLaunch();
         // flywheel - right trigger
-        if(gamepad1.right_trigger > 0.5) {
-            //activateFlywheel.schedule();
-            outtake.setFlywheelPower(0.6);
+        /*if(gamepad1.right_trigger > 0.5) {
+            activateFlywheel.schedule();
+            //outtake.setFlywheelPower(0.6);
         }
         else {
             outtake.setFlywheelPower(0);
-        }
+        }*/
+
 
         // rotate spindexer CCW - right bumper
         if(gamepad1.rightBumperWasPressed()) {
@@ -148,7 +162,11 @@ public class V2SimpleTeleOp extends OpMode {
         }
 
 
-
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("distance from goal", outtake.distFromGoal(follower.getPose()));
+        telemetry.addLine();
         telemetry.addData("purple pixels", spindexer.getPurplePixels());
         telemetry.addData("green pixels", spindexer.getGreenPixels());
         FtcDashboard.getInstance().startCameraStream(spindexer.webcam, 0);

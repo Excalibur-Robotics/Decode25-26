@@ -17,11 +17,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(12.7) // robot mass in kg - need to measure
-            .forwardZeroPowerAcceleration(-57.3529403763483)
-            .lateralZeroPowerAcceleration(-81.35358357682023)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.12, 0, 0, 0.03))
-            .headingPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0, 0.02))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.02, 0, 0, 0.6, 0.01))
+            .forwardZeroPowerAcceleration(-29.67254318817769)
+            .lateralZeroPowerAcceleration(-63.223690012824356)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.06, 0, 0, 0.04))
+            .headingPIDFCoefficients(new PIDFCoefficients(0.8, 0, 0, 0.03))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015, 0, 0, 0.6, 0.01))
             .centripetalScaling(0.0005);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.9, 1);
@@ -36,8 +36,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(53.5705100232222) // use ForwardVelocityTuner to tune
-            .yVelocity(38.65271452655942); // use LateralVelocityTuner to tune
+            .xVelocity(62.016429030050446) // use ForwardVelocityTuner to tune
+            .yVelocity(49.42297074926182); // use LateralVelocityTuner to tune
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(1.093) // y offset in inches

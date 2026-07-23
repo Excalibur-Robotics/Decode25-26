@@ -13,10 +13,10 @@ public class LTPipeline extends OpenCvPipeline{
 
     public double GreenPixels;
     public double PurplePixels;
-    public static int min_green_R = 0;
+    public static int min_green_R = 50;
     public static int min_green_G = 90;
     public static int min_green_B = 100;
-    public static int max_green_R = 120;
+    public static int max_green_R = 100;
     public static int max_green_G = 255;
     public static int max_green_B = 255;
 

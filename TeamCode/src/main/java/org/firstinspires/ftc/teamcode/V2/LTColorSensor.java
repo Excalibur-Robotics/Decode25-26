@@ -9,7 +9,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "CST")
+//@TeleOp(name = "CST")
 public class LTColorSensor extends OpMode {
     OpenCvCamera LT; //Logitech
     LTPipeline pipeline;

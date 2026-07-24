@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootAll;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
@@ -51,7 +52,7 @@ public class CloseBlueAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = false; // make false if trying to scan motif
+    private boolean motifSeen;
     private int id = 0;
     private boolean onRedTeam = false;
 
@@ -114,13 +115,14 @@ public class CloseBlueAuto extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0);  // uncomment if trying to scan motif
+        outtake.setLLPipeline(0); // uncomment if trying to scan motif
+        motifSeen = false; // make false if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
         spindexerState.add("purple");
-        spindexerState.add("green");
         spindexerState.add("purple");
+        spindexerState.add("green");
         spindexer.setIndexerState(spindexerState);
         follower.setStartingPose(startPose);
         outtake.startLL();
@@ -164,6 +166,15 @@ public class CloseBlueAuto extends CommandOpMode {
         telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
         telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
         opModeTimer.reset();
+        telemetry.addLine();
+        telemetry.addData("motif ID", id);
+        telemetry.addLine();
+        ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("spindexer", spindexer.inOuttakeMode() ? "  " +
+                indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
+        telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
+                + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.update();
     }
 
@@ -172,6 +183,13 @@ public class CloseBlueAuto extends CommandOpMode {
         CommandScheduler.getInstance().reset();
         V2TeleOpBlue.indexer = spindexer.getIndexerState();
         V2TeleOpRed.indexer = spindexer.getIndexerState();
+
+        V2TeleOpRed.motifID = id;
+        V2TeleOpBlue.motifID = id;
+        if(id != 0) {
+            V2TeleOpRed.motifFromAuto = true;
+            V2TeleOpBlue.motifFromAuto = true;
+        }
 
         V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
         V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
@@ -207,13 +225,15 @@ public class CloseBlueAuto extends CommandOpMode {
             case 2:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
-                    follower.followPath(intakeFirstRow);
+                    follower.followPath(intakeFirstRow, 0.5, false);
                     pathState = 3;
+                    pathTimer.reset();
                 }
                 break;
             case 3:
+                //if(spindexer.getNumArtifacts() == 3 || pathTimer.milliseconds() > 3000) {
                 if(!follower.isBusy()) {
-                    follower.followPath(toSecondShoot);
+                    follower.followPath(toSecondShoot, 1, false);
                     pathState = 4;
                 }
                 break;
@@ -231,13 +251,13 @@ public class CloseBlueAuto extends CommandOpMode {
             case 5:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
-                    follower.followPath(intakeSecondRow);
+                    follower.followPath(intakeSecondRow, 0.5, false);
                     pathState = 6;
                 }
                 break;
             case 6:
                 if(!follower.isBusy()) {
-                    follower.followPath(toThirdShoot);
+                    follower.followPath(toThirdShoot, 1, false);
                     pathState = 7;
                 }
                 break;

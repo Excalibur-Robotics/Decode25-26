@@ -52,7 +52,7 @@ public class CloseRedAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = false; // make false if trying to scan motif
+    private boolean motifSeen;
     private int id = 0;
     private boolean onRedTeam = true;
 
@@ -117,13 +117,13 @@ public class CloseRedAuto extends CommandOpMode {
 
         outtake.setTeam(onRedTeam);
         outtake.setLLPipeline(0); // uncomment if trying to scan motif
-        motifSeen = false;
+        motifSeen = false; // make false if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
         spindexerState.add("purple");
-        spindexerState.add("green");
         spindexerState.add("purple");
+        spindexerState.add("green");
         spindexer.setIndexerState(spindexerState);
         follower.setStartingPose(startPose);
         outtake.startLL();
@@ -147,16 +147,11 @@ public class CloseRedAuto extends CommandOpMode {
         }
         else {
             outtake.scanMotif(follower.getPose());
-            if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
-                id = outtake.getApriltagID();
-                outtake.setTeam(onRedTeam);
-                motifSeen = true;
-            }
         }
         outtake.calculateHood(follower.getPose());
         outtake.calculateFlywheel(follower.getPose());
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
-            intake.activateIntake();
+            intake.setIntakePower(0.2);
         }
 
 
@@ -187,6 +182,10 @@ public class CloseRedAuto extends CommandOpMode {
 
         V2TeleOpRed.motifID = id;
         V2TeleOpBlue.motifID = id;
+        if(id != 0) {
+            V2TeleOpRed.motifFromAuto = true;
+            V2TeleOpBlue.motifFromAuto = true;
+        }
 
         V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
         V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
@@ -209,6 +208,10 @@ public class CloseRedAuto extends CommandOpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
+                    if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+                        id = outtake.getApriltagID();
+                    }
+                    outtake.setTeam(onRedTeam);
                     motifSeen = true;
                     if(outtake.atTargetSpeed()) {
                         new ShootAll(outtake, spindexer, id).schedule(false);

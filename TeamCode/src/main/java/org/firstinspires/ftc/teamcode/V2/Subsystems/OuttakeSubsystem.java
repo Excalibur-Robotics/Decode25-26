@@ -228,7 +228,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // aim turret with robot position
     public void aimTurret(Pose botPose) {
-        Pose goal = new Pose(onRedTeam ? 136 : 8, 142);
+        Pose goal = new Pose(onRedTeam ? 144 : 6, 144);
         double angle = Math.toDegrees(Math.atan((goal.getY() - botPose.getY()) / (goal.getX() - botPose.getX())));
         if(angle < 0)
             angle += 180;

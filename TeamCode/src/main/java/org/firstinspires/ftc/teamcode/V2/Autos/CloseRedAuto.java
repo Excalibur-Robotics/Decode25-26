@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.V2.Autos;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.V2.Commands.ShootAll;
+import org.firstinspires.ftc.teamcode.V2.Commands.ShootArtifact;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
@@ -36,6 +38,7 @@ public class CloseRedAuto extends CommandOpMode {
     Pose afterSecondIntake;
     Pose shootPose;
     Pose gatePose;
+    Pose controlPoint;
 
     PathChain toFirstShoot;
     PathChain toFirstRow;
@@ -49,7 +52,7 @@ public class CloseRedAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = true; // make false if trying to scan motif
+    private boolean motifSeen = false; // make false if trying to scan motif
     private int id = 0;
     private boolean onRedTeam = true;
 
@@ -62,12 +65,14 @@ public class CloseRedAuto extends CommandOpMode {
 
         startPose = new Pose(123.9, 123.1, Math.toRadians(39.6));
         firstShootPose = new Pose(95, 101, Math.toRadians(40));
-        beforeFirstIntake = new Pose(98.0, 83.0, 0);
-        afterFirstIntake = new Pose(126.0, 83.0, 0);
-        beforeSecondIntake = new Pose(98.0, 59.0, 0);
-        afterSecondIntake = new Pose(126.0, 59.0, 0);
+        beforeFirstIntake = new Pose(98.0, 84.0, 0);
+        afterFirstIntake = new Pose(123.0, 84.0, 0);
+        beforeSecondIntake = new Pose(98.0, 60.0, 0);
+        afterSecondIntake = new Pose(130.0, 60.0, 0);
         shootPose = new Pose(96, 96, 0);
         gatePose = new Pose(132, 62, Math.toRadians(35));
+        controlPoint = new Pose(113, 58);
+
 
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, firstShootPose))
@@ -79,7 +84,7 @@ public class CloseRedAuto extends CommandOpMode {
                 .build();
         intakeFirstRow = follower.pathBuilder()
                 .addPath(new BezierLine(beforeFirstIntake, afterFirstIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeFirstIntake.getHeading())
                 .build();
         toSecondShoot = follower.pathBuilder()
                 .addPath(new BezierLine(afterFirstIntake, firstShootPose))
@@ -87,18 +92,18 @@ public class CloseRedAuto extends CommandOpMode {
                 .build();
         toSecondRow = follower.pathBuilder()
                 .addPath(new BezierLine(firstShootPose, beforeSecondIntake))
-                .setLinearHeadingInterpolation(firstShootPose.getHeading(), 0)
+                .setLinearHeadingInterpolation(firstShootPose.getHeading(), beforeSecondIntake.getHeading())
                 .build();
         intakeSecondRow = follower.pathBuilder()
                 .addPath(new BezierLine(beforeSecondIntake, afterSecondIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(beforeSecondIntake.getHeading())
                 .build();
         toThirdShoot = follower.pathBuilder()
-                .addPath(new BezierLine(afterSecondIntake, shootPose))
-                .setLinearHeadingInterpolation(0, shootPose.getHeading())
+                .addPath(new BezierCurve(afterSecondIntake, controlPoint, shootPose))
+                .setLinearHeadingInterpolation(afterSecondIntake.getHeading(), shootPose.getHeading())
                 .build();
         toGate = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, gatePose))
+                .addPath(new BezierCurve(shootPose, controlPoint, gatePose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), gatePose.getHeading())
                 .build();
         toShoot = follower.pathBuilder()
@@ -111,7 +116,8 @@ public class CloseRedAuto extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        //outtake.setLLPipeline(0);  uncomment if trying to scan motif
+        outtake.setLLPipeline(0); // uncomment if trying to scan motif
+        motifSeen = false;
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
@@ -161,6 +167,15 @@ public class CloseRedAuto extends CommandOpMode {
         telemetry.addData("number of artifacts", spindexer.getNumArtifacts());
         telemetry.addData("OpMode loop time", opModeTimer.milliseconds());
         opModeTimer.reset();
+        telemetry.addLine();
+        telemetry.addData("motif ID", id);
+        telemetry.addLine();
+        ArrayList<String> indexer = spindexer.getIndexerState();
+        telemetry.addData("spindexer", spindexer.inOuttakeMode() ? "  " +
+                indexer.get(2).charAt(0) : " " + indexer.get(2).charAt(0) + " " + indexer.get(1).charAt(0));
+        telemetry.addData("state        ", spindexer.inOuttakeMode() ? " " + indexer.get(0).charAt(0)
+                + " " + indexer.get(1).charAt(0) : "   " + indexer.get(0).charAt(0));
+        telemetry.addData("# artifacts", spindexer.getNumArtifacts());
         telemetry.update();
     }
 
@@ -169,6 +184,9 @@ public class CloseRedAuto extends CommandOpMode {
         CommandScheduler.getInstance().reset();
         V2TeleOpBlue.indexer = spindexer.getIndexerState();
         V2TeleOpRed.indexer = spindexer.getIndexerState();
+
+        V2TeleOpRed.motifID = id;
+        V2TeleOpBlue.motifID = id;
 
         V2TeleOpRed.startingSpindexAngle = spindexer.getTargetAngle();
         V2TeleOpBlue.startingSpindexAngle = spindexer.getTargetAngle();
@@ -204,13 +222,15 @@ public class CloseRedAuto extends CommandOpMode {
             case 2:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
-                    follower.followPath(intakeFirstRow);
+                    follower.followPath(intakeFirstRow, 0.5, false);
                     pathState = 3;
+                    pathTimer.reset();
                 }
                 break;
             case 3:
+                //if(spindexer.getNumArtifacts() == 3 || pathTimer.milliseconds() > 3000) {
                 if(!follower.isBusy()) {
-                    follower.followPath(toSecondShoot);
+                    follower.followPath(toSecondShoot, 1, false);
                     pathState = 4;
                 }
                 break;
@@ -228,13 +248,13 @@ public class CloseRedAuto extends CommandOpMode {
             case 5:
                 if(!follower.isBusy()) {
                     new IntakeCommand(intake, spindexer).schedule();
-                    follower.followPath(intakeSecondRow);
+                    follower.followPath(intakeSecondRow, 0.5, false);
                     pathState = 6;
                 }
                 break;
             case 6:
                 if(!follower.isBusy()) {
-                    follower.followPath(toThirdShoot);
+                    follower.followPath(toThirdShoot, 1, false);
                     pathState = 7;
                 }
                 break;

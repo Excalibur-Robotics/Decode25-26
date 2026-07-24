@@ -62,10 +62,10 @@ public class V2SimpleTeleOp extends OpMode {
         rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
         rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake, gamepad1));
 
-        outtake.setHood(hoodDown);
+        //outtake.setHood(hoodDown);
         kickerTimer = new ElapsedTime();
-        outtake.resetTurretEncoder();
-        spindexer.resetSpindexEncoder();
+        //outtake.resetTurretEncoder();
+        //spindexer.resetSpindexEncoder();
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

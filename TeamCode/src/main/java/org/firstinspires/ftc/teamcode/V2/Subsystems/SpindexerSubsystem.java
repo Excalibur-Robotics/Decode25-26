@@ -68,6 +68,7 @@ public class SpindexerSubsystem extends SubsystemBase {
     public SpindexerSubsystem(HardwareMap hwMap) {
         spindexMotor = hwMap.get(DcMotorEx.class, "Bore");
         light = hwMap.get(Servo.class, "light");
+        turnOnLight();
 
         spindexMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spindexMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -198,12 +198,6 @@ public class V2TeleOpRed extends CommandOpMode {
         if (gamepad1.leftBumperWasPressed()) {
             spindexer.rotateCW();
         }
-        /*if(gamepad1.yWasPressed()) {
-            if(spindexer.inOuttakeMode())
-                spindexer.setToIntakeMode();
-            else
-                spindexer.setToOuttakeMode();
-        }*/
 
 
         if (gamepad1.dpad_up) {

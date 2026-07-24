@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.V2.Autos;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -36,6 +37,7 @@ public class CloseBlueAuto extends CommandOpMode {
     Pose afterSecondIntake;
     Pose shootPose;
     Pose gatePose;
+    Pose controlPoint;
 
     PathChain toFirstShoot;
     PathChain toFirstRow;
@@ -49,7 +51,7 @@ public class CloseBlueAuto extends CommandOpMode {
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
-    private boolean motifSeen = true; // make false if trying to scan motif
+    private boolean motifSeen = false; // make false if trying to scan motif
     private int id = 0;
     private boolean onRedTeam = false;
 
@@ -62,12 +64,13 @@ public class CloseBlueAuto extends CommandOpMode {
 
         startPose = new Pose(20.1, 123.1, Math.toRadians(144));
         firstShootPose = new Pose(49, 101, Math.toRadians(136));
-        beforeFirstIntake = new Pose(48, 83.0, Math.PI);
-        afterFirstIntake = new Pose(18, 83.0, Math.PI);
-        beforeSecondIntake = new Pose(48, 59.0, Math.PI);
-        afterSecondIntake = new Pose(18, 57.0, Math.PI);
+        beforeFirstIntake = new Pose(48, 84.0, Math.PI);
+        afterFirstIntake = new Pose(21, 84.0, Math.PI);
+        beforeSecondIntake = new Pose(48, 60.0, Math.PI);
+        afterSecondIntake = new Pose(18, 60.0, Math.PI);
         shootPose = new Pose(50, 94, Math.PI);
-        gatePose = new Pose(14, 62, Math.toRadians(145));
+        gatePose = new Pose(14, 61, Math.toRadians(145));
+        controlPoint = new Pose(31, 58);
 
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, firstShootPose))
@@ -94,11 +97,11 @@ public class CloseBlueAuto extends CommandOpMode {
                 .setConstantHeadingInterpolation(beforeSecondIntake.getHeading())
                 .build();
         toThirdShoot = follower.pathBuilder()
-                .addPath(new BezierLine(afterSecondIntake, shootPose))
+                .addPath(new BezierCurve(afterSecondIntake, controlPoint, shootPose))
                 .setLinearHeadingInterpolation(afterSecondIntake.getHeading(), shootPose.getHeading())
                 .build();
         toGate = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, gatePose))
+                .addPath(new BezierCurve(shootPose, controlPoint, gatePose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), gatePose.getHeading())
                 .build();
         toShoot = follower.pathBuilder()
@@ -111,7 +114,7 @@ public class CloseBlueAuto extends CommandOpMode {
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        //outtake.setLLPipeline(0);  uncomment if trying to scan motif
+        outtake.setLLPipeline(0);  // uncomment if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();

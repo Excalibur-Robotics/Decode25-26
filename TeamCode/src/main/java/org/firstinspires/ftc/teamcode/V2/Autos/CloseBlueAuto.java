@@ -39,6 +39,7 @@ public class CloseBlueAuto extends CommandOpMode {
     Pose shootPose;
     Pose gatePose;
     Pose controlPoint;
+    Pose finalPose;
 
     PathChain toFirstShoot;
     PathChain toFirstRow;
@@ -49,6 +50,7 @@ public class CloseBlueAuto extends CommandOpMode {
     PathChain toThirdShoot;
     PathChain toGate;
     PathChain toShoot;
+    PathChain toFinalPose;
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
@@ -66,12 +68,14 @@ public class CloseBlueAuto extends CommandOpMode {
         startPose = new Pose(20.1, 123.1, Math.toRadians(144));
         firstShootPose = new Pose(49, 101, Math.toRadians(136));
         beforeFirstIntake = new Pose(48, 84.0, Math.PI);
-        afterFirstIntake = new Pose(21, 84.0, Math.PI);
-        beforeSecondIntake = new Pose(48, 60.0, Math.PI);
-        afterSecondIntake = new Pose(18, 60.0, Math.PI);
+        afterFirstIntake = new Pose(24, 84.0, Math.PI);
+        beforeSecondIntake = new Pose(50, 60.0, Math.PI);
+        afterSecondIntake = new Pose(18, 58.0, Math.PI);
         shootPose = new Pose(50, 94, Math.PI);
-        gatePose = new Pose(14, 61, Math.toRadians(145));
-        controlPoint = new Pose(31, 58);
+        gatePose = new Pose(15, 57, Math.toRadians(145));
+        controlPoint = new Pose(34, 58);
+        finalPose = new Pose(20, 92, Math.PI);
+
 
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, firstShootPose))
@@ -109,14 +113,18 @@ public class CloseBlueAuto extends CommandOpMode {
                 .addPath(new BezierLine(gatePose, shootPose))
                 .setLinearHeadingInterpolation(gatePose.getHeading(), shootPose.getHeading())
                 .build();
+        toFinalPose = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, finalPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .build();
 
         pathState = 0;
         opModeTimer = new ElapsedTime();
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0); // uncomment if trying to scan motif
-        motifSeen = false; // make false if trying to scan motif
+        //outtake.setLLPipeline(0); // uncomment if trying to scan motif
+        motifSeen = true; // make false if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
@@ -146,11 +154,6 @@ public class CloseBlueAuto extends CommandOpMode {
         }
         else {
             outtake.scanMotif(follower.getPose());
-            if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
-                id = outtake.getApriltagID();
-                outtake.setTeam(onRedTeam);
-                motifSeen = true;
-            }
         }
         outtake.calculateHood(follower.getPose());
         outtake.calculateFlywheel(follower.getPose());
@@ -196,11 +199,11 @@ public class CloseBlueAuto extends CommandOpMode {
 
         V2TeleOpRed.startX = follower.getPose().getX();
         V2TeleOpRed.startY = follower.getPose().getY();
-        V2TeleOpRed.startHeading = follower.getPose().getHeading();
+        V2TeleOpRed.startHeading = Math.toDegrees(follower.getPose().getHeading());
 
         V2TeleOpBlue.startX = follower.getPose().getX();
         V2TeleOpBlue.startY = follower.getPose().getY();
-        V2TeleOpBlue.startHeading = follower.getPose().getHeading();
+        V2TeleOpBlue.startHeading = Math.toDegrees(follower.getPose().getHeading());
     }
 
     public void autoPathUpdate() {
@@ -212,6 +215,10 @@ public class CloseBlueAuto extends CommandOpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
+                    if(id == 0 && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
+                        id = outtake.getApriltagID();
+                    }
+                    outtake.setTeam(onRedTeam);
                     motifSeen = true;
                     if(outtake.atTargetSpeed()) {
                         new ShootAll(outtake, spindexer, id).schedule(false);
@@ -266,9 +273,9 @@ public class CloseBlueAuto extends CommandOpMode {
                     if(outtake.atTargetSpeed()) {
                         new ShootAll(outtake, spindexer, id).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
-                            follower.followPath(toGate);
-                            new IntakeCommand(intake, spindexer).schedule();
-                            pathState = 8;
+                            follower.followPath(toFinalPose);
+                            //new IntakeCommand(intake, spindexer).schedule();
+                            pathState = -1;
                             pathTimer.reset();
                         }
                     }

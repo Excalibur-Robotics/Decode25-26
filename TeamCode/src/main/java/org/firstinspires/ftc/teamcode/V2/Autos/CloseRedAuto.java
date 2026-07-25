@@ -39,6 +39,7 @@ public class CloseRedAuto extends CommandOpMode {
     Pose shootPose;
     Pose gatePose;
     Pose controlPoint;
+    Pose finalPose;
 
     PathChain toFirstShoot;
     PathChain toFirstRow;
@@ -49,6 +50,7 @@ public class CloseRedAuto extends CommandOpMode {
     PathChain toThirdShoot;
     PathChain toGate;
     PathChain toShoot;
+    PathChain toFinalPose;
 
     private int pathState;
     private ElapsedTime opModeTimer, pathTimer;
@@ -72,6 +74,7 @@ public class CloseRedAuto extends CommandOpMode {
         shootPose = new Pose(96, 96, 0);
         gatePose = new Pose(132, 62, Math.toRadians(35));
         controlPoint = new Pose(113, 58);
+        finalPose = new Pose(124, 92, 0);
 
 
         toFirstShoot = follower.pathBuilder()
@@ -110,14 +113,18 @@ public class CloseRedAuto extends CommandOpMode {
                 .addPath(new BezierLine(gatePose, shootPose))
                 .setLinearHeadingInterpolation(gatePose.getHeading(), shootPose.getHeading())
                 .build();
+        toFinalPose = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, finalPose))
+                .setConstantHeadingInterpolation(shootPose.getHeading())
+                .build();
 
         pathState = 0;
         opModeTimer = new ElapsedTime();
         pathTimer = new ElapsedTime();
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0); // uncomment if trying to scan motif
-        motifSeen = false; // make false if trying to scan motif
+        //outtake.setLLPipeline(0); // uncomment if trying to scan motif
+        motifSeen = true; // make false if trying to scan motif
         outtake.resetTurretEncoder();
         spindexer.resetSpindexEncoder();
         ArrayList<String> spindexerState = new ArrayList<String>();
@@ -151,7 +158,7 @@ public class CloseRedAuto extends CommandOpMode {
         outtake.calculateHood(follower.getPose());
         outtake.calculateFlywheel(follower.getPose());
         if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
-            intake.setIntakePower(0.2);
+            intake.activateIntake();
         }
 
 
@@ -192,11 +199,11 @@ public class CloseRedAuto extends CommandOpMode {
 
         V2TeleOpRed.startX = follower.getPose().getX();
         V2TeleOpRed.startY = follower.getPose().getY();
-        V2TeleOpRed.startHeading = follower.getPose().getHeading();
+        V2TeleOpRed.startHeading = Math.toDegrees(follower.getPose().getHeading());
 
         V2TeleOpBlue.startX = follower.getPose().getX();
         V2TeleOpBlue.startY = follower.getPose().getY();
-        V2TeleOpBlue.startHeading = follower.getPose().getHeading();
+        V2TeleOpBlue.startHeading = Math.toDegrees(follower.getPose().getHeading());
     }
 
     public void autoPathUpdate() {
@@ -266,9 +273,9 @@ public class CloseRedAuto extends CommandOpMode {
                     if(outtake.atTargetSpeed()) {
                         new ShootAll(outtake, spindexer, id).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
-                            follower.followPath(toGate);
-                            new IntakeCommand(intake, spindexer).schedule();
-                            pathState = 8;
+                            follower.followPath(toFinalPose);
+                            //new IntakeCommand(intake, spindexer).schedule();
+                            pathState = -1;
                             pathTimer.reset();
                         }
                     }

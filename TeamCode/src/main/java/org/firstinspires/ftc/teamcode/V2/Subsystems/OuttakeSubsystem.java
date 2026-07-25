@@ -46,7 +46,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public static double testHoodAngle = 0.9;
 
     public static double kickerDist = 1.0; // difference of up and down position
-    public static double kickerDown = 0.0; // kicker servo down position
+    public static double kickerDown = 0.23; // kicker servo down position
     public static double transferTime = 600; // in milliseconds
 
     public static int turretTicksPerRev = 2151;
@@ -217,11 +217,11 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // input target angle
     public void rotateTurret(double angle) {
-        if(angle > 230) {
-            angle = 230;
+        if(angle > 260) {
+            angle = 260;
         }
-        else if(angle < -130) {
-            angle = -130;
+        else if(angle < -85) {
+            angle = -85;
         }
         turret.setPower(turretPID.Calculate(angle, getTurretPos()));
     }

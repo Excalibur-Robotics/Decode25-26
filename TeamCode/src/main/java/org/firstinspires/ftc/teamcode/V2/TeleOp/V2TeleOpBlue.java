@@ -73,6 +73,7 @@ public class V2TeleOpBlue extends CommandOpMode {
     public static double startHeading = 90;
 
     public static double intakePower = 0.2;
+    private Pose resetPose;
 
     ElapsedTime timer;
 
@@ -117,14 +118,14 @@ public class V2TeleOpBlue extends CommandOpMode {
                 new InstantCommand(),
                 () -> outtake.atTargetSpeed()), false);*/
         X.whenPressed(new ShootArtifact(outtake, spindexer));
-        B.whenPressed(new ConditionalCommand(
+        /*B.whenPressed(new ConditionalCommand(
                 new ShootColor(outtake, spindexer, "purple"),
                 new InstantCommand(),
                 () -> spindexer.getIndexerState().contains("purple") && outtake.atTargetSpeed()), false);
         A.whenPressed(new ConditionalCommand(
                 new ShootColor(outtake, spindexer, "green"),
                 new InstantCommand(),
-                () -> spindexer.getIndexerState().contains("green") && outtake.atTargetSpeed()), false);
+                () -> spindexer.getIndexerState().contains("green") && outtake.atTargetSpeed()), false);*/
         Y.whenPressed(new ConditionalCommand(
                 new ShootAll(outtake, spindexer, motifID),
                 new InstantCommand(),
@@ -133,9 +134,10 @@ public class V2TeleOpBlue extends CommandOpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         follower.update();
+        resetPose = onRedTeam ? new Pose(127, 79, Math.PI/2) : new Pose(16.5, 79, Math.PI/2);
 
         outtake.setTeam(onRedTeam);
-        outtake.setLLPipeline(0); // if scanning motif first
+        //outtake.setLLPipeline(0); // if scanning motif first
         outtake.startLL();
         spindexer.turnOnLight();
         timer = new ElapsedTime();
@@ -157,11 +159,20 @@ public class V2TeleOpBlue extends CommandOpMode {
     public void run() {
         CommandScheduler.getInstance().run();
         follower.update();
-
         drivetrain.teleOpDrive(gamepad1);//moving the robot
         spindexer.powerSpindexer();
         outtake.calculateFlywheel(follower.getPose());
         outtake.calculateHood(follower.getPose());
+
+        //outtake.aimTurret(follower.getPose());
+
+        /*if(outtake.getTX() != 0) {
+            follower.setPose(outtake.getMegaTagPos());
+            localized = true;
+        }
+        if(localized)
+            outtake.aimTurret(follower.getPose());*/
+
 
         if (!localized) {
             if (outtake.getTX() != 0 && outtake.getApriltagID() == (onRedTeam ? 24 : 20)) {
@@ -175,6 +186,11 @@ public class V2TeleOpBlue extends CommandOpMode {
             //    outtake.aimTurret(follower.getPose());
             //else
             //    outtake.calculateTurretLL(outtake.getTX());
+        }
+
+
+        if(gamepad1.dpad_up && gamepad1.b) {
+            follower.setPose(resetPose);
         }
 
         if(!motifFromAuto && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
@@ -192,15 +208,6 @@ public class V2TeleOpBlue extends CommandOpMode {
         if (gamepad1.leftBumperWasPressed()) {
             spindexer.rotateCW();
         }
-
-
-        if (gamepad1.dpad_up) {
-            endgame.activateEndgame();
-        }
-        if (gamepad1.dpad_down) {
-            endgame.resetServos();
-        }
-
 
         if (gamepad1.dpad_left) {
             intake.setIntakePower(-1);

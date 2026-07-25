@@ -59,8 +59,8 @@ public class SpindexerSubsystem extends SubsystemBase {
     public LHV2PID PID;
     private double TP; // target position in ticks
 
-    public static int purpleTolerance = 140000;
-    public static int greenTolerance = 140000;
+    public static int purpleTolerance = 100000;
+    public static int greenTolerance = 100000;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();

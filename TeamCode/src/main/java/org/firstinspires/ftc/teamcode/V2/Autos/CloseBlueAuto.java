@@ -60,11 +60,13 @@ public class CloseBlueAuto extends CommandOpMode {
 
     @Override
     public void initialize() {
+        // initialize subsystems
         follower = Constants.createFollower(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
         spindexer = new SpindexerSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
 
+        // set all the poses
         startPose = new Pose(20.1, 123.1, Math.toRadians(144));
         firstShootPose = new Pose(49, 101, Math.toRadians(136));
         beforeFirstIntake = new Pose(48, 84.0, Math.PI);
@@ -76,7 +78,7 @@ public class CloseBlueAuto extends CommandOpMode {
         controlPoint = new Pose(34, 58);
         finalPose = new Pose(20, 92, Math.PI);
 
-
+        // set all the paths
         toFirstShoot = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, firstShootPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), firstShootPose.getHeading())
@@ -142,10 +144,17 @@ public class CloseBlueAuto extends CommandOpMode {
     public void run() {
         CommandScheduler.getInstance().run();
 
-        follower.update();
-        autoPathUpdate();
+        follower.update(); // update robot position
+        autoPathUpdate(); // determine what the robot should be doing right now
 
         spindexer.powerSpindexer();
+        outtake.calculateHood(follower.getPose());
+        outtake.calculateFlywheel(follower.getPose());
+        if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
+            intake.activateIntake();
+        }
+
+        // if scanning the motif first
         if(motifSeen) {
             if (outtake.getTX() == 0)
                 outtake.aimTurret(follower.getPose());
@@ -154,11 +163,6 @@ public class CloseBlueAuto extends CommandOpMode {
         }
         else {
             outtake.scanMotif(follower.getPose());
-        }
-        outtake.calculateHood(follower.getPose());
-        outtake.calculateFlywheel(follower.getPose());
-        if(Math.abs(spindexer.getSpindexerPower()) > 0.1) {
-            intake.activateIntake();
         }
 
 
@@ -182,6 +186,7 @@ public class CloseBlueAuto extends CommandOpMode {
     }
 
     @Override
+    // when auto ends, send data to teleop via static variables
     public void reset() {
         CommandScheduler.getInstance().reset();
         V2TeleOpBlue.indexer = spindexer.getIndexerState();
@@ -206,6 +211,7 @@ public class CloseBlueAuto extends CommandOpMode {
         V2TeleOpBlue.startHeading = Math.toDegrees(follower.getPose().getHeading());
     }
 
+    // state machine to control the sequence of actions in auto
     public void autoPathUpdate() {
         switch (pathState) {
             case 0:

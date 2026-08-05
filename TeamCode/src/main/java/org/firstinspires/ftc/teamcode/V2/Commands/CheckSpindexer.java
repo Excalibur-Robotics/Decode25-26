@@ -5,6 +5,9 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 
 import java.util.ArrayList;
+/*
+Never finished this
+ */
 
 public class CheckSpindexer extends CommandBase {
     SpindexerSubsystem spindexer;

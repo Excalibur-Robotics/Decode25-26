@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.V2.Commands.ActivateFlywheel;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.V2.Subsystems.LEDs;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.V2.Subsystems.SpindexerSubsystem;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -25,6 +24,8 @@ import java.util.ArrayList;
 /*
 Simple TeleOp for V2 with the goal of just being able to launch artifacts.
 Driver manually controls each individual movement, no automatic actions.
+
+Used for testing stuff mostly
  */
 @Config
 @TeleOp (name = "BasicTeleOpV2")

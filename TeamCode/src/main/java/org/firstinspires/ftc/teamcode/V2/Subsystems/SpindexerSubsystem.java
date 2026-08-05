@@ -59,8 +59,8 @@ public class SpindexerSubsystem extends SubsystemBase {
     public LHV2PID PID;
     private double TP; // target position in ticks
 
-    public static int purpleTolerance = 100000;
-    public static int greenTolerance = 100000;
+    public static int purpleTolerance = 80000;
+    public static int greenTolerance = 80000;
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime();
@@ -80,8 +80,6 @@ public class SpindexerSubsystem extends SubsystemBase {
         else
             TP = 0;
 
-        //TP = spindexMotor.getCurrentPosition();
-
         PID = new LHV2PID(kP, kI, kD);
         timer.reset();
 
@@ -89,7 +87,7 @@ public class SpindexerSubsystem extends SubsystemBase {
         indexer.add("empty");
         indexer.add("empty");
         indexer.add("empty");
-        numArtifacts = 0; // start with 3 preloads
+        numArtifacts = 0;
         OuttakeMode = true; // start spindexer in outtake mode
 
         // camera initialization
@@ -114,13 +112,6 @@ public class SpindexerSubsystem extends SubsystemBase {
         );
     }
 
-    /*
-    @Override
-    public void periodic() {
-        powerSpindexer();
-    }
-
-     */
 
     // power spindexer based on PID
     public void powerSpindexer() {

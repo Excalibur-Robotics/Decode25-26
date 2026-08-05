@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.ArrayList;
 
 /*
-This is the OpMode for our TeleOp for V1. It uses a command based system with
+This is the OpMode for our TeleOp for V2. It uses a command based system with
 FTCLib. The robot can intake artifacts, which are detected by a color sensor
 and stored in the spindexer, and launch artifacts of a specified color by
 automatically rotating the spindexer to the correct position
@@ -60,7 +60,7 @@ public class V2TeleOpBlue extends CommandOpMode {
     Button A;
     Button Y;
 
-    private boolean onRedTeam = false;
+    private boolean onRedTeam = false; // blue and red teleops are the exact same except this
     private boolean localized = false;
 
     // STATIC VARIABLES (Passing data from Auto)
@@ -95,8 +95,6 @@ public class V2TeleOpBlue extends CommandOpMode {
         drivetrain = new DrivetrainSubsystem(hardwareMap);
         endgame = new EndgameSubsystem(hardwareMap);
 
-        //spindexer.setTargetAngle(startingSpindexAngle);
-
         // set buttons/triggers
         leftTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5);
         rightTrigger = new Trigger(() -> gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5);
@@ -113,10 +111,6 @@ public class V2TeleOpBlue extends CommandOpMode {
                 () -> outtake.getKickerPos() < outtake.getKickerDown()+0.05
                 /*&& spindexer.getNumArtifacts() < 3 &&*/));
         rightTrigger.toggleWhenActive(new ActivateFlywheel(outtake, gamepad1));
-        /*X.whenPressed(new ConditionalCommand(
-                new ShootArtifact(outtake, spindexer),
-                new InstantCommand(),
-                () -> outtake.atTargetSpeed()), false);*/
         X.whenPressed(new ShootArtifact(outtake, spindexer));
         /*B.whenPressed(new ConditionalCommand(
                 new ShootColor(outtake, spindexer, "purple"),
@@ -144,6 +138,7 @@ public class V2TeleOpBlue extends CommandOpMode {
         if(indexer != null)
             spindexer.setIndexerState(indexer);
 
+        // telemetry during init before starting
         while(!isStarted() && !isStopRequested()) {
             telemetry.addData("spindexer position", spindexer.getSpindexerAngle());
             telemetry.addData("spindexer target position", spindexer.getTargetAngle());
@@ -157,42 +152,22 @@ public class V2TeleOpBlue extends CommandOpMode {
 
     @Override
     public void run() {
+        // commands that are called every pass
         CommandScheduler.getInstance().run();
         follower.update();
-        drivetrain.teleOpDrive(gamepad1);//moving the robot
+        drivetrain.teleOpDrive(gamepad1); // moving the robot
         spindexer.powerSpindexer();
         outtake.calculateFlywheel(follower.getPose());
         outtake.calculateHood(follower.getPose());
 
-        //outtake.aimTurret(follower.getPose());
+        outtake.aimTurret(follower.getPose());
 
-        /*if(outtake.getTX() != 0) {
-            follower.setPose(outtake.getMegaTagPos());
-            localized = true;
-        }
-        if(localized)
-            outtake.aimTurret(follower.getPose());*/
-
-
-        if (!localized) {
-            if (outtake.getTX() != 0 && outtake.getApriltagID() == (onRedTeam ? 24 : 20)) {
-                follower.setPose(outtake.getMegaTagPos());
-                localized = true;
-            }
-        }
-        else {
-            outtake.aimTurret(follower.getPose());
-            //if (outtake.getTX() == 0)
-            //    outtake.aimTurret(follower.getPose());
-            //else
-            //    outtake.calculateTurretLL(outtake.getTX());
-        }
-
-
+        // manual relocalization
         if(gamepad1.dpad_up && gamepad1.b) {
             follower.setPose(resetPose);
         }
 
+        // for scanning motif
         if(!motifFromAuto && outtake.getApriltagID() > 20 && outtake.getApriltagID() < 24) {
             motifID = outtake.getApriltagID();
             outtake.setTeam(onRedTeam);
@@ -209,9 +184,11 @@ public class V2TeleOpBlue extends CommandOpMode {
             spindexer.rotateCW();
         }
 
+        // reverse intake if necessary
         if (gamepad1.dpad_left) {
             intake.setIntakePower(-1);
         }
+
         // automatically activate intake when spindexer is spinning
         if(gamepad1.left_trigger <= 0.5) {
             if (Math.abs(spindexer.getSpindexerPower()) > 0.1) {

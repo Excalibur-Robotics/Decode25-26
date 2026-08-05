@@ -51,9 +51,9 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     public static int turretTicksPerRev = 2151;
     private LHV2PID turretPID;
-    public static double kP = 0.018; // needs to be tuned
+    public static double kP = 0.018;
     public static double kI = 0.0;
-    public static double kD = 0.5; // needs to be tuned
+    public static double kD = 0.5;
 
     private boolean onRedTeam;
 
@@ -78,12 +78,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         //setHood(hoodPosClose);
     }
 
-    @Override
-    public void periodic() {
-        //calculateTurret(getTX());
-        //calculateFlywheelSpeed();
-        //setHood(calculateHood());
-    }
 
     public void setFlywheelPower(double power) {
         flywheel.setPower(power);
@@ -93,7 +87,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         targetSpeed = speed;
     }
 
-    // calculate flywheel speed based on april tag
+    // test speeds and angles for LUT tuning
     public void calculateLaunch() {
         setTargetSpeed(testFlywheelSpeed);
         setHood(testHoodAngle);
@@ -250,22 +244,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         double turretAngle = angle - botHeading;
         rotateTurret(turretAngle);
     }
-
-    /*public int scanMotif(Pose botPose) {
-        int id = 0;
-        double angle = Math.toDegrees(Math.atan((144 - botPose.getY()) / (72 - botPose.getX())));
-        if(angle < 0)
-            angle += 180;
-        double botHeading = Math.toDegrees(botPose.getHeading());
-        if(!onRedTeam && botHeading < -90)
-            botHeading += 360;
-        double turretAngle = angle - botHeading;
-        rotateTurret(turretAngle);
-        if(getApriltagID() > 20 && getApriltagID() < 24) {
-            id = getApriltagID();
-        }
-        return id;
-    }*/
 
     public void resetTurretEncoder() {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -30,14 +30,11 @@ public class IntakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        // Don't allow command to run if spindexer is full
-        //if(spindexer.getNumArtifacts() < 3) {
-            if (spindexer.inOuttakeMode()) {
-                spindexer.setToIntakeMode();
-            }
-            // activate intake at start of command
-            intake.activateIntake();
-        //}
+        if (spindexer.inOuttakeMode()) {
+            spindexer.setToIntakeMode();
+        }
+        // activate intake at start of command
+        intake.activateIntake();
 
         artifactPreviouslyDetected = true;
     }
@@ -59,11 +56,5 @@ public class IntakeCommand extends CommandBase {
     public void end(boolean interrupted) {
         // when the command ends, stop the intake motor
         intake.stopIntake();
-    }
-
-    @Override
-    public boolean isFinished() {
-        // end the command if the spindexer is full
-        return false;//spindexer.getNumArtifacts() == 3;
     }
 }

@@ -112,11 +112,11 @@ public class NewAutoFarRed extends CommandOpMode {
                 .build();
         toCornerIntake = follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, cornerIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(cornerIntake.getHeading())
                 .build();
         cornerToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(cornerIntake, shootPose))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(cornerIntake.getHeading())
                 .build();
 
         pathState = 0;
@@ -211,8 +211,10 @@ public class NewAutoFarRed extends CommandOpMode {
                     motifSeen = true;
                     new ShootArtifact(outtake, spindexer).schedule(false);
                     if(spindexer.getNumArtifacts() == 0) {
-                        follower.followPath(toFirstIntake);
-                        pathState = 2;
+                        follower.followPath(toCornerIntake);
+                        new IntakeCommand(intake, spindexer).schedule();
+                        pathTimer.reset();
+                        pathState = 5;
                     }
                 }
                 break;
@@ -237,6 +239,7 @@ public class NewAutoFarRed extends CommandOpMode {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
                             follower.followPath(toCornerIntake);
+                            new IntakeCommand(intake, spindexer).schedule();
                             pathState = 5;
                             pathTimer.reset();
                         }

@@ -72,7 +72,7 @@ public class NewAutoFarBlue extends CommandOpMode {
         afterSecondIntake = new Pose(18, 60, Math.PI);
         beforeThirdIntake = new Pose(48, 84, Math.PI);
         afterThirdIntake = new Pose(18, 84, Math.PI);
-        cornerIntake = new Pose(130, 9, Math.PI);
+        cornerIntake = new Pose(14, 9, Math.PI);
 
         toFirstIntake = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, beforeFirstIntake))
@@ -112,11 +112,11 @@ public class NewAutoFarBlue extends CommandOpMode {
                 .build();
         toCornerIntake = follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, cornerIntake))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(cornerIntake.getHeading())
                 .build();
         cornerToShoot = follower.pathBuilder()
                 .addPath(new BezierLine(cornerIntake, shootPose))
-                .setConstantHeadingInterpolation(0)
+                .setConstantHeadingInterpolation(cornerIntake.getHeading())
                 .build();
 
         pathState = 0;
@@ -211,8 +211,10 @@ public class NewAutoFarBlue extends CommandOpMode {
                     motifSeen = true;
                     new ShootArtifact(outtake, spindexer).schedule(false);
                     if(spindexer.getNumArtifacts() == 0) {
-                        follower.followPath(toFirstIntake);
-                        pathState = 2;
+                        follower.followPath(toCornerIntake);
+                        new IntakeCommand(intake, spindexer).schedule();
+                        pathTimer.reset();
+                        pathState = 5;
                     }
                 }
                 break;
@@ -237,6 +239,7 @@ public class NewAutoFarBlue extends CommandOpMode {
                         new ShootArtifact(outtake, spindexer).schedule(false);
                         if (spindexer.getNumArtifacts() == 0) {
                             follower.followPath(toCornerIntake);
+                            new IntakeCommand(intake, spindexer).schedule();
                             pathState = 5;
                             pathTimer.reset();
                         }
